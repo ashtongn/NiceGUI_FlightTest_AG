@@ -119,9 +119,9 @@ From the top down:
 
 1. Give the plan a name and an authorization reference in the top bar.
 2. Under Mission radios, pick how the plan starts:
-   - Start all together on Run mission. Step times are offsets from the
-     moment you confirm Run mission; 00:00:30 means thirty seconds after the
-     confirm.
+   - Start all together on Run mission (the default for a new plan). Step
+     times are elapsed from the moment you confirm Run mission, read T+ m:ss;
+     0:30 means thirty seconds after the confirm.
    - Start all at planned UTC times. Step times are clock times on the date
      shown. Run mission arms the plan, and each step keys at its UTC time.
 3. Add steps. Either click a catalog entry, which puts it on the radio chosen
@@ -883,6 +883,11 @@ plays a position on the aircraft feed.
   centred on the cursor.
 - show whole day: the full 24 h on a clock plan. fit all steps: frames every
   step.
+- The time scale. A relative plan reads T+ elapsed time (m:ss, h:mm:ss past an
+  hour). An empty plan shows an hour; a plan with steps shows its length
+  plus a little room, rounded up to 5 min and never under 30 min, so a
+  loaded 30 or 60 min mission fills the width. A clock plan shows the 24 h
+  UTC day.
 - A lane: one radio, with the radio's colour on its left edge and as a band
   on each of its blocks; the block fill is the catalog group. The red line is
   the current time. Click a block to edit it (this also selects its radio for

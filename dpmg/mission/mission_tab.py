@@ -76,7 +76,12 @@ GROUP_COLORS = {"Jammers": "#dc2626", "Tools generators": "#2563eb",
 def _group_color(technique: str) -> str:
     e = catalog.get(technique)
     return GROUP_COLORS.get(e.group if e else "", "#6b7280")
-MIN_WINDOW_S = 60.0         # always show at least this many seconds
+# relative (elapsed-time) timeline window. Missions usually run 30 to 60 min:
+# an empty plan shows an hour, a plan with steps fits its length (padded and
+# rounded up to 5 min) but never less than half an hour.
+EMPTY_WINDOW_S = 3600.0
+MIN_WINDOW_S = 1800.0
+WINDOW_ROUND_S = 300.0
 NEW_STEP_LEAD_S = 60.0      # a catalog step on the UTC clock starts this far ahead
 CLOCK_SKEW_WARN_S = 1.0     # a radio OS clock this far from the console shows amber
 
@@ -368,10 +373,36 @@ def _new_step_id() -> str:
 
 
 def _fmt_time(t: float) -> str:
+    """Elapsed plan time as a stopwatch reads it: m:ss, h:mm:ss from an hour,
+    with a tenth of a second only when the time has one (0:07.5)."""
+    t = round(max(0.0, float(t)), 1)
+    whole = int(t)
+    tenth = int(round((t - whole) * 10))
+    h, rem = divmod(whole, 3600)
+    m, s = divmod(rem, 60)
+    out = f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+    return out + (f".{tenth}" if tenth else "")
+
+
+def _fmt_dur(t: float) -> str:
+    """A duration in short words (30s, 2:00, 1.5 h) for the planning chips."""
     t = float(t)
+    if t >= 3600:
+        return f"{t / 3600:.1f} h"
     if t >= 60:
         return f"{int(t // 60)}:{int(t % 60):02d}"
     return f"{t:g}s"
+
+
+def relative_window_s(span_s: float, has_steps: bool) -> float:
+    """How much elapsed time the relative timeline shows for a plan whose last
+    step stops at span_s: an hour when empty, else the plan plus a little
+    room (5 %, at least a minute) rounded up to 5 min, never under 30 min."""
+    if not has_steps:
+        return max(EMPTY_WINDOW_S, float(span_s))
+    span = max(0.0, float(span_s))
+    want = span + max(60.0, span * 0.05)
+    return max(MIN_WINDOW_S, math.ceil(want / WINDOW_ROUND_S) * WINDOW_ROUND_S)
 
 
 # Where the plan is kept between page loads and GUI restarts.
@@ -381,12 +412,10 @@ AUTOSAVE_PATH = (os.environ.get("DPMG_MISSION_AUTOSAVE")
 
 
 def _fresh_mission():
-    # a fresh plan opens on the 24 h UTC clock timeline with today's date, since
-    # that is the view operators plan against; switch the top-bar timeline
-    # dropdown to "Start on Run mission" for a relative plan.
-    m = mf.new_mission("new mission")
-    m["anchor"] = {"mode": "clock", "date": _today_utc(), "tz": "UTC"}
-    return m
+    # a fresh plan is relative: step times are elapsed from Run mission (T+),
+    # which suits the 30 to 60 min missions flown. "Start all at planned UTC
+    # times" under Mission radios switches a plan to the 24 h UTC clock.
+    return mf.new_mission("new mission")
 
 
 class _PlanSession:
@@ -1412,12 +1441,13 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         return min(max(t, last), mf.DAY_S - 1.0)
 
     def timeline_span():
-        span = max((mf.step_stop_s(s) for s in mission()["steps"]), default=0.0)
-        return max(MIN_WINDOW_S, span + 20.0)
+        timed = [s for s in mission()["steps"] if not mf.is_location_task(s)]
+        span = max((mf.step_stop_s(s) for s in timed), default=0.0)
+        return relative_window_s(span, bool(timed))
 
     def _plan_stop_s():
-        # where a run ends; timeline_span is the window drawn around it, 20 s
-        # longer, and a location task is not part of a run
+        # where a run ends; timeline_span is the window drawn around it, a
+        # little longer, and a location task is not part of a run
         return max((mf.step_stop_s(s) for s in mission()["steps"]
                     if not mf.is_location_task(s)), default=0.0)
 
@@ -3766,14 +3796,12 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     a["date"] = date_in.value or ""
                     date_in.set_visibility(a["mode"] == "clock")
                     # pick a sane view when the timeline kind changes: fill the
-                    # width with the whole day for clock mode, the relative px
-                    # default otherwise.
+                    # width with the whole window (the 24 h day on the clock,
+                    # the mission's elapsed window when relative).
                     if a["mode"] != was:
-                        if a["mode"] == "clock":
-                            state["fit"] = True
-                        else:
-                            state["fit"] = False
-                            state["px_per_s"] = PX_PER_S
+                        state["fit"] = True
+                        state["px_per_s"] = PX_PER_S
+                        state["scroll_cmd"] = ("abs", 0.0)
                     _revalidate(); _refresh_all()
                 anchor_sel.on_value_change(_on_anchor)
                 date_in.on_value_change(_on_anchor)
@@ -4341,7 +4369,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 ui.button(icon="chevron_left", on_click=lambda: _pan(-0.5)).props("dense flat").tooltip("pan left")
                 ui.button(icon="chevron_right", on_click=lambda: _pan(0.5)).props("dense flat").tooltip("pan right")
                 ui.button("to selected", icon="my_location", on_click=lambda: _jump_selected()).props("dense flat").tooltip("scroll to the selected step")
-                ui.label("UTC" if _tl_clock() else "relative").classes(
+                ui.label("UTC" if _tl_clock() else "T+ elapsed from Run mission (m:ss)").classes(
                     "text-xs text-gray-500 ml-2")
                 ui.label("wheel to zoom, shift-wheel to pan").classes(
                     "text-xs text-gray-400 ml-2")
@@ -4424,12 +4452,19 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 "if(n++<9)requestAnimationFrame(tick);};"
                 "tick();requestAnimationFrame(tick);})();")
 
+    def _tl_tick(total, fit, px):
+        # fitted: a few ticks across the width (6 h on the clock's day, 5 or
+        # 10 min on a relative half hour or hour); zoomed: about one per 90 px
+        if fit:
+            return _nice_tick(total / (5.0 if _tl_clock() else 8.0))
+        return _nice_tick(max(90.0 / px, total / 200.0))
+
     def _ruler(total, fit, px):
         # a few nice ticks across the fitted width (6 h on a full day, so the
         # labels stay legible), else about one per 90 px. The total/200 floor
         # caps how many labels the ruler draws when zoomed right in, so a deep
         # zoom cannot spawn thousands of DOM nodes.
-        tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
+        tick = _tl_tick(total, fit, px)
         with ui.element("div").style(
                 "position:relative;height:18px;width:100%;"
                 "border-bottom:1px solid #2c322c"):
@@ -4539,7 +4574,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         # online says so; its steps are skipped if it is still offline at Run mission.
         _lane_title(rid)
         # light grid lines at the ruler's tick spacing
-        tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
+        tick = _tl_tick(total, fit, px)
         period = _span(tick, total, fit, px)
         rcol = _radio_color(rid)
         lane = ui.element("div").classes("mp-lane").props(
@@ -4756,8 +4791,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                         drag={"type": "staged", "id": i}))
                     with chip:
                         ui.label(item.get("label") or item["technique"]).classes("mp-bench-name")
-                        ui.label(_fmt_time(item["dur_s"]) if item["dur_s"] < 3600 else
-                                 f"{item['dur_s'] / 3600:.1f} h").classes("mp-bench-dur")
+                        ui.label(_fmt_dur(item["dur_s"])).classes("mp-bench-dur")
                         ui.button(icon="close", on_click=lambda _e, i=item["id"]: _unstage(i)) \
                             .props("dense flat round size=xs").classes("mp-bench-x") \
                             .tooltip("remove from planning")

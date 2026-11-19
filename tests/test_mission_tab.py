@@ -212,3 +212,16 @@ def test_triggers_see_every_radio_whatever_the_map_shows(tmp_path):
     fix = tg.Fix(32.22, -110.97, t=sess.triggers.clock())
     events = sess.triggers.update(sess.mission, fix)
     assert [(e["kind"], e["step"]["radio"]) for e in events] == [("start", "G40-SIM")]
+
+
+def test_relative_timeline_reads_elapsed_time_and_fits_short_missions():
+    # a new plan is relative (T+ from Run mission), not the 24 h UTC clock
+    assert mt._fresh_mission()["anchor"]["mode"] == "on_tx"
+    assert [mt._fmt_time(t) for t in (0, 7.5, 90, 1800, 3725)] == \
+        ["0:00", "0:07.5", "1:30", "30:00", "1:02:05"]
+    # empty: an hour; with steps: the plan plus room, 5 min steps, 30 min floor
+    assert mt.relative_window_s(0, False) == 3600
+    assert mt.relative_window_s(120, True) == 1800
+    assert mt.relative_window_s(1800, True) == 2100
+    assert mt.relative_window_s(3600, True) == 3900
+    assert mt.relative_window_s(5000, True) == 5400
