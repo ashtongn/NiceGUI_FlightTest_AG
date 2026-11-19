@@ -120,17 +120,24 @@ def test_match_planned_radio_binds_by_name_or_prefix():
     assert match_planned_radio("", live) is None
 
 
-def test_every_catalog_group_has_its_own_block_colour():
-    # a group missing from GROUP_COLORS falls back to the Radio setup grey, and
-    # a scenario JSON comm step would look like a radio setup step on the timeline
+def test_every_catalog_group_has_a_timeline_kind_and_red_is_only_conflicts():
+    # a group missing from the palette would fall back to tx/rx by radiating,
+    # so a scenario JSON comm step could look like a plain transmitter
     from dpmg.mission import catalog
-    from dpmg.mission.mission_tab import GROUP_COLORS, _group_color
+    from dpmg.mission.mission_tab import _group_color, _kind_style
+    from dpmg.web import theme
     for g in catalog.GROUPS:
-        assert g in GROUP_COLORS, f"no timeline colour for catalog group {g}"
-    colours = [GROUP_COLORS[g] for g in catalog.GROUPS]
-    assert len(set(colours)) == len(colours), "two catalog groups share a colour"
-    assert _group_color("scenario_json") == GROUP_COLORS["Comms"]
+        assert g in theme.TIMELINE_GROUP_KIND or any(
+            catalog.get(t) and catalog.get(t).group == g for t in theme.TIMELINE_TECHNIQUE_KIND), \
+            f"no timeline kind for catalog group {g}"
+    assert _group_color("scenario_json") == theme.TIMELINE_KINDS["comm"]["fill"]
     assert _group_color("scenario_json") != _group_color("set_rate")
+    assert _kind_style("record") == theme.TIMELINE_KINDS["rx"]
+    assert _kind_style("replay") == theme.TIMELINE_KINDS["playback"]
+    # no fill is red: red means a conflict
+    for k in theme.TIMELINE_KINDS.values():
+        r, g_, b_ = (int(k["fill"][i:i + 2], 16) for i in (1, 3, 5))
+        assert not (r > 150 and g_ < 90 and b_ < 90), k
 
 
 class _FakeHost:
@@ -219,12 +226,25 @@ def test_relative_timeline_reads_elapsed_time_and_fits_short_missions():
     assert mt._fresh_mission()["anchor"]["mode"] == "on_tx"
     assert [mt._fmt_time(t) for t in (0, 7.5, 90, 1800, 3725)] == \
         ["0:00", "0:07.5", "1:30", "30:00", "1:02:05"]
-    # empty: an hour; with steps: the plan plus room, 5 min steps, 30 min floor
+    # empty: an hour; with steps: the plan plus room, 5 min steps, 1 h floor
     assert mt.relative_window_s(0, False) == 3600
-    assert mt.relative_window_s(120, True) == 1800
-    assert mt.relative_window_s(1800, True) == 2100
+    assert mt.relative_window_s(120, True) == 3600
+    assert mt.relative_window_s(1800, True) == 3600
     assert mt.relative_window_s(3600, True) == 3900
     assert mt.relative_window_s(5000, True) == 5400
+
+
+def test_parse_duration_reads_times_as_typed():
+    pd = mt.parse_duration
+    assert pd("2:30") == 150 and pd("1:05:00") == 3900 and pd("0:07.5") == 7.5
+    assert pd("90") == 90 and pd("90s") == 90 and pd("5m") == 300
+    assert pd("1.5h") == 5400 and pd("1h 30m") == 5400 and pd("500ms") == 0.5
+    assert pd("T+ 12:30") == 750 and pd(" 2 min ") == 120
+    # the editor shows m:ss, and what it shows reads back the same
+    for t in (0, 7.5, 90, 1800, 3725):
+        assert pd(mt._fmt_time(t)) == t
+    for bad in ("", None, "abc", "1:75", "5 parsecs", "1:2:3:4", "-5", "5m x"):
+        assert pd(bad) is None, bad
 
 
 def test_bulk_edit_writes_a_shared_setting_only_where_it_exists():
