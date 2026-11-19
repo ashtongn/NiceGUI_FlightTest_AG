@@ -219,12 +219,25 @@ def test_relative_timeline_reads_elapsed_time_and_fits_short_missions():
     assert mt._fresh_mission()["anchor"]["mode"] == "on_tx"
     assert [mt._fmt_time(t) for t in (0, 7.5, 90, 1800, 3725)] == \
         ["0:00", "0:07.5", "1:30", "30:00", "1:02:05"]
-    # empty: an hour; with steps: the plan plus room, 5 min steps, 30 min floor
+    # empty: an hour; with steps: the plan plus room, 5 min steps, 1 h floor
     assert mt.relative_window_s(0, False) == 3600
-    assert mt.relative_window_s(120, True) == 1800
-    assert mt.relative_window_s(1800, True) == 2100
+    assert mt.relative_window_s(120, True) == 3600
+    assert mt.relative_window_s(1800, True) == 3600
     assert mt.relative_window_s(3600, True) == 3900
     assert mt.relative_window_s(5000, True) == 5400
+
+
+def test_parse_duration_reads_times_as_typed():
+    pd = mt.parse_duration
+    assert pd("2:30") == 150 and pd("1:05:00") == 3900 and pd("0:07.5") == 7.5
+    assert pd("90") == 90 and pd("90s") == 90 and pd("5m") == 300
+    assert pd("1.5h") == 5400 and pd("1h 30m") == 5400 and pd("500ms") == 0.5
+    assert pd("T+ 12:30") == 750 and pd(" 2 min ") == 120
+    # the editor shows m:ss, and what it shows reads back the same
+    for t in (0, 7.5, 90, 1800, 3725):
+        assert pd(mt._fmt_time(t)) == t
+    for bad in ("", None, "abc", "1:75", "5 parsecs", "1:2:3:4", "-5", "5m x"):
+        assert pd(bad) is None, bad
 
 
 def test_bulk_edit_writes_a_shared_setting_only_where_it_exists():

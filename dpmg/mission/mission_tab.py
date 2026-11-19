@@ -21,6 +21,7 @@ import asyncio
 import json
 import math
 import os
+import re
 import sys
 import time
 import uuid
@@ -64,8 +65,7 @@ from dpmg.link.acft_pos_multicast import FORMATS as FEED_FORMATS
 from dpmg.link.acft_pos_multicast import MulticastPosListener, local_ipv4_addresses
 
 
-PX_PER_S = 10.0             # timeline horizontal scale
-LANE_H = 64                 # pixel height of one radio lane
+LANE_H = 70                 # pixel height of one radio lane
 # block colour by catalog group (conflicts keep the colour and get a red edge)
 GROUP_COLORS = {"Jammers": "#dc2626", "Tools generators": "#2563eb",
                 "Record and replay": "#16a34a", "Radio setup": "#6b7280",
@@ -77,11 +77,16 @@ def _group_color(technique: str) -> str:
     e = catalog.get(technique)
     return GROUP_COLORS.get(e.group if e else "", "#6b7280")
 # relative (elapsed-time) timeline window. Missions usually run 30 to 60 min:
-# an empty plan shows an hour, a plan with steps fits its length (padded and
-# rounded up to 5 min) but never less than half an hour.
+# an empty plan spans an hour, a plan with steps spans its length (padded and
+# rounded up to 5 min) but never less than an hour.
 EMPTY_WINDOW_S = 3600.0
-MIN_WINDOW_S = 1800.0
+MIN_WINDOW_S = 3600.0
 WINDOW_ROUND_S = 300.0
+# how much time the timeline shows across its width by default, whatever the
+# plan's length (a longer plan, or the 24 h UTC day, scrolls sideways)
+VIEW_S = 3600.0
+MIN_VIEW_S = 20.0           # deepest zoom: this much time across the width
+STEP_MIN_PX = 128           # a step block is never narrower than this, so its name reads
 NEW_STEP_LEAD_S = 60.0      # a catalog step on the UTC clock starts this far ahead
 CLOCK_SKEW_WARN_S = 1.0     # a radio OS clock this far from the console shows amber
 
@@ -384,6 +389,48 @@ def _fmt_time(t: float) -> str:
     return out + (f".{tenth}" if tenth else "")
 
 
+_DUR_UNITS = {"ms": 0.001, "s": 1.0, "sec": 1.0, "secs": 1.0, "second": 1.0,
+              "seconds": 1.0, "m": 60.0, "min": 60.0, "mins": 60.0, "minute": 60.0,
+              "minutes": 60.0, "h": 3600.0, "hr": 3600.0, "hrs": 3600.0,
+              "hour": 3600.0, "hours": 3600.0}
+_DUR_TOKEN = re.compile(r"(\d+(?:\.\d*)?|\.\d+)\s*([a-z]*)")
+
+
+def parse_duration(text):
+    """A time typed the way people say it, as seconds, or None if it does not
+    read. m:ss or h:mm:ss (2:30, 1:05:00), a number with a unit (90s, 5m,
+    1.5h, 500ms, 1h 30m), or a bare number of seconds (90). A leading T+ is
+    ignored, so the start of a relative step reads the same."""
+    t = str(text if text is not None else "").strip().lower()
+    t = re.sub(r"^t\s*\+\s*|^\+", "", t).strip()
+    if not t:
+        return None
+    if ":" in t:
+        parts = t.split(":")
+        if len(parts) > 3 or any(not re.fullmatch(r"\d+(\.\d*)?", p.strip())
+                                 for p in parts):
+            return None
+        vals = [float(p) for p in parts]
+        if any(v >= 60 for v in vals[1:]):
+            return None
+        sec = 0.0
+        for v in vals:
+            sec = sec * 60.0 + v
+        return sec
+    pos, sec = 0, 0.0
+    for m in _DUR_TOKEN.finditer(t):
+        if t[pos:m.start()].strip(" ,"):
+            return None
+        unit = m.group(2) or "s"
+        if unit not in _DUR_UNITS:
+            return None
+        sec += float(m.group(1)) * _DUR_UNITS[unit]
+        pos = m.end()
+    if pos == 0 or t[pos:].strip():
+        return None
+    return sec
+
+
 def _fmt_dur(t: float) -> str:
     """A duration in short words (30s, 2:00, 1.5 h) for the planning chips."""
     t = float(t)
@@ -397,7 +444,7 @@ def _fmt_dur(t: float) -> str:
 def relative_window_s(span_s: float, has_steps: bool) -> float:
     """How much elapsed time the relative timeline shows for a plan whose last
     step stops at span_s: an hour when empty, else the plan plus a little
-    room (5 %, at least a minute) rounded up to 5 min, never under 30 min."""
+    room (5 %, at least a minute) rounded up to 5 min, never under an hour."""
     if not has_steps:
         return max(EMPTY_WINDOW_S, float(span_s))
     span = max(0.0, float(span_s))
@@ -949,6 +996,11 @@ PAGE_CSS = """
               border: 1px dashed #d0a644; background: rgba(208,166,68,.12); }
 .mp-root .mp-dirty .q-field__control { box-shadow: inset 0 0 0 2px #d0a644;
                                         background: rgba(208,166,68,.14); }
+.mp-root .mp-step { z-index:1; line-height:1.25; }
+.mp-root .mp-step:hover { z-index:6; box-shadow:0 0 0 1px #f2f2f2, 0 4px 12px rgba(0,0,0,.6) !important; }
+.mp-root .mp-step-primary { z-index:5; }
+.mp-root .mp-step-line { pointer-events:none; white-space:nowrap; overflow:hidden;
+                         text-overflow:ellipsis; max-width:100%; }
 .mp-root .mp-selcount { font-size: 11px; color: #d0a644; font-weight: 600; }
 """
 
@@ -1028,8 +1080,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         "sel": set(),              # all selected step ids (ctrl-click adds to this)
         "conflicts": [],           # last validate() result
         "drag": None,              # current drag payload
-        "px_per_s": PX_PER_S,      # timeline zoom (pixels per second)
-        "fit": True,               # fill the container width instead of px zoom
+        "view_s": VIEW_S,          # timeline zoom: seconds shown across the width
+        "homed": False,            # the first draw scrolls to where the plan is
         "scroll_cmd": None,        # one-shot scroll target for the next rebuild
         "radio_clock": {},         # serial: last gps_status result
         "scen_note": {},           # step id: the comm waveform's one-line summary
@@ -2432,8 +2484,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     f"display:inline-flex;align-items:center;gap:5px;padding:1px 8px;"
                     f"border-radius:999px;font-size:11px;font-family:monospace;"
                     f"border:2px solid {col};"
-                    + (f"background:{col};color:white;" if on else f"background:white;color:{col};")
-                    + ("box-shadow:0 0 0 2px #111827;" if picked else "")) \
+                    + (f"background:{col};color:white;" if on else f"background:transparent;color:{col};")
+                    + ("box-shadow:0 0 0 2px #f2f2f2;" if picked else "")) \
                     .tooltip(f"{'hide' if on else 'show'} {rid} on the map"
                              + (" (selected)" if picked else ""))
                 chip.on("click", lambda e, rid=rid: (sess.toggle_show(rid, lane_radios())
@@ -3919,9 +3971,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     # width with the whole window (the 24 h day on the clock,
                     # the mission's elapsed window when relative).
                     if a["mode"] != was:
-                        state["fit"] = True
-                        state["px_per_s"] = PX_PER_S
-                        state["scroll_cmd"] = ("abs", 0.0)
+                        state["view_s"] = VIEW_S
+                        state["homed"] = False
                     _revalidate(); _refresh_all()
                 anchor_sel.on_value_change(_on_anchor)
                 date_in.on_value_change(_on_anchor)
@@ -4400,45 +4451,82 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         spm = _t.time() - mid
         return spm if 0 <= spm <= mf.DAY_S else None
 
-    def _set_zoom(px):
-        # any explicit zoom leaves fit mode and uses fixed pixels per second.
-        # keep the time at the centre of the view fixed so the + / - buttons
-        # zoom about the middle instead of jumping back to 00:00. The scroll
-        # has to be recomputed from the client's view width, so it is handed to
-        # _refresh_timeline as a command and run from inside the rebuild (the
-        # button that fired this is about to be cleared, so a run_javascript
-        # out here would hit a deleted slot).
-        old_px = None if state["fit"] else state["px_per_s"]
-        state["fit"] = False
-        state["px_per_s"] = max(0.004, min(60.0, px))
-        state["scroll_cmd"] = ("anchor", old_px, state["px_per_s"],
-                               max(_tl_total(), 1.0))
+    def _visible(total=None):
+        # seconds shown across the timeline's width: the zoom, never more than
+        # the whole span (then the span just fills the width, no scroll)
+        total = max(_tl_total(), 1.0) if total is None else total
+        return max(min(MIN_VIEW_S, total), min(state["view_s"], total))
+
+    def _timed_bounds():
+        timed = [s for s in mission()["steps"] if not mf.is_location_task(s)]
+        if not timed:
+            return None
+        return (min(mf.step_start_s(s) for s in timed),
+                max(mf.step_stop_s(s) for s in timed))
+
+    def _home_t():
+        # where the view opens: T+0 on a relative plan whose first step is in
+        # its first stretch; otherwise (and always on the UTC day) a little
+        # before the first step, or before now on an empty UTC plan
+        total = max(_tl_total(), 1.0)
+        vis = _visible(total)
+        b = _timed_bounds()
+        if b is not None:
+            t = b[0]
+        elif _tl_clock():
+            t = _now_spm() or 0.0
+        else:
+            t = 0.0
+        if not _tl_clock() and t < vis * 0.75:
+            return 0.0
+        t = math.floor(max(0.0, t - 60.0) / WINDOW_ROUND_S) * WINDOW_ROUND_S
+        return max(0.0, min(t, total - vis))
+
+    def _set_view(view_s, scroll_cmd=None):
+        # zoom to view_s seconds across the width. By default the time at the
+        # centre of the view stays put. The scroll has to be recomputed from
+        # the client's view width, so it is handed to _refresh_timeline as a
+        # command and run from inside the rebuild (the button that fired this
+        # is about to be cleared, so a run_javascript out here would hit a
+        # deleted slot).
+        total = max(_tl_total(), 1.0)
+        old = _visible(total)
+        state["view_s"] = max(MIN_VIEW_S, min(total, float(view_s)))
+        state["scroll_cmd"] = scroll_cmd or ("anchor", old, _visible(total), total)
         _refresh_timeline()
 
+    def _zoom(factor):
+        _set_view(_visible() * factor)
+
     def _whole_day():
-        # fill the visible timeline with the whole day, no horizontal scroll
-        state["fit"] = True
-        state["scroll_cmd"] = ("abs", 0.0)
+        # the whole span across the width, no horizontal scroll
+        _set_view(_tl_total(), ("abs", 0.0))
+
+    def _hour_view():
+        # back to the default one-hour scale, at the start of the plan
+        state["view_s"] = VIEW_S
+        state["homed"] = False
         _refresh_timeline()
 
     def _fit_steps():
-        state["fit"] = True
-        state["scroll_cmd"] = ("abs", 0.0)
-        _refresh_timeline()
+        # frame every timed step: from T+0 on a relative plan (the run starts
+        # there), from just before the first step on the UTC day
+        b = _timed_bounds()
+        if b is None:
+            _hour_view()
+            return
+        lo = 0.0 if not _tl_clock() else max(0.0, b[0] - 60.0)
+        span = max(MIN_VIEW_S, (b[1] - lo) * 1.05)
+        _set_view(span, ("time", lo, min(span, max(_tl_total(), 1.0))))
 
-    def _pos(t, total, fit, px):
-        # left offset for a time, as a percent of the lane in fit mode or
-        # fixed pixels otherwise.
-        if fit:
-            return f"{(t / total * 100.0) if total > 0 else 0:.4f}%"
-        return f"{int(t * px)}px"
+    def _pos(t, total):
+        # left offset for a time, as a percent of the track (the track is as
+        # wide as total / visible viewports, so this holds at any zoom)
+        return f"{(t / total * 100.0) if total > 0 else 0:.4f}%"
 
-    def _span(dur, total, fit, px):
-        # width for a duration, matching _pos; min-width keeps a short step
-        # visible when the whole day is squeezed into the container.
-        if fit:
-            return f"{(dur / total * 100.0) if total > 0 else 0:.4f}%"
-        return f"{max(14, int(dur * px))}px"
+    def _span(dur, total):
+        # width for a duration, matching _pos
+        return f"{(dur / total * 100.0) if total > 0 else 0:.4f}%"
 
     def _run_elapsed():
         # plan seconds into the current run, for the position line; a
@@ -4451,9 +4539,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         # hidden when nothing runs
         el = _run_elapsed()
         total = max(_tl_total(), 1.0)
-        fit, px = state["fit"], state["px_per_s"]
         shown = el is not None and 0 <= el <= total
-        left = _pos(el if shown else 0.0, total, fit, px)
+        left = _pos(el if shown else 0.0, total)
         disp = "block" if shown else "none"
         for m in state.get("run_markers", []):
             m.style(f"left:{left};display:{disp}")
@@ -4467,22 +4554,30 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         state["run_markers"] = []
         state["run_ruler"] = None
         timeline_box.clear()
-        px = state["px_per_s"]
-        fit = state["fit"]
         total = max(_tl_total(), 1.0)
-        # the ruler and the lanes share one scroll viewport. "inner" is as wide
-        # as the plan (fit = fill the viewport, no scroll; pixel-zoom = wider
-        # than the viewport, so it scrolls). Everything inside positions off the
-        # inner's left edge (time 0), so cursor-to-time needs no gutter maths.
-        inner_w = "100%" if fit else f"{int(total * px)}px"
+        vis = _visible(total)
+        if not state.get("homed"):
+            # first draw, a plan just loaded or the timeline kind changed:
+            # open on the one-hour view where the plan is
+            state["homed"] = True
+            state["scroll_cmd"] = ("time", _home_t(), vis)
+        # the ruler and the lanes share one scroll viewport. "inner" is the
+        # whole span, as many viewports wide as the span holds visible windows
+        # (an hour by default), so a longer plan or the UTC day scrolls instead
+        # of squeezing. Everything inside positions off the inner's left edge
+        # (time 0) in percent, so cursor-to-time needs no gutter maths.
+        inner_w = "100%" if vis >= total else f"{total / vis * 100.0:.4f}%"
         with timeline_box:
             with ui.row().classes("items-center gap-1"):
-                ui.button(icon="zoom_out",
-                          on_click=lambda: _set_zoom(state["px_per_s"] / 1.6)) \
-                    .props("dense flat")
-                ui.button(icon="zoom_in",
-                          on_click=lambda: _set_zoom(state["px_per_s"] * 1.6)) \
-                    .props("dense flat")
+                ui.button(icon="zoom_out", on_click=lambda: _zoom(1.6)) \
+                    .props("dense flat").tooltip("show more time")
+                ui.button(icon="zoom_in", on_click=lambda: _zoom(1 / 1.6)) \
+                    .props("dense flat").tooltip("show less time, wider steps")
+                ui.label((f"{vis / 3600:.3g} h" if vis >= 3600 else f"{vis / 60:.3g} min"
+                          if vis >= 60 else f"{vis:.3g} s") + " across").classes("text-xs font-mono text-gray-500") \
+                    .tooltip("how much time the width of the timeline shows")
+                ui.button("1 h", on_click=lambda: _hour_view()).props("dense flat") \
+                    .tooltip("back to the one-hour view at the start of the plan")
                 if _tl_clock():
                     ui.button("show whole day", on_click=lambda: _whole_day()).props("dense flat").tooltip("show the full 24 h")
                 ui.button("fit all steps", on_click=lambda: _fit_steps()).props("dense flat").tooltip("zoom the timeline to every step")
@@ -4491,6 +4586,11 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 ui.button("to selected", icon="my_location", on_click=lambda: _jump_selected()).props("dense flat").tooltip("scroll to the selected step")
                 ui.label("UTC" if _tl_clock() else "T+ elapsed from Run mission (m:ss)").classes(
                     "text-xs text-gray-500 ml-2")
+                _b = _timed_bounds()
+                if _b is not None and _b[1] > vis and not _tl_clock():
+                    ui.label(f"plan runs to {_fmt_time(_b[1])}").classes(
+                        "text-xs text-amber-700 ml-2").tooltip(
+                        "steps reach past the view: scroll, or fit all steps")
                 ui.label("wheel to zoom, shift-wheel to pan, drag a box or "
                          "shift-click to select several").classes(
                     "text-xs text-gray-400 ml-2")
@@ -4521,12 +4621,12 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             with _hscroll():
                 with ui.element("div").style(
                         f"position:relative;width:{inner_w};min-width:{inner_w}"):
-                    _ruler(total, fit, px)
+                    _ruler(total)
             for rid in lane_radios():
                 with _hscroll():
                     with ui.element("div").style(
                             f"position:relative;width:{inner_w};min-width:{inner_w}"):
-                        _lane(rid, total, fit, px)
+                        _lane(rid, total)
             _location_strip()
             # keep every lane's horizontal scroll in lock-step, and hold the
             # scroll position across a rebuild (a rebuild happens on every
@@ -4555,22 +4655,27 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             state["scroll_cmd"] = None
             if cmd and cmd[0] == "abs":
                 pre = f"window._missionScroll={float(cmd[1]):.1f};"
-            elif cmd and cmd[0] == "anchor":
-                _, old_px, new_px, total = cmd
-                op = "null" if old_px is None else f"{old_px:.6f}"
+            elif cmd and cmd[0] == "time":
+                # put this time at the left edge; px per s is the viewport
+                # width over the visible seconds
+                _, t0, vis_s = cmd
                 pre = ("const _b=document.querySelectorAll('.mission-hs');"
                        "if(_b.length){const _cw=_b[0].clientWidth;"
-                       f"const _op=({op}!==null)?{op}:_cw/{total:.3f};"
-                       f"const _np={new_px:.6f};"
+                       f"window._missionScroll=Math.max(0,{float(t0):.3f}*_cw/{vis_s:.3f});}}")
+            elif cmd and cmd[0] == "anchor":
+                _, old_vis, new_vis, span = cmd
+                pre = ("const _b=document.querySelectorAll('.mission-hs');"
+                       "if(_b.length){const _cw=_b[0].clientWidth;"
+                       f"const _op=_cw/{old_vis:.3f},_np=_cw/{new_vis:.3f};"
                        "const _ct=((window._missionScroll||0)+_cw/2)/_op;"
-                       f"let _ns=_ct*_np-_cw/2;const _mx={total:.3f}*_np-_cw;"
+                       f"let _ns=_ct*_np-_cw/2;const _mx={span:.3f}*_np-_cw;"
                        "if(_ns>_mx)_ns=_mx;if(_ns<0)_ns=0;window._missionScroll=_ns;}")
             ui.run_javascript(
                 "(()=>{" + pre + "window._missionHold=performance.now()+300;let n=0;"
                 "const tick=()=>{"
                 "const bars=[...document.querySelectorAll('.mission-hs')];"
                 "if(bars.length){const x0=window._missionScroll||0;"
-                "if(x0>0)bars.forEach(b=>{if(Math.abs(b.scrollLeft-x0)>1)b.scrollLeft=x0;});"
+                "bars.forEach(b=>{if(Math.abs(b.scrollLeft-x0)>1)b.scrollLeft=x0;});"
                 "bars.forEach(b=>{b.onscroll=()=>{"
                 "if(performance.now()<(window._missionHold||0))return;"
                 "const x=b.scrollLeft;window._missionScroll=x;"
@@ -4578,19 +4683,16 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 "if(n++<9)requestAnimationFrame(tick);};"
                 "tick();requestAnimationFrame(tick);})();")
 
-    def _tl_tick(total, fit, px):
-        # fitted: a few ticks across the width (6 h on the clock's day, 5 or
-        # 10 min on a relative half hour or hour); zoomed: about one per 90 px
-        if fit:
-            return _nice_tick(total / (5.0 if _tl_clock() else 8.0))
-        return _nice_tick(max(90.0 / px, total / 200.0))
+    def _tl_tick(total):
+        # about eight ticks across the visible width (10 min on the hour view,
+        # 3 h on the whole day). The total/800 floor caps how many labels the
+        # ruler draws when zoomed right in on a long span, so a deep zoom
+        # cannot spawn thousands of DOM nodes.
+        return _nice_tick(max(_visible(total) / 8.0, total / 800.0))
 
-    def _ruler(total, fit, px):
-        # a few nice ticks across the fitted width (6 h on a full day, so the
-        # labels stay legible), else about one per 90 px. The total/200 floor
-        # caps how many labels the ruler draws when zoomed right in, so a deep
-        # zoom cannot spawn thousands of DOM nodes.
-        tick = _tl_tick(total, fit, px)
+    def _ruler(total):
+        # nice ticks at _tl_tick's spacing, labelled with the plan time
+        tick = _tl_tick(total)
         with ui.element("div").style(
                 "position:relative;height:18px;width:100%;"
                 "border-bottom:1px solid #2c322c"):
@@ -4605,7 +4707,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 else:
                     shift = "translateX(-50%)"
                 ui.label(_tl_label(t)).style(
-                    f"position:absolute;left:{_pos(t, total, fit, px)};"
+                    f"position:absolute;left:{_pos(t, total)};"
                     f"font-size:10px;color:#8d968b;font-family:monospace;transform:{shift}")
                 t += tick
             # where the run is now, in plan time; _move_run_marker keeps it
@@ -4694,14 +4796,14 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     "pointer-events:none")
         return row
 
-    def _lane(rid, total, fit, px):
+    def _lane(rid, total):
         # the radio name sits above its lane and sticks to the left edge, so it
         # stays readable while the lane is scrolled. A planned radio that is not
         # online says so; its steps are skipped if it is still offline at Run mission.
         _lane_title(rid)
         # light grid lines at the ruler's tick spacing
-        tick = _tl_tick(total, fit, px)
-        period = _span(tick, total, fit, px)
+        tick = _tl_tick(total)
+        period = _span(tick, total)
         rcol = _radio_color(rid)
         lane = ui.element("div").classes("mp-lane").props(
             f'data-total="{total:.1f}" data-clock="{1 if _tl_clock() else 0}" '
@@ -4730,7 +4832,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             now = _now_spm()
             if now is not None:
                 ui.element("div").style(
-                    f"position:absolute;left:{_pos(now, total, fit, px)};top:0;"
+                    f"position:absolute;left:{_pos(now, total)};top:0;"
                     f"width:2px;height:{LANE_H}px;background:#ef4444;opacity:0.7")
             # the run position line (relative plans): drawn in every lane,
             # shown and moved by _move_run_marker while a plan runs
@@ -4739,7 +4841,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 "background:#d0a644;opacity:0.9;display:none;pointer-events:none;z-index:2"))
             for step in mission()["steps"]:
                 if step.get("radio") == rid and not mf.is_location_task(step):
-                    _step_block(step, total, fit, px)
+                    _step_block(step, total)
 
     def _on_wheel(e):
         a = getattr(e, "args", None) or []
@@ -4752,23 +4854,15 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         if cw <= 0:
             return
         total = max(_tl_total(), 1.0)
-        px_fit = cw / total
-        cur_px = px_fit if state["fit"] else state["px_per_s"]
-        if cur_px <= 0:
-            cur_px = px_fit
+        vis = _visible(total)
+        cur_px = cw / vis
         # the time under the cursor, kept fixed across the zoom
         t_cursor = max(0.0, min(total, (vx + sl) / cur_px))
-        new_px = cur_px * (1.0 / 1.25 if dy > 0 else 1.25)
-        new_px = max(px_fit, min(60.0, new_px))
-        if new_px <= px_fit * 1.0005:
-            # zoomed all the way out: the whole span fills the viewport
-            if not state["fit"]:
-                state["fit"] = True
-                state["scroll_cmd"] = ("abs", 0.0)
-                _refresh_timeline()
+        new_vis = max(MIN_VIEW_S, min(total, vis * (1.25 if dy > 0 else 1.0 / 1.25)))
+        if abs(new_vis - vis) < 1e-6:
             return
-        state["fit"] = False
-        state["px_per_s"] = new_px
+        state["view_s"] = new_vis
+        new_px = cw / new_vis
         new_scroll = t_cursor * new_px - vx
         max_scroll = max(0.0, total * new_px - cw)
         new_scroll = max(0.0, min(max_scroll, new_scroll))
@@ -4785,7 +4879,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             f"position:absolute;left:0;top:0;bottom:0;width:6px;"
             f"background:{_radio_color(rid)};pointer-events:none")
 
-    def _step_block(step, total, fit, px):
+    def _step_block(step, total):
         sid = step.get("id")
         start = mf.step_start_s(step)
         stop = mf.step_stop_s(step)
@@ -4793,7 +4887,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         in_sel = sid in state.get("sel", set())
         primary = state["selected"] == sid
         color = _group_color(step.get("technique", ""))
-        border = ("3px solid #111827" if primary else
+        border = ("2px solid #f2f2f2" if primary else
                   "2px solid #f59e0b" if in_sel else
                   "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.15)")
         multi = in_sel and len(state.get("sel", set())) > 1
@@ -4805,16 +4899,34 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             # the time the re-init takes, drawn so nothing is placed inside it
             need = mf.rate_change_block_s((_plan_radio(step.get("radio")) or {}).get("type"))
             ui.element("div").style(
-                f"position:absolute;left:{_pos(start, total, fit, px)};top:7px;"
-                f"width:{_span(need, total, fit, px)};height:{LANE_H - 14}px;border-radius:6px;"
+                f"position:absolute;left:{_pos(start, total)};top:7px;"
+                f"width:{_span(need, total)};height:{LANE_H - 14}px;border-radius:6px;"
                 "background:repeating-linear-gradient(45deg,#9ca3af55,#9ca3af55 6px,transparent 6px,"
                 "transparent 12px);border:1px dashed #6b7280;pointer-events:none").tooltip(
                 f"re-init, about {need:g} s: keep steps out of this time")
-        blk = ui.element("div").style(
-            f"position:absolute;left:{_pos(start, total, fit, px)};top:7px;"
-            f"width:{_span(stop - start, total, fit, px)};min-width:14px;"
-            f"height:{LANE_H - 14}px;background:{color};color:white;"
-            f"border:{border};border-radius:6px;font-size:11px;overflow:hidden;"
+        # the step's true extent as a thin bar along the lane floor: the block
+        # above it is held to a readable minimum width, so a short step's block
+        # can run past its stop; this bar never does
+        ui.element("div").style(
+            f"position:absolute;left:{_pos(start, total)};bottom:2px;"
+            f"width:{_span(stop - start, total)};min-width:2px;height:3px;"
+            f"background:{color};pointer-events:none")
+        entry = catalog.get(step.get("technique", ""))
+        name = (entry.label if entry else "") or step.get("technique", "?")
+        detail = _step_detail(step)
+        times = f"{_tl_label(start)}-{_tl_label(stop)}"
+        dur = _fmt_dur(round(stop - start, 1))
+        tip = "\n".join(x for x in (
+            ("! " if bad else "") + name,
+            f"{step.get('technique', '?')}{detail}",
+            f"{times}  ({dur})  on {step.get('radio')}",
+            *[c.message for c in conflicts_for(sid)][:3]) if x)
+        blk = ui.element("div").classes(
+            "mp-step" + (" mp-step-primary" if primary else "")).style(
+            f"position:absolute;left:{_pos(start, total)};top:7px;"
+            f"width:{_span(stop - start, total)};min-width:{STEP_MIN_PX}px;"
+            f"height:{LANE_H - 16}px;background:{color};color:white;"
+            f"border:{border};font-size:11px;overflow:hidden;"
             f"padding:3px 6px 3px 12px;cursor:pointer;box-shadow:{shadow}").props("draggable=true")
         blk.on("click",
                lambda e, s=sid: _select(s, _additive(e)),
@@ -4822,10 +4934,13 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         blk.on("dragstart", lambda e, s=sid: _begin_drag(s))
         with blk:
             _radio_tag(step.get("radio"))
-            ui.label(("! " if bad else "") + step.get("technique", "?") + _step_detail(step)).style(
-                "pointer-events:none;white-space:nowrap;font-weight:600")
-            ui.label(f"{_tl_label(start)}-{_tl_label(stop)}").style(
-                "pointer-events:none;opacity:0.85;font-size:10px")
+            ui.label(("! " if bad else "") + name).classes("mp-step-line").style(
+                "font-weight:600")
+            ui.label(detail.strip(" ()") or step.get("technique", "")).classes(
+                "mp-step-line").style("opacity:0.85;font-size:10px")
+            ui.label(f"{times} · {dur}").classes("mp-step-line").style(
+                "opacity:0.85;font-size:10px;font-family:monospace")
+            ui.tooltip(tip).classes("whitespace-pre-line text-xs")
 
     # planning timeline: a time-less holding lane above the radio lanes.
     # Items keep a duration only; the drop point on a radio lane sets the start.
@@ -4939,12 +5054,11 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         if st is None:
             ui.notify("select a step first", type="info")
             return
-        if state["fit"]:
-            return
-        total = max(_tl_total(), 1.0)
+        vis = _visible()
         ui.run_javascript(
             "(()=>{const b=document.querySelector('.mission-hs');if(!b)return;"
-            f"b.scrollLeft=Math.max(0,{mf.step_start_s(st) * state['px_per_s']:.1f}-b.clientWidth/3);}})()")
+            f"b.scrollLeft=Math.max(0,{mf.step_start_s(st):.1f}*b.clientWidth/{vis:.3f}"
+            "-b.clientWidth/3);})()")
 
     def _on_lane_drop(e, radio_id):
         x = 0.0
@@ -4961,7 +5075,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             # the drop sits at this fraction along the lane, so at this time
             start_s = max(0.0, min(total, x / lane_w * total))
         else:
-            start_s = max(0.0, x / state["px_per_s"])
+            start_s = 0.0
         drag = state.get("drag")
         state["drag"] = None
         if not drag:
@@ -5166,14 +5280,21 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 _note_count(len(timed))
             _touch("__priority__", lambda: pr.value, [pr])
             durs = {round(mf.step_stop_s(s) - mf.step_start_s(s), 3) for s in timed}
-            dv, du = _best_unit(next(iter(durs))) if len(durs) == 1 else (None, "s")
-            with _row("duration", "each step keeps its start; its stop moves"):
-                dn = ui.number(value=None if dv is None else round(dv, 4), format="%g",
-                               placeholder="mixed", min=0).props("dense outlined").classes("w-24")
-                dsu = ui.select(_UNIT_ORDER, value=du).props("dense outlined").classes("w-20")
+            with _row("duration", "each step keeps its start; its stop moves. "
+                      "Type m:ss (2:30), 90s, 5m or 1.5h"):
+                dn = ui.input(value=_fmt_time(next(iter(durs))) if len(durs) == 1 else "",
+                              placeholder="mixed").props("dense outlined").classes("w-28")
+                ui.label("m:ss, 90s, 5m").classes("text-[10px] text-gray-500")
                 _note_count(len(timed))
-            _touch("__duration__", lambda: None if dn.value in (None, "")
-                   else _to_seconds(dn.value, dsu.value), [dn, dsu])
+
+            def _read_dur():
+                if not (dn.value or "").strip():
+                    return None
+                v = parse_duration(dn.value)
+                if v is None:
+                    raise ValueError("duration must be m:ss, h:mm:ss, or like 90s, 5m")
+                return v
+            _touch("__duration__", _read_dur, [dn])
 
         shared = bulk_fields(steps)
         section_done = set()
@@ -5351,56 +5472,75 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
 
                 def _write_stop(sec):
                     pass
-            elif clock:
-                with ui.row().classes("items-center gap-1"):
-                    ui.label("start").classes("w-10 text-xs")
-                    st = ui.input(value=mf.clock_hms(start0),
-                                  placeholder="HH:MM").props(
-                        "dense outlined").classes("w-28")
-                    ui.label("UTC").classes("text-xs text-gray-500")
-                with ui.row().classes("items-center gap-1"):
-                    ui.label("stop").classes("w-10 text-xs")
-                    sp = ui.input(value=mf.clock_hms(stop0),
-                                  placeholder="HH:MM").props(
-                        "dense outlined").classes("w-28")
-                    ui.label("UTC").classes("text-xs text-gray-500")
-                time_fields = (st, sp)
-
-                def _read_start():
-                    return mf.parse_clock(st.value)
-
-                def _read_stop():
-                    return mf.parse_clock(sp.value)
-
-                def _write_stop(sec):
-                    sp.value = mf.clock_hms(sec)
             else:
-                sv, su = _best_unit(start0)
-                with ui.row().classes("items-center gap-1"):
-                    ui.label("start").classes("w-10 text-xs")
-                    st = ui.number(value=round(sv, 4), format="%g").props(
-                        "dense outlined").classes("w-24")
-                    st_u = ui.select(_UNIT_ORDER, value=su).props(
-                        "dense outlined").classes("w-20")
-                pv, pu = _best_unit(stop0)
-                with ui.row().classes("items-center gap-1"):
-                    ui.label("stop").classes("w-10 text-xs")
-                    sp = ui.number(value=round(pv, 4), format="%g").props(
-                        "dense outlined").classes("w-24")
-                    sp_u = ui.select(_UNIT_ORDER, value=pu).props(
-                        "dense outlined").classes("w-20")
-                time_fields = (st, st_u, sp, sp_u)
+                # start and stop read as the timeline does (T+ m:ss, or UTC
+                # HH:MM:SS on the clock); the duration is typed as m:ss, 90s,
+                # 5m and so on, and keeps stop in step with it
+                if clock:
+                    fmt_t, parse_t, unit_txt = mf.clock_hms, mf.parse_clock, "UTC"
+                    t_ph, t_tip = "HH:MM:SS", "UTC time of day, HH:MM or HH:MM:SS"
+                else:
+                    fmt_t, parse_t, unit_txt = _fmt_time, parse_duration, "T+"
+                    t_ph = "m:ss"
+                    t_tip = ("time from Run mission: m:ss or h:mm:ss (12:30), "
+                             "or 90s, 5m, 1h 10m")
+                d_tip = "how long the step runs: m:ss (2:30), 90s, 5m, 1.5h"
+                with ui.row().classes("items-center gap-1 no-wrap"):
+                    ui.label("start").classes("w-14 text-xs")
+                    st = ui.input(value=fmt_t(start0), placeholder=t_ph).props(
+                        "dense outlined").classes("w-28").tooltip(t_tip)
+                    ui.label(unit_txt).classes("text-xs text-gray-500")
+                with ui.row().classes("items-center gap-1 no-wrap"):
+                    ui.label("duration").classes("w-14 text-xs")
+                    du = ui.input(value=_fmt_time(stop0 - start0), placeholder="m:ss").props(
+                        "dense outlined").classes("w-28").tooltip(d_tip)
+                    ui.label("m:ss, 90s, 5m").classes("text-xs text-gray-500")
+                with ui.row().classes("items-center gap-1 no-wrap"):
+                    ui.label("stop").classes("w-14 text-xs")
+                    sp = ui.input(value=fmt_t(stop0), placeholder=t_ph).props(
+                        "dense outlined").classes("w-28").tooltip(t_tip)
+                    ui.label(unit_txt).classes("text-xs text-gray-500")
+                time_fields = (st, du, sp)
+                _sync = {"busy": False}
+
+                def _sync_times(e, src):
+                    # duration and stop follow each other; a new start moves the
+                    # stop and keeps the duration
+                    if _sync["busy"]:
+                        return
+                    a0, d0, b0 = parse_t(st.value), parse_duration(du.value), parse_t(sp.value)
+                    _sync["busy"] = True
+                    try:
+                        if src in ("start", "dur") and a0 is not None and d0 is not None:
+                            sp.value = fmt_t(a0 + d0)
+                        elif src == "stop" and a0 is not None and b0 is not None and b0 > a0:
+                            du.value = _fmt_time(b0 - a0)
+                    finally:
+                        _sync["busy"] = False
+                st.on("blur", lambda e: _sync_times(e, "start"))
+                du.on("blur", lambda e: _sync_times(e, "dur"))
+                sp.on("blur", lambda e: _sync_times(e, "stop"))
+                for _w, _src in ((st, "start"), (du, "dur"), (sp, "stop")):
+                    _w.on("keydown.enter", lambda e, s_=_src: _sync_times(e, s_))
 
                 def _read_start():
-                    return _to_seconds(st.value, st_u.value)
+                    return parse_t(st.value)
 
                 def _read_stop():
-                    return _to_seconds(sp.value, sp_u.value)
+                    a0, d0 = parse_t(st.value), parse_duration(du.value)
+                    b0 = parse_t(sp.value)
+                    # the duration wins when both were typed and disagree,
+                    # unless only the stop was changed
+                    if a0 is not None and d0 is not None and \
+                            (b0 is None or du.value != _fmt_time(stop0 - start0)):
+                        return a0 + d0
+                    return b0
 
                 def _write_stop(sec):
-                    nv, nu = _best_unit(sec)
-                    sp.value = round(nv, 4)
-                    sp_u.value = nu
+                    sp.value = fmt_t(sec)
+                    a0 = parse_t(st.value)
+                    if a0 is not None:
+                        du.value = _fmt_time(sec - a0)
 
             if not loc_task:
                 prio_in = ui.number("priority (1 high, 9 low)", value=mf.step_priority(step),
@@ -5688,9 +5828,10 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             _dirty_fields = time_fields + tuple(w for w in form_widgets
                                                 if not isinstance(w, ui.checkbox))
 
-            def _mark_dirty(_=None):
-                for w in _dirty_fields:
-                    w.props("bg-color=orange-1")
+            def _mark_dirty(e):
+                w = getattr(e, "sender", None)
+                if w is not None and not isinstance(w, ui.checkbox):
+                    w.classes("mp-dirty")
                 apply_btn.props(remove="color=primary")
                 apply_btn.props("color=warning")
                 dirty_note.set_text("unsaved changes, click Apply")
@@ -5699,7 +5840,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
 
             def _mark_clean():
                 for w in _dirty_fields:
-                    w.props(remove="bg-color=orange-1")
+                    w.classes(remove="mp-dirty")
                 apply_btn.props(remove="color=warning")
                 apply_btn.props("color=primary")
                 dirty_note.set_text("")
@@ -5726,7 +5867,12 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     start_s = _read_start()
                     stop_s = _read_stop()
                     if start_s is None or stop_s is None:
-                        ui.notify("times must be HH:MM or HH:MM:SS", type="negative")
+                        ui.notify("times must be HH:MM or HH:MM:SS" if clock else
+                                  "times must be m:ss, h:mm:ss, or like 90s, 5m",
+                                  type="negative")
+                        return
+                    if stop_s <= start_s:
+                        ui.notify("the step must stop after it starts", type="negative")
                         return
                     step["schedule"] = {"start_s": round(start_s, 3),
                                         "stop_s": round(stop_s, 3)}
@@ -5762,8 +5908,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 if w is not None:
                     w.on_value_change(_mark_dirty)
 
-            def _on_form(_=None):
-                _mark_dirty()
+            def _on_form(e):
+                _mark_dirty(e)
                 _show_rows()
                 _preview()
             for w in form_widgets:
@@ -5939,6 +6085,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         sess.mission = loaded
         state["selected"] = None
         state["sel"] = set()
+        state["view_s"] = VIEW_S
+        state["homed"] = False
         audit.add("edit", f"loaded plan '{loaded.get('name', '?')}'")
         _revalidate()
         _refresh_all()
