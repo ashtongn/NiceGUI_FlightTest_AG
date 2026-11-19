@@ -120,17 +120,24 @@ def test_match_planned_radio_binds_by_name_or_prefix():
     assert match_planned_radio("", live) is None
 
 
-def test_every_catalog_group_has_its_own_block_colour():
-    # a group missing from GROUP_COLORS falls back to the Radio setup grey, and
-    # a scenario JSON comm step would look like a radio setup step on the timeline
+def test_every_catalog_group_has_a_timeline_kind_and_red_is_only_conflicts():
+    # a group missing from the palette would fall back to tx/rx by radiating,
+    # so a scenario JSON comm step could look like a plain transmitter
     from dpmg.mission import catalog
-    from dpmg.mission.mission_tab import GROUP_COLORS, _group_color
+    from dpmg.mission.mission_tab import _group_color, _kind_style
+    from dpmg.web import theme
     for g in catalog.GROUPS:
-        assert g in GROUP_COLORS, f"no timeline colour for catalog group {g}"
-    colours = [GROUP_COLORS[g] for g in catalog.GROUPS]
-    assert len(set(colours)) == len(colours), "two catalog groups share a colour"
-    assert _group_color("scenario_json") == GROUP_COLORS["Comms"]
+        assert g in theme.TIMELINE_GROUP_KIND or any(
+            catalog.get(t) and catalog.get(t).group == g for t in theme.TIMELINE_TECHNIQUE_KIND), \
+            f"no timeline kind for catalog group {g}"
+    assert _group_color("scenario_json") == theme.TIMELINE_KINDS["comm"]["fill"]
     assert _group_color("scenario_json") != _group_color("set_rate")
+    assert _kind_style("record") == theme.TIMELINE_KINDS["rx"]
+    assert _kind_style("replay") == theme.TIMELINE_KINDS["playback"]
+    # no fill is red: red means a conflict
+    for k in theme.TIMELINE_KINDS.values():
+        r, g_, b_ = (int(k["fill"][i:i + 2], 16) for i in (1, 3, 5))
+        assert not (r > 150 and g_ < 90 and b_ < 90), k
 
 
 class _FakeHost:

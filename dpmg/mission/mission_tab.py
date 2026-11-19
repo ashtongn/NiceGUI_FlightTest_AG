@@ -59,6 +59,7 @@ from . import feed_binding as fb
 from dpmg.link import feed_settings
 from dpmg.link.aircraft_feeds import PanelFields
 from dpmg.link.proto import Status
+from dpmg.web import theme as _theme
 from dpmg.web import port_pick_ui as _ppu            # port map choices
 from dpmg.radio import g40_clock as _g40_clock       # the clock choices and the clock line
 from dpmg.link.acft_pos_multicast import FORMATS as FEED_FORMATS
@@ -66,16 +67,17 @@ from dpmg.link.acft_pos_multicast import MulticastPosListener, local_ipv4_addres
 
 
 LANE_H = 70                 # pixel height of one radio lane
-# block colour by catalog group (conflicts keep the colour and get a red edge)
-GROUP_COLORS = {"Jammers": "#dc2626", "Tools generators": "#2563eb",
-                "Record and replay": "#16a34a", "Radio setup": "#6b7280",
-                "IQ playback": "#7c3aed", "Transponder": "#0891b2", "Secure": "#d97706",
-                "Comms": "#db2777"}
+def _kind_style(technique: str) -> dict:
+    """The timeline palette entry (fill, border, text) for a technique: by what
+    the step does, so nothing is red unless it is in conflict (theme.py)."""
+    e = catalog.get(technique)
+    kind = _theme.timeline_kind(technique, e.group if e else "",
+                                bool(e.radiates) if e else False)
+    return _theme.TIMELINE_KINDS[kind]
 
 
 def _group_color(technique: str) -> str:
-    e = catalog.get(technique)
-    return GROUP_COLORS.get(e.group if e else "", "#6b7280")
+    return _kind_style(technique)["fill"]
 # relative (elapsed-time) timeline window. Missions usually run 30 to 60 min:
 # an empty plan spans an hour, a plan with steps spans its length (padded and
 # rounded up to 5 min) but never less than an hour.
@@ -984,10 +986,10 @@ PAGE_CSS = """
 .mp-root .mp-bench-title { font:600 11px 'JetBrains Mono',Menlo,monospace; letter-spacing:.14em; color:#d0a644; }
 .mp-root .mp-bench-zone { display:flex; flex-wrap:wrap; gap:6px; min-height:40px; align-items:center; padding:4px 0; }
 .mp-root .mp-bench-empty { color:#5d665a; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
-.mp-root .mp-bench-chip { display:flex; align-items:center; gap:8px; padding:4px 4px 4px 8px; color:#fff; cursor:grab;
-    border:1px solid rgba(0,0,0,.5); font-size:11px; font-weight:600; }
+.mp-root .mp-bench-chip { display:flex; align-items:center; gap:8px; padding:4px 4px 4px 8px; cursor:grab;
+    font-size:11px; font-weight:600; }
 .mp-root .mp-bench-dur { font:10px 'JetBrains Mono',Menlo,monospace; opacity:.85; }
-.mp-root .mp-bench-x { color:#fff !important; }
+.mp-root .mp-bench-x { color:inherit !important; }
 .mp-root .mm-drop-hot { outline: 2px dashed #d0a644; outline-offset: -4px; }
 .mp-root .mp-bar { background: #1a1e1a; border: 1px solid #2c322c;
                    padding: 4px 8px; }
@@ -997,7 +999,6 @@ PAGE_CSS = """
 .mp-root .mp-dirty .q-field__control { box-shadow: inset 0 0 0 2px #d0a644;
                                         background: rgba(208,166,68,.14); }
 .mp-root .mp-step { z-index:1; line-height:1.25; }
-.mp-root .mp-step:hover { z-index:6; box-shadow:0 0 0 1px #f2f2f2, 0 4px 12px rgba(0,0,0,.6) !important; }
 .mp-root .mp-step-primary { z-index:5; }
 .mp-root .mp-step-line { pointer-events:none; white-space:nowrap; overflow:hidden;
                          text-overflow:ellipsis; max-width:100%; }
@@ -1069,6 +1070,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
     me.mount()
     ui.add_head_html(me.head_html())
     ui.add_css(PAGE_CSS)
+    ui.add_css(_theme.TIMELINE_CSS)
     ui.add_head_html(CURSOR_JS)
     root = ui.element("div").classes("mp-root w-full")
     root.__enter__()
@@ -3984,7 +3986,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     ui.label("Catalog").classes("text-sm font-bold grow")
                     ui.icon("info").classes("text-gray-400 cursor-help").tooltip(
                         "click a technique to add it to the selected radio, or drag it "
-                        "onto a lane; a red tower marks one that radiates")
+                        "onto a lane; an amber tower marks one that radiates")
                 lane_target = ui.select([], label="add to radio").props(
                     "dense outlined").classes("w-full")
                 cat_search = ui.input(placeholder="search the catalog").props(
@@ -4029,7 +4031,9 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                         "one lane per radio, with the radio's colour on its left edge and "
                         "as a band on each block; click a block to edit, ctrl-click to select "
                         "several, drag onto a lane to move to that radio or time; a red "
-                        "edge means a conflict; the block fill follows the catalog group; "
+                        "edge and ! mean a conflict (the only red); the fill says what the "
+                        "step does (amber transmit, blue receive, brown jammer, grey tool); "
+                        "hatched and faded: its radio is offline; "
                         "click a lane's name or empty space to select that radio for the map")
                 timeline_box = ui.column().classes("w-full gap-1 min-w-0")
             map_card = _build_map_card()
@@ -4758,17 +4762,21 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                               else "")
                     rule = ("automatic" if mf.trigger_block(s).get("confirm") == "auto"
                             else "confirmed once" if sid in sess.confirmed_once else "needs confirm")
-                    border = ("2px solid #f2f2f2" if primary else "2px solid #f59e0b" if in_sel
-                              else "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.45)")
-                    color = "#b91c1c" if active else _group_color(s.get("technique", ""))
-                    blk = ui.element("div").style(
-                        f"position:relative;width:300px;height:{LANE_H - 14}px;background:{color};color:white;"
-                        f"border:{border};border-radius:6px;font-size:11px;overflow:hidden;"
-                        "padding:3px 6px 3px 12px;cursor:pointer;box-shadow:0 1px 2px rgba(0,0,0,.25)")
+                    ks = _kind_style(s.get("technique", ""))
+                    border, shadow = _block_edge(ks, primary, in_sel, bad)
+                    if active:      # keyed now: an amber glow, the fill stays its kind
+                        shadow = ", ".join(x for x in (shadow, f"0 0 10px {_theme.ACCENT}") if x)
+                    blk = ui.element("div").classes(
+                        "mp-step" + ("" if _is_online(rid) else " mp-step-offline")).style(
+                        f"position:relative;width:300px;height:{LANE_H - 14}px;background:{ks['fill']};"
+                        f"color:{ks['text']};border:{border};font-size:11px;overflow:hidden;"
+                        f"padding:3px 6px 3px 12px;cursor:pointer;box-shadow:{shadow or 'none'}")
                     blk.on("click", lambda e, sid=sid: _select(sid))
                     with blk:
                         _radio_tag(rid)
-                        ui.label(("! " if bad else "") + f"{s['technique']}{_step_detail(s)}"
+                        if bad:
+                            ui.label("!").classes("mp-step-badge")
+                        ui.label(f"{s['technique']}{_step_detail(s)}"
                                  + (f"  {status}" if status else "")).style(
                             "pointer-events:none;white-space:nowrap;font-weight:600")
                         ui.label(f"on {rid}  ({rule})").style(
@@ -4833,7 +4841,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             if now is not None:
                 ui.element("div").style(
                     f"position:absolute;left:{_pos(now, total)};top:0;"
-                    f"width:2px;height:{LANE_H}px;background:#ef4444;opacity:0.7")
+                    f"width:2px;height:{LANE_H}px;background:{_theme.TIMELINE_NOW};opacity:0.8")
             # the run position line (relative plans): drawn in every lane,
             # shown and moved by _move_run_marker while a plan runs
             state.setdefault("run_markers", []).append(ui.element("div").style(
@@ -4879,6 +4887,22 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             f"position:absolute;left:0;top:0;bottom:0;width:6px;"
             f"background:{_radio_color(rid)};pointer-events:none")
 
+    def _block_edge(ks, primary, in_sel, bad):
+        """A block's border and outer rings (theme palette): the editor's step
+        gets a light edge and an amber ring, other selected steps an amber
+        edge, a step in conflict a red edge and a faint red ring."""
+        multi = in_sel and len(state.get("sel", set())) > 1
+        border = (f"2px solid {_theme.TIMELINE_PRIMARY}" if primary else
+                  f"2px solid {_theme.TIMELINE_CONFLICT}" if bad else
+                  f"2px solid {_theme.TIMELINE_SELECTED}" if multi else
+                  f"1px solid {ks['border']}")
+        rings = []
+        if primary:
+            rings.append(f"0 0 0 1px {_theme.TIMELINE_SELECTED}")
+        if bad:
+            rings.append(f"0 0 0 {4 if primary else 3}px {_theme.TIMELINE_CONFLICT_RING}")
+        return border, ", ".join(rings)
+
     def _step_block(step, total):
         sid = step.get("id")
         start = mf.step_start_s(step)
@@ -4886,15 +4910,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         bad = bool(conflicts_for(sid))
         in_sel = sid in state.get("sel", set())
         primary = state["selected"] == sid
-        color = _group_color(step.get("technique", ""))
-        border = ("2px solid #f2f2f2" if primary else
-                  "2px solid #f59e0b" if in_sel else
-                  "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.15)")
-        multi = in_sel and len(state.get("sel", set())) > 1
-        # a step in a multi-selection gets an amber halo, so the whole group
-        # reads at a glance whatever its fill
-        shadow = ("0 0 0 2px #d0a644, 0 0 8px rgba(208,166,68,.7)" if multi else
-                  "0 0 0 2px rgba(220,38,38,.35)" if bad else "0 1px 2px rgba(0,0,0,.25)")
+        ks = _kind_style(step.get("technique", ""))
+        border, shadow = _block_edge(ks, primary, in_sel, bad)
         if step.get("technique") == "set_rate":
             # the time the re-init takes, drawn so nothing is placed inside it
             need = mf.rate_change_block_s((_plan_radio(step.get("radio")) or {}).get("type"))
@@ -4910,7 +4927,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         ui.element("div").style(
             f"position:absolute;left:{_pos(start, total)};bottom:2px;"
             f"width:{_span(stop - start, total)};min-width:2px;height:3px;"
-            f"background:{color};pointer-events:none")
+            f"background:{ks['border']};pointer-events:none")
         entry = catalog.get(step.get("technique", ""))
         name = (entry.label if entry else "") or step.get("technique", "?")
         detail = _step_detail(step)
@@ -4922,19 +4939,23 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             f"{times}  ({dur})  on {step.get('radio')}",
             *[c.message for c in conflicts_for(sid)][:3]) if x)
         blk = ui.element("div").classes(
-            "mp-step" + (" mp-step-primary" if primary else "")).style(
+            "mp-step" + (" mp-step-primary" if primary else "")
+            + ("" if _is_online(step.get("radio")) else " mp-step-offline")).style(
             f"position:absolute;left:{_pos(start, total)};top:7px;"
             f"width:{_span(stop - start, total)};min-width:{STEP_MIN_PX}px;"
-            f"height:{LANE_H - 16}px;background:{color};color:white;"
+            f"height:{LANE_H - 16}px;background:{ks['fill']};color:{ks['text']};"
             f"border:{border};font-size:11px;overflow:hidden;"
-            f"padding:3px 6px 3px 12px;cursor:pointer;box-shadow:{shadow}").props("draggable=true")
+            f"padding:3px {22 if bad else 6}px 3px 12px;cursor:pointer;"
+            f"box-shadow:{shadow or 'none'}").props("draggable=true")
         blk.on("click",
                lambda e, s=sid: _select(s, _additive(e)),
                js_handler="(e)=>emit(e.ctrlKey||e.metaKey||e.shiftKey)")
         blk.on("dragstart", lambda e, s=sid: _begin_drag(s))
         with blk:
             _radio_tag(step.get("radio"))
-            ui.label(("! " if bad else "") + name).classes("mp-step-line").style(
+            if bad:
+                ui.label("!").classes("mp-step-badge")
+            ui.label(name).classes("mp-step-line").style(
                 "font-weight:600")
             ui.label(detail.strip(" ()") or step.get("technique", "")).classes(
                 "mp-step-line").style("opacity:0.85;font-size:10px")
@@ -5034,7 +5055,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     ui.label("drop signals here").classes("mp-bench-empty")
                 for item in _staged():
                     chip = ui.element("div").classes("mp-bench-chip").props("draggable=true") \
-                        .style(f"background:{_group_color(item['technique'])}")
+                        .style(f"background:{_kind_style(item['technique'])['fill']};"
+                               f"color:{_kind_style(item['technique'])['text']}")
                     chip.on("dragstart", lambda e, i=item["id"]: state.update(
                         drag={"type": "staged", "id": i}))
                     with chip:
@@ -6322,6 +6344,7 @@ def _catalog_card(entry, lane_target, state, add_step, lane_radios):
         with ui.row().classes("items-center gap-1 w-full no-wrap"):
             ui.label(entry.label).classes("text-xs grow")
             if entry.radiates:
-                ui.icon("cell_tower").classes("text-red-600 text-sm shrink-0") \
+                ui.icon("cell_tower").classes("text-sm shrink-0") \
+                    .style(f"color:{_theme.TIMELINE_KINDS['tx']['border']}") \
                     .tooltip("radiates: needs the Run mission or trigger confirm")
     return card

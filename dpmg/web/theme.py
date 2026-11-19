@@ -14,6 +14,51 @@ TEXT = "#d7dbe2"
 MUTED = "#8d968b"
 ACCENT = "#d0a644"
 
+# mission timeline palette. A step block is coloured by what it does, not
+# by alarm: red is kept for conflicts and errors alone. Each kind has a fill,
+# an edge (the fill about 15 % lighter) and its label colour.
+TIMELINE_TEXT = "#F2F4EF"
+TIMELINE_KINDS = {
+    "tx":        {"fill": "#8A6A1E", "border": "#B8902F", "text": TIMELINE_TEXT},  # radiating
+    "rx":        {"fill": "#3F5F73", "border": "#5E8499", "text": TIMELINE_TEXT},  # listen, record
+    "playback":  {"fill": "#5B6B2E", "border": "#7E9142", "text": TIMELINE_TEXT},  # IQ playback, replay
+    "comm":      {"fill": "#4E5A7A", "border": "#6F7DA3", "text": TIMELINE_TEXT},  # scenario waveforms
+    "jammer":    {"fill": "#7A4E2D", "border": "#A06E45", "text": TIMELINE_TEXT},
+    "generator": {"fill": "#5A5F66", "border": "#7C828A", "text": TIMELINE_TEXT},  # tone, chirp, noise
+    "config":    {"fill": "#2F3630", "border": "#4A544B", "text": "#C9CFC4"},      # set rate, dwell
+}
+# catalog group -> kind; a technique entry overrides its group (the record and
+# replay group holds one of each)
+TIMELINE_GROUP_KIND = {"Jammers": "jammer", "Tools generators": "generator",
+                       "Radio setup": "config", "IQ playback": "playback",
+                       "Comms": "comm", "Transponder": "tx", "Secure": "tx"}
+TIMELINE_TECHNIQUE_KIND = {"record": "rx", "replay": "playback"}
+TIMELINE_PRIMARY = TIMELINE_TEXT       # 2 px edge of the step the editor shows
+TIMELINE_SELECTED = ACCENT             # edge of the other selected steps, and the ring
+TIMELINE_CONFLICT = "#E5484D"          # the only red: a step with a plan error
+TIMELINE_CONFLICT_RING = "#E5484D33"
+TIMELINE_STAGED_BORDER = "#6A7560"     # dashed edge of a planning-bench chip
+TIMELINE_NOW = "#7FA650"               # the current-time line on the UTC day
+
+
+def timeline_kind(technique: str, group: str = "", radiates: bool = False) -> str:
+    """The palette kind for a step: by technique, then catalog group, else
+    radiating (tx) or not (rx)."""
+    return (TIMELINE_TECHNIQUE_KIND.get(technique) or TIMELINE_GROUP_KIND.get(group)
+            or ("tx" if radiates else "rx"))
+
+
+TIMELINE_CSS = f"""
+.mp-root .mp-step:hover {{ filter:brightness(1.08); border-color:{ACCENT} !important; z-index:6; }}
+.mp-root .mp-step-offline {{ opacity:.55; background-image:repeating-linear-gradient(45deg,
+    rgba(0,0,0,.30) 0 5px, transparent 5px 10px) !important; }}
+.mp-root .mp-step-badge {{ position:absolute; top:3px; right:3px; width:14px; height:14px;
+    background:{TIMELINE_CONFLICT}; color:#fff; font:700 10px/14px 'JetBrains Mono',Menlo,monospace;
+    text-align:center; pointer-events:none; z-index:2; }}
+.mp-root .mp-bench-chip {{ opacity:.7; border:1px dashed {TIMELINE_STAGED_BORDER} !important; }}
+.mp-root .mp-bench-chip:hover {{ opacity:1; }}
+"""
+
 THEME_CSS = f"""
 :root {{ --bg:{BG}; --surface:{SURFACE}; --raised:{RAISED}; --border:{BORDER};
   --text:{TEXT}; --muted:{MUTED}; --accent:{ACCENT}; }}
