@@ -212,3 +212,39 @@ def test_triggers_see_every_radio_whatever_the_map_shows(tmp_path):
     fix = tg.Fix(32.22, -110.97, t=sess.triggers.clock())
     events = sess.triggers.update(sess.mission, fix)
     assert [(e["kind"], e["step"]["radio"]) for e in events] == [("start", "G40-SIM")]
+
+
+def test_relative_timeline_reads_elapsed_time_and_fits_short_missions():
+    # a new plan is relative (T+ from Run mission), not the 24 h UTC clock
+    assert mt._fresh_mission()["anchor"]["mode"] == "on_tx"
+    assert [mt._fmt_time(t) for t in (0, 7.5, 90, 1800, 3725)] == \
+        ["0:00", "0:07.5", "1:30", "30:00", "1:02:05"]
+    # empty: an hour; with steps: the plan plus room, 5 min steps, 30 min floor
+    assert mt.relative_window_s(0, False) == 3600
+    assert mt.relative_window_s(120, True) == 1800
+    assert mt.relative_window_s(1800, True) == 2100
+    assert mt.relative_window_s(3600, True) == 3900
+    assert mt.relative_window_s(5000, True) == 5400
+
+
+def test_bulk_edit_writes_a_shared_setting_only_where_it_exists():
+    from dpmg.mission import catalog
+    def step(sid, tech, start, atten=None):
+        p = catalog.get(tech).fresh_params()
+        if atten is not None:
+            p["tx_atten_db"] = atten
+        return {"id": sid, "radio": "R", "technique": tech, "params": p,
+                "schedule": {"start_s": start, "stop_s": start + 30}}
+    steps = [step("a", "jammer.noise", 0, 10), step("b", "jammer.tone", 60, 20),
+             step("c", "rx_dwell", 120)]
+    shared = {f.key: (ids, common) for f, ids, common in mt.bulk_fields(steps)}
+    ids, common = shared["tx_atten_db"]
+    assert ids == ["a", "b"] and common is mt.MIXED      # rx_dwell has no TX atten
+    n = mt.apply_bulk(steps, {"tx_atten_db": 30}, priority=2, duration_s=90)
+    assert n == 3
+    assert [s["params"].get("tx_atten_db") for s in steps] == [30, 30, None]
+    assert "tx_atten_db" not in steps[2]["params"]
+    assert all(s["priority"] == 2 for s in steps)
+    assert [s["schedule"] for s in steps][1] == {"start_s": 60, "stop_s": 150}
+    shared = {f.key: common for f, _, common in mt.bulk_fields(steps)}
+    assert shared["tx_atten_db"] == 30

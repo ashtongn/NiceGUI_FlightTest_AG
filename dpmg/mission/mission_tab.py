@@ -76,7 +76,12 @@ GROUP_COLORS = {"Jammers": "#dc2626", "Tools generators": "#2563eb",
 def _group_color(technique: str) -> str:
     e = catalog.get(technique)
     return GROUP_COLORS.get(e.group if e else "", "#6b7280")
-MIN_WINDOW_S = 60.0         # always show at least this many seconds
+# relative (elapsed-time) timeline window. Missions usually run 30 to 60 min:
+# an empty plan shows an hour, a plan with steps fits its length (padded and
+# rounded up to 5 min) but never less than half an hour.
+EMPTY_WINDOW_S = 3600.0
+MIN_WINDOW_S = 1800.0
+WINDOW_ROUND_S = 300.0
 NEW_STEP_LEAD_S = 60.0      # a catalog step on the UTC clock starts this far ahead
 CLOCK_SKEW_WARN_S = 1.0     # a radio OS clock this far from the console shows amber
 
@@ -368,10 +373,109 @@ def _new_step_id() -> str:
 
 
 def _fmt_time(t: float) -> str:
+    """Elapsed plan time as a stopwatch reads it: m:ss, h:mm:ss from an hour,
+    with a tenth of a second only when the time has one (0:07.5)."""
+    t = round(max(0.0, float(t)), 1)
+    whole = int(t)
+    tenth = int(round((t - whole) * 10))
+    h, rem = divmod(whole, 3600)
+    m, s = divmod(rem, 60)
+    out = f"{h}:{m:02d}:{s:02d}" if h else f"{m}:{s:02d}"
+    return out + (f".{tenth}" if tenth else "")
+
+
+def _fmt_dur(t: float) -> str:
+    """A duration in short words (30s, 2:00, 1.5 h) for the planning chips."""
     t = float(t)
+    if t >= 3600:
+        return f"{t / 3600:.1f} h"
     if t >= 60:
         return f"{int(t // 60)}:{int(t % 60):02d}"
     return f"{t:g}s"
+
+
+def relative_window_s(span_s: float, has_steps: bool) -> float:
+    """How much elapsed time the relative timeline shows for a plan whose last
+    step stops at span_s: an hour when empty, else the plan plus a little
+    room (5 %, at least a minute) rounded up to 5 min, never under 30 min."""
+    if not has_steps:
+        return max(EMPTY_WINDOW_S, float(span_s))
+    span = max(0.0, float(span_s))
+    want = span + max(60.0, span * 0.05)
+    return max(MIN_WINDOW_S, math.ceil(want / WINDOW_ROUND_S) * WINDOW_ROUND_S)
+
+
+# multi-step (bulk) editing: the settings several selected steps share
+MIXED = object()        # a shared field whose value differs between the steps
+_BULK_SKIP_KEYS = {"source", "path", "name", "spec_path", "spec"}   # set by pickers
+
+
+def bulk_fields(steps):
+    """The catalog fields a set of steps can be bulk-edited on, in catalog
+    order: [(field, [step ids that have it], common value or MIXED)]. A field
+    joins when every step that has it agrees on its kind; for a select, only
+    the choices every such step offers are kept (none left: field skipped).
+    JSON fields and the file/scenario/recording picks are left to the single
+    editor."""
+    by_key, order = {}, []
+    for s in steps:
+        entry = catalog.get(s.get("technique"))
+        for f in (entry.fields if entry else []):
+            if f.kind == "json" or f.key in _BULK_SKIP_KEYS:
+                continue
+            if f.key not in by_key:
+                by_key[f.key] = []
+                order.append(f.key)
+            by_key[f.key].append((s, f))
+    out = []
+    for key in order:
+        pairs = by_key[key]
+        kinds = {f.kind for _, f in pairs}
+        if len(kinds) != 1:
+            continue
+        f0 = pairs[0][1]
+        if f0.kind == "select":
+            vals = [v for v, _ in f0.choices]
+            for _, f in pairs[1:]:
+                ok = {v for v, _ in f.choices}
+                vals = [v for v in vals if v in ok]
+            if not vals:
+                continue
+            labels = dict(f0.choices)
+            f0 = catalog.Field(f0.key, f0.label, f0.kind, f0.default,
+                               choices=[(v, labels[v]) for v in vals],
+                               optional=all(f.optional for _, f in pairs),
+                               help=f0.help, blank=f0.blank)
+        values = [(s.get("params") or {}).get(key, f.default) for s, f in pairs]
+        common = values[0] if all(v == values[0] for v in values) else MIXED
+        out.append((f0, [s.get("id") for s, _ in pairs], common))
+    return out
+
+
+def apply_bulk(steps, params=None, priority=None, duration_s=None):
+    """Write params (key: value) into every step whose technique has that
+    field, and a priority and duration into every timed step. Returns the
+    number of steps changed."""
+    params = params or {}
+    changed = 0
+    for s in steps:
+        entry = catalog.get(s.get("technique"))
+        keys = {f.key for f in (entry.fields if entry else [])}
+        hit = False
+        for k, v in params.items():
+            if k in keys:
+                s.setdefault("params", {})[k] = v
+                hit = True
+        if not mf.is_location_task(s):
+            if priority is not None:
+                s["priority"] = max(1, min(9, int(priority)))
+                hit = True
+            if duration_s is not None:
+                st = mf.step_start_s(s)
+                s["schedule"] = {"start_s": st, "stop_s": round(st + float(duration_s), 3)}
+                hit = True
+        changed += hit
+    return changed
 
 
 # Where the plan is kept between page loads and GUI restarts.
@@ -381,12 +485,10 @@ AUTOSAVE_PATH = (os.environ.get("DPMG_MISSION_AUTOSAVE")
 
 
 def _fresh_mission():
-    # a fresh plan opens on the 24 h UTC clock timeline with today's date, since
-    # that is the view operators plan against; switch the top-bar timeline
-    # dropdown to "Start on Run mission" for a relative plan.
-    m = mf.new_mission("new mission")
-    m["anchor"] = {"mode": "clock", "date": _today_utc(), "tz": "UTC"}
-    return m
+    # a fresh plan is relative: step times are elapsed from Run mission (T+),
+    # which suits the 30 to 60 min missions flown. "Start all at planned UTC
+    # times" under Mission radios switches a plan to the 24 h UTC clock.
+    return mf.new_mission("new mission")
 
 
 class _PlanSession:
@@ -842,6 +944,12 @@ PAGE_CSS = """
 .mp-root .mm-drop-hot { outline: 2px dashed #d0a644; outline-offset: -4px; }
 .mp-root .mp-bar { background: #1a1e1a; border: 1px solid #2c322c;
                    padding: 4px 8px; }
+.mp-root .mp-lane[data-rid] { user-select: none; cursor: crosshair; }
+.mp-marquee { position: fixed; z-index: 9999; pointer-events: none;
+              border: 1px dashed #d0a644; background: rgba(208,166,68,.12); }
+.mp-root .mp-dirty .q-field__control { box-shadow: inset 0 0 0 2px #d0a644;
+                                        background: rgba(208,166,68,.14); }
+.mp-root .mp-selcount { font-size: 11px; color: #d0a644; font-weight: 600; }
 """
 
 CURSOR_JS = """<script>
@@ -857,6 +965,43 @@ document.addEventListener('mousemove',function(e){
   const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.floor(t%60),p=n=>String(n).padStart(2,'0');
   rd.textContent=(lane.dataset.clock==='1'||h>0)?p(h)+':'+p(m)+':'+p(s):p(m)+':'+p(s);
 });
+// marquee: press on an empty part of a lane and drag a box across steps (and
+// across lanes) to select them; shift/ctrl/cmd adds to the selection
+(function(){
+  let st=null,box=null;
+  document.addEventListener('pointerdown',function(e){
+    if(e.button!==0)return;
+    const lane=e.target.closest&&e.target.closest('.mp-lane[data-rid]');
+    if(!lane||e.target!==lane)return;
+    st={x:e.clientX,y:e.clientY,add:e.shiftKey||e.ctrlKey||e.metaKey,moved:false};
+  });
+  document.addEventListener('pointermove',function(e){
+    if(!st)return;
+    const dx=e.clientX-st.x,dy=e.clientY-st.y;
+    if(!st.moved&&Math.abs(dx)<5&&Math.abs(dy)<5)return;
+    st.moved=true;
+    if(!box){box=document.createElement('div');box.className='mp-marquee';document.body.appendChild(box);}
+    box.style.left=Math.min(st.x,e.clientX)+'px';box.style.top=Math.min(st.y,e.clientY)+'px';
+    box.style.width=Math.abs(dx)+'px';box.style.height=Math.abs(dy)+'px';
+  });
+  document.addEventListener('pointerup',function(e){
+    if(!st)return;
+    const s=st;st=null;
+    if(box){box.remove();box=null;}
+    if(!s.moved)return;
+    window._mpMarqUntil=performance.now()+300;
+    const x0=Math.min(s.x,e.clientX),x1=Math.max(s.x,e.clientX);
+    const y0=Math.min(s.y,e.clientY),y1=Math.max(s.y,e.clientY);
+    const lanes=[];
+    document.querySelectorAll('.mp-lane[data-rid]').forEach(l=>{
+      const r=l.getBoundingClientRect();
+      if(r.bottom<y0||r.top>y1||r.width<=0)return;
+      const tot=parseFloat(l.dataset.total),f=v=>Math.max(0,Math.min(1,(v-r.left)/r.width))*tot;
+      lanes.push({rid:l.dataset.rid,t0:f(x0),t1:f(x1)});
+    });
+    if(lanes.length&&window.emitEvent)window.emitEvent('mp_marquee',{lanes:lanes,add:s.add});
+  });
+})();
 </script>"""
 
 
@@ -1412,12 +1557,13 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         return min(max(t, last), mf.DAY_S - 1.0)
 
     def timeline_span():
-        span = max((mf.step_stop_s(s) for s in mission()["steps"]), default=0.0)
-        return max(MIN_WINDOW_S, span + 20.0)
+        timed = [s for s in mission()["steps"] if not mf.is_location_task(s)]
+        span = max((mf.step_stop_s(s) for s in timed), default=0.0)
+        return relative_window_s(span, bool(timed))
 
     def _plan_stop_s():
-        # where a run ends; timeline_span is the window drawn around it, 20 s
-        # longer, and a location task is not part of a run
+        # where a run ends; timeline_span is the window drawn around it, a
+        # little longer, and a location task is not part of a run
         return max((mf.step_stop_s(s) for s in mission()["steps"]
                     if not mf.is_location_task(s)), default=0.0)
 
@@ -3711,13 +3857,17 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
 
     dialog_host = ui.element("div")
 
-    # Delete / Backspace removes the selected step(s) without opening the editor.
+    # Delete / Backspace removes the selected step(s) without opening the editor;
+    # Esc clears the selection.
     # ignore keeps it from firing while the operator is typing in a field.
     def _on_key(e):
         if not e.action.keydown:
             return
-        if str(getattr(e.key, "name", e.key)) in ("Delete", "Backspace"):
+        k = str(getattr(e.key, "name", e.key))
+        if k in ("Delete", "Backspace"):
             _delete_selected()
+        elif k == "Escape":
+            _clear_selection()
 
     ui.keyboard(on_key=_on_key,
                 ignore=["input", "select", "button", "textarea"])
@@ -3766,14 +3916,12 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     a["date"] = date_in.value or ""
                     date_in.set_visibility(a["mode"] == "clock")
                     # pick a sane view when the timeline kind changes: fill the
-                    # width with the whole day for clock mode, the relative px
-                    # default otherwise.
+                    # width with the whole window (the 24 h day on the clock,
+                    # the mission's elapsed window when relative).
                     if a["mode"] != was:
-                        if a["mode"] == "clock":
-                            state["fit"] = True
-                        else:
-                            state["fit"] = False
-                            state["px_per_s"] = PX_PER_S
+                        state["fit"] = True
+                        state["px_per_s"] = PX_PER_S
+                        state["scroll_cmd"] = ("abs", 0.0)
                     _revalidate(); _refresh_all()
                 anchor_sel.on_value_change(_on_anchor)
                 date_in.on_value_change(_on_anchor)
@@ -4341,10 +4489,16 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 ui.button(icon="chevron_left", on_click=lambda: _pan(-0.5)).props("dense flat").tooltip("pan left")
                 ui.button(icon="chevron_right", on_click=lambda: _pan(0.5)).props("dense flat").tooltip("pan right")
                 ui.button("to selected", icon="my_location", on_click=lambda: _jump_selected()).props("dense flat").tooltip("scroll to the selected step")
-                ui.label("UTC" if _tl_clock() else "relative").classes(
+                ui.label("UTC" if _tl_clock() else "T+ elapsed from Run mission (m:ss)").classes(
                     "text-xs text-gray-500 ml-2")
-                ui.label("wheel to zoom, shift-wheel to pan").classes(
+                ui.label("wheel to zoom, shift-wheel to pan, drag a box or "
+                         "shift-click to select several").classes(
                     "text-xs text-gray-400 ml-2")
+                nsel = len(state.get("sel", set()))
+                if nsel > 1:
+                    ui.label(f"{nsel} selected").classes("mp-selcount ml-2")
+                    ui.button("clear", on_click=lambda: _clear_selection()) \
+                        .props("dense flat no-caps size=sm").tooltip("Esc")
                 ui.label("").props("id=tl-cursor").classes("mp-cursor-read ml-auto")
             _bench()
             # each lane (and the ruler) gets its own horizontal scroller, so a
@@ -4424,12 +4578,19 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 "if(n++<9)requestAnimationFrame(tick);};"
                 "tick();requestAnimationFrame(tick);})();")
 
+    def _tl_tick(total, fit, px):
+        # fitted: a few ticks across the width (6 h on the clock's day, 5 or
+        # 10 min on a relative half hour or hour); zoomed: about one per 90 px
+        if fit:
+            return _nice_tick(total / (5.0 if _tl_clock() else 8.0))
+        return _nice_tick(max(90.0 / px, total / 200.0))
+
     def _ruler(total, fit, px):
         # a few nice ticks across the fitted width (6 h on a full day, so the
         # labels stay legible), else about one per 90 px. The total/200 floor
         # caps how many labels the ruler draws when zoomed right in, so a deep
         # zoom cannot spawn thousands of DOM nodes.
-        tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
+        tick = _tl_tick(total, fit, px)
         with ui.element("div").style(
                 "position:relative;height:18px;width:100%;"
                 "border-bottom:1px solid #2c322c"):
@@ -4539,20 +4700,23 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         # online says so; its steps are skipped if it is still offline at Run mission.
         _lane_title(rid)
         # light grid lines at the ruler's tick spacing
-        tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
+        tick = _tl_tick(total, fit, px)
         period = _span(tick, total, fit, px)
         rcol = _radio_color(rid)
         lane = ui.element("div").classes("mp-lane").props(
-            f'data-total="{total:.1f}" data-clock="{1 if _tl_clock() else 0}"').style(
+            f'data-total="{total:.1f}" data-clock="{1 if _tl_clock() else 0}" '
+            f'data-rid="{rid}"').style(
             f"position:relative;height:{LANE_H}px;width:100%;"
             f"border-left:5px solid {rcol};"
             + (f"background-color:{rcol}14;" if _is_selected_radio(rid) else "")
             + f"background-image:repeating-linear-gradient(to right,#2a302a 0 1px,"
             f"transparent 1px {period})")
         lane.on("dragover.prevent", lambda e: None)
-        # a click on the empty lane (not on a block) selects the radio
+        # a click on the empty lane (not on a block) selects the radio; the
+        # click that ends a marquee box does not
         lane.on("click", lambda e, r=rid: _select_radio(r),
-                js_handler="(e)=>{if(e.target===e.currentTarget) emit();}")
+                js_handler="(e)=>{if(e.target===e.currentTarget&&"
+                "performance.now()>(window._mpMarqUntil||0)) emit();}")
         # emit the drop x within the lane (measured from the lane's left edge, so
         # it is right even when scrolled) and the lane's full pixel width, so the
         # time maps the same way whether the lane is fitted or pixel-zoomed.
@@ -4632,7 +4796,11 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         border = ("3px solid #111827" if primary else
                   "2px solid #f59e0b" if in_sel else
                   "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.15)")
-        shadow = "0 0 0 2px rgba(220,38,38,.35)" if bad else "0 1px 2px rgba(0,0,0,.25)"
+        multi = in_sel and len(state.get("sel", set())) > 1
+        # a step in a multi-selection gets an amber halo, so the whole group
+        # reads at a glance whatever its fill
+        shadow = ("0 0 0 2px #d0a644, 0 0 8px rgba(208,166,68,.7)" if multi else
+                  "0 0 0 2px rgba(220,38,38,.35)" if bad else "0 1px 2px rgba(0,0,0,.25)")
         if step.get("technique") == "set_rate":
             # the time the re-init takes, drawn so nothing is placed inside it
             need = mf.rate_change_block_s((_plan_radio(step.get("radio")) or {}).get("type"))
@@ -4650,7 +4818,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             f"padding:3px 6px 3px 12px;cursor:pointer;box-shadow:{shadow}").props("draggable=true")
         blk.on("click",
                lambda e, s=sid: _select(s, _additive(e)),
-               js_handler="(e)=>emit(e.ctrlKey||e.metaKey)")
+               js_handler="(e)=>emit(e.ctrlKey||e.metaKey||e.shiftKey)")
         blk.on("dragstart", lambda e, s=sid: _begin_drag(s))
         with blk:
             _radio_tag(step.get("radio"))
@@ -4756,8 +4924,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                         drag={"type": "staged", "id": i}))
                     with chip:
                         ui.label(item.get("label") or item["technique"]).classes("mp-bench-name")
-                        ui.label(_fmt_time(item["dur_s"]) if item["dur_s"] < 3600 else
-                                 f"{item['dur_s'] / 3600:.1f} h").classes("mp-bench-dur")
+                        ui.label(_fmt_dur(item["dur_s"])).classes("mp-bench-dur")
                         ui.button(icon="close", on_click=lambda _e, i=item["id"]: _unstage(i)) \
                             .props("dense flat round size=xs").classes("mp-bench-x") \
                             .tooltip("remove from planning")
@@ -4835,7 +5002,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             _refresh_all()
 
     def _additive(e):
-        """True when the click came with ctrl/cmd held. The emitted value
+        """True when the click came with shift, ctrl or cmd held. The emitted value
         arrives as a bare bool for a single emit, or wrapped in a list; handle
         both so ctrl-click never throws."""
         a = getattr(e, "args", None)
@@ -4844,8 +5011,9 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         return bool(a)
 
     def _select(sid, additive=False):
-        """Click selects just this step. Ctrl/Cmd-click toggles it in the
-        multi-selection (so several can be dragged together). The primary is the
+        """Click selects just this step. Shift/Ctrl/Cmd-click toggles it in the
+        multi-selection (so several can be dragged together and edited at
+        once). The primary is the
         one the editor shows."""
         sel = state.setdefault("sel", set())
         if additive:
@@ -4891,8 +5059,260 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         else:
             state["drag"] = {"type": "move", "id": sid}
 
+    def _select_many(ids, additive=False):
+        """Select a set of steps at once (the marquee box). additive adds them
+        to the current selection; otherwise they replace it."""
+        sel = state.setdefault("sel", set())
+        ids = set(ids)
+        if not additive:
+            sel.clear()
+        sel |= ids
+        if state["selected"] not in sel:
+            first = min((s for s in mission()["steps"] if s.get("id") in sel),
+                        key=mf.step_start_s, default=None)
+            state["selected"] = first.get("id") if first else None
+        _refresh_timeline()
+        _refresh_editor()
+        if sel:
+            try:
+                right_tabs.set_value(tab_editor)
+            except Exception:
+                pass
+
+    def _clear_selection():
+        if not state.get("sel") and state.get("selected") is None:
+            return
+        state["sel"] = set()
+        state["selected"] = None
+        _refresh_timeline()
+        _refresh_editor()
+
+    def _on_marquee(e):
+        # a box dragged across the lanes: every timed step on a crossed lane
+        # that overlaps the box's time range
+        a = getattr(e, "args", None) or {}
+        hits = set()
+        for h in a.get("lanes") or []:
+            try:
+                rid, t0, t1 = h.get("rid"), float(h.get("t0")), float(h.get("t1"))
+            except (TypeError, ValueError, AttributeError):
+                continue
+            for s in mission()["steps"]:
+                if (s.get("radio") == rid and not mf.is_location_task(s)
+                        and mf.step_start_s(s) < t1 and mf.step_stop_s(s) > t0):
+                    hits.add(s.get("id"))
+        if hits or not a.get("add"):
+            _select_many(hits, additive=bool(a.get("add")))
+
+    ui.on("mp_marquee", _on_marquee)
+
+    def _bulk_editor():
+        """The editor for several selected steps: the settings they share.
+        A field shows the common value, or "mixed" where the steps differ.
+        Only the fields changed here are written, each to every selected step
+        that has that setting; the rest of each step is left alone."""
+        ids = state.get("sel", set())
+        steps = [s for s in mission()["steps"] if s.get("id") in ids]
+        n = len(steps)
+        timed = [s for s in steps if not mf.is_location_task(s)]
+        ui.label("Edit selected steps").classes("text-sm font-bold")
+        ui.label(f"{n} steps selected").classes("text-xs font-mono text-amber-700")
+        ui.label("Change a field, then Apply: it is written to every selected step "
+                 "that has that setting. Untouched fields, and fields left on "
+                 "mixed, stay as they are on each step.").classes(
+            "text-xs text-gray-500 whitespace-normal")
+        with ui.row().classes("gap-1 w-full"):
+            for s in sorted(steps, key=mf.step_start_s):
+                ui.button(f"{s.get('technique')} · {s.get('radio')}",
+                          on_click=lambda _e, i=s.get("id"): _select(i)) \
+                    .props("dense flat no-caps size=sm").classes("text-[10px]") \
+                    .tooltip("edit this step alone")
+
+        touched = {}          # key: reader returning the new value
+        apply_btn = None
+
+        def _row(label, tip):
+            r = ui.row().classes("items-center gap-1 w-full")
+            with r:
+                ui.label(label).classes(
+                    "text-xs w-32 shrink-0 whitespace-normal leading-tight").tooltip(tip or "")
+            return r
+
+        def _note_count(cnt):
+            if cnt < n:
+                ui.label(f"{cnt} of {n}").classes("text-[10px] text-gray-500") \
+                    .tooltip(f"only {cnt} of the selected steps have this setting")
+
+        def _touch(key, reader, widgets):
+            def _h(_=None):
+                touched[key] = reader
+                for w in widgets:
+                    w.classes("mp-dirty")
+                if apply_btn is not None:
+                    apply_btn.props(remove="color=primary")
+                    apply_btn.props("color=warning")
+                    apply_btn.set_text(f"Apply {len(touched)} change(s) to selected")
+            for w in widgets:
+                w.on_value_change(_h)
+
+        if timed:
+            _section("Timing")
+            prios = {mf.step_priority(s) for s in timed}
+            with _row("priority (1 high, 9 low)", "when a location task wants the radio, "
+                      "the higher priority wins"):
+                pr = ui.number(value=prios.pop() if len(prios) == 1 else None,
+                               placeholder="mixed", min=1, max=9, step=1, format="%d") \
+                    .props("dense outlined").classes("w-28")
+                _note_count(len(timed))
+            _touch("__priority__", lambda: pr.value, [pr])
+            durs = {round(mf.step_stop_s(s) - mf.step_start_s(s), 3) for s in timed}
+            dv, du = _best_unit(next(iter(durs))) if len(durs) == 1 else (None, "s")
+            with _row("duration", "each step keeps its start; its stop moves"):
+                dn = ui.number(value=None if dv is None else round(dv, 4), format="%g",
+                               placeholder="mixed", min=0).props("dense outlined").classes("w-24")
+                dsu = ui.select(_UNIT_ORDER, value=du).props("dense outlined").classes("w-20")
+                _note_count(len(timed))
+            _touch("__duration__", lambda: None if dn.value in (None, "")
+                   else _to_seconds(dn.value, dsu.value), [dn, dsu])
+
+        shared = bulk_fields(steps)
+        section_done = set()
+        _RF = {"center_hz", "tx_center_hz", "tx_atten_db", "rx_gain_index"}
+        shared = [x for x in shared if x[0].key in _RF] + \
+                 [x for x in shared if x[0].key not in _RF]
+        # a setting only one selected step has is better edited on that step;
+        # it is kept, folded away, so the shared ones stand out
+        common_f = [x for x in shared if len(x[1]) > 1 or n == 1]
+        lone_f = [x for x in shared if not (len(x[1]) > 1 or n == 1)]
+        lone_box = None
+        for i, (f, sids, common) in enumerate(common_f + lone_f):
+            if i == len(common_f):
+                lone_box = ui.expansion(f"settings only one step has ({len(lone_f)})") \
+                    .classes("w-full text-xs")
+            if lone_box is None:
+                sec = "RF" if f.key in _RF else "Options"
+                if sec not in section_done:
+                    section_done.add(sec)
+                    _section(sec)
+            mixed = common is MIXED
+            with (lone_box if lone_box is not None else ui.element("div").classes("w-full")), \
+                    _row(f.label, f.help):
+                if f.kind == "hz":
+                    nv, nu = (None, "MHz") if mixed else _best_hz_unit(
+                        common, "MHz" if f.optional else "kHz")
+                    num = ui.number(value=None if nv is None else round(nv, 6), format="%g",
+                                    placeholder="mixed" if mixed else (f.blank if f.optional else "")) \
+                        .props("dense outlined").classes("grow").style("min-width:7rem")
+                    unit = ui.select(list(_HZ_UNITS), value=nu).props("dense outlined") \
+                        .classes("w-20 shrink-0")
+
+                    def _read(num=num, unit=unit, f=f):
+                        if num.value in (None, ""):
+                            if f.optional:
+                                return None
+                            raise ValueError(f"{f.label} is empty")
+                        return float(num.value) * _HZ_UNITS[unit.value]
+                    ws = [num, unit]
+                elif f.kind == "num":
+                    num = ui.number(value=None if mixed else common, format="%g",
+                                    min=f.min, max=f.max, step=f.step,
+                                    placeholder="mixed" if mixed else "") \
+                        .props("dense outlined").classes("w-28")
+
+                    def _read(num=num, f=f):
+                        if num.value in (None, ""):
+                            if f.optional:
+                                return None
+                            raise ValueError(f"{f.label} is empty")
+                        v = float(num.value)
+                        return int(v) if f.step == 1 else v
+                    ws = [num]
+                elif f.kind in ("select", "bool"):
+                    if f.kind == "bool":
+                        opts = {True: "on", False: "off"}
+                        key = None if mixed else bool(common)
+                    else:
+                        opts = {(_BLANK if v is None else v): lab for v, lab in f.choices}
+                        key = None if mixed else (_BLANK if common is None else common)
+                        if key is not None and key not in opts:
+                            opts[key] = f"{common} (from file)"
+                    if mixed:
+                        opts = {"__mixed__": "mixed", **opts}
+                        key = "__mixed__"
+                    sel = ui.select(opts, value=key).props("dense outlined").classes("w-40")
+
+                    def _read(sel=sel):
+                        if sel.value == "__mixed__":
+                            raise LookupError
+                        return None if sel.value == _BLANK else sel.value
+                    ws = [sel]
+                else:
+                    tx = ui.input(value="" if mixed or common is None else str(common),
+                                  placeholder="mixed" if mixed else "") \
+                        .props("dense outlined").classes("w-48")
+
+                    def _read(tx=tx):
+                        return tx.value or ""
+                    ws = [tx]
+                _note_count(len(sids))
+            _touch(f.key, _read, ws)
+
+        if not shared and not timed:
+            ui.label("these steps share no settings").classes("text-xs text-gray-500")
+
+        def _apply(_=None):
+            params, prio, dur = {}, None, None
+            try:
+                for k, rd in touched.items():
+                    try:
+                        v = rd()
+                    except LookupError:          # left on (or put back to) mixed
+                        continue
+                    if k == "__priority__":
+                        prio = None if v in (None, "") else int(v)
+                    elif k == "__duration__":
+                        dur = v
+                    else:
+                        params[k] = v
+            except (TypeError, ValueError) as ex:
+                ui.notify(str(ex), type="negative")
+                return
+            if dur is not None and dur <= 0:
+                ui.notify("duration must be above zero", type="negative")
+                return
+            if not params and prio is None and dur is None:
+                ui.notify("nothing changed", type="info")
+                return
+            cnt = apply_bulk(steps, params, prio, dur)
+            what = [f"{k}={v}" for k, v in params.items()]
+            if prio is not None:
+                what.append(f"priority={prio}")
+            if dur is not None:
+                what.append(f"duration={_fmt_dur(dur)}")
+            audit.add("edit", f"bulk edit of {cnt} step(s): " + ", ".join(what))
+            _revalidate(); _refresh_conflicts(); _refresh_timeline()
+            _refresh_audit(); _refresh_editor()
+            ui.notify(f"applied to {cnt} step(s)", type="positive")
+
+        ui.label("").classes("min-h-[0.5rem]")
+        with ui.element("div").classes("w-full").style(
+                "position:sticky;bottom:0;background:var(--surface,#fff);padding:6px 0 2px;"
+                "border-top:1px solid var(--border,#e5e7eb);z-index:1"):
+            with ui.row().classes("gap-2"):
+                apply_btn = ui.button(f"Apply to {n} selected", on_click=_apply) \
+                    .props("dense color=primary").tooltip(
+                    "write the changed (amber) fields into every selected step that has them")
+                ui.button("Clear selection", on_click=_clear_selection) \
+                    .props("dense flat no-caps").tooltip("Esc")
+                ui.button(f"Delete {n}", icon="delete", on_click=_delete_selected) \
+                    .props("dense color=negative outline")
+
     def _refresh_editor():
         editor_box.clear()
+        if len(state.get("sel", set())) > 1:
+            with editor_box:
+                _bulk_editor()
+            return
         sid = state["selected"]
         step = next((s for s in mission()["steps"] if s.get("id") == sid), None)
         rtype = ((_plan_radio(step.get("radio")) or {}).get("type")) if step else None
@@ -5255,8 +5675,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             dirty_note = ui.label("").classes("text-xs min-h-[1.1rem]")
             # the buttons stay in view at the bottom of a long editor
             with ui.element("div").classes("w-full").style(
-                    "position:sticky;bottom:0;background:white;padding:6px 0 2px;"
-                    "border-top:1px solid #e5e7eb"):
+                    "position:sticky;bottom:0;background:var(--surface,#fff);padding:6px 0 2px;"
+                    "border-top:1px solid var(--border,#e5e7eb);z-index:1"):
                 with ui.row().classes("gap-2"):
                     apply_btn = ui.button("Apply changes").props("dense color=primary").tooltip("write the amber fields into the plan")
                     ui.button("Delete step", icon="delete",
