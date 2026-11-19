@@ -1003,7 +1003,7 @@ PAGE_CSS = """
 .mp-root .mp-step-line { pointer-events:none; white-space:nowrap; overflow:hidden;
                          text-overflow:ellipsis; max-width:100%; }
 /* view toolbar: Timeline / Map switch and the console, one 44 px row */
-.mp-root .mp-toolbar { display:flex; flex-wrap:wrap; width:100%; margin:0 0 8px; }
+.mp-root .mp-toolbar { display:flex; flex-wrap:wrap; width:100%; margin:12px 0 8px; }
 .mp-root .mp-seg { display:flex; border:1px solid var(--border); background:var(--raised); }
 .mp-root .mp-seg-btn { display:flex; align-items:center; justify-content:center; gap:8px;
     min-width:140px; height:42px; padding:0 16px; cursor:pointer; user-select:none;
@@ -1031,7 +1031,25 @@ PAGE_CSS = """
 .mp-root .mp-status-ok { color:#7fa650; border-color:#7fa65055; }
 .mp-root .mp-status-warn { color:#e0a030; border-color:#e0a03055; }
 .mp-root .mp-status-err { color:#e5484d; border-color:#e5484d77; background:#e5484d14; }
+/* Step editor / Audit log: Quasar tabs drawn as the same segmented control */
+.mp-root .mp-segtabs { background:transparent !important; border:0 !important; min-height:0; }
+.mp-root .mp-segtabs .q-tabs__content { flex:0 0 auto; border:1px solid var(--border);
+    background:var(--raised); overflow:hidden; }
+.mp-root .mp-segtabs .q-tab { min-width:140px; min-height:42px; height:42px; padding:0 16px;
+    color:var(--muted); background:var(--raised); font-size:12px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; opacity:1; }
+.mp-root .mp-segtabs .q-tab + .q-tab { border-left:1px solid var(--border); }
+.mp-root .mp-segtabs .q-tab__content { gap:8px; min-width:0; }
+.mp-root .mp-segtabs .q-tab__icon { font-size:20px; width:20px; height:20px; margin:0; }
+.mp-root .mp-segtabs .q-tab__label { font-size:12px; font-weight:600; letter-spacing:.08em; line-height:1; }
+.mp-root .mp-segtabs .q-tab:hover { background:#1f241f; color:var(--text); }
+.mp-root .mp-segtabs .q-tab--active, .mp-root .mp-segtabs .q-tab--active:hover {
+    background:var(--surface); color:var(--accent) !important; box-shadow:inset 0 -2px 0 var(--accent); }
+.mp-root .mp-segtabs .q-tab__indicator { display:none; }
+.mp-root .mp-segtabs .q-focus-helper { display:none; }
 @media (max-width: 1100px) {
+  .mp-root .mp-segtabs .q-tabs__content { flex:1 1 auto; }
+  .mp-root .mp-segtabs .q-tab { flex:1; }
   .mp-root .mp-seg { width:100%; }
   .mp-root .mp-seg-btn { flex:1; }
   .mp-root .mp-console { flex-basis:100%; border-left:1px solid var(--border); border-top:0;
@@ -4097,9 +4115,11 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             map_ui["show_map"] = lambda: _show_main("Map")
             _show_main("Timeline")
 
-            with ui.tabs().props("dense no-caps").classes("w-full") as right_tabs:
-                tab_editor = ui.tab("Step editor")
-                tab_audit = ui.tab("Audit log")
+            # the same segmented look as the Timeline / Map switch
+            with ui.tabs().props("dense inline-label align=left") \
+                    .classes("w-full mp-segtabs") as right_tabs:
+                tab_editor = ui.tab("Step editor", icon="edit_note")
+                tab_audit = ui.tab("Audit log", icon="receipt_long")
             with ui.tab_panels(right_tabs, value=tab_editor).classes(
                     "w-full").props("keep-alive"):
                 with ui.tab_panel(tab_editor).classes("p-0"):
