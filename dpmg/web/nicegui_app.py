@@ -2849,7 +2849,7 @@ def build_acm_tab():
         _refresh()
 
 
-from dpmg.web.theme import apply_theme  # noqa: E402
+from dpmg.web.theme import apply_theme, theme_toggle  # noqa: E402
 
 
 @ui.page("/engineering")                                # Operator view is the default ("/")
@@ -2862,6 +2862,7 @@ def main_page():
             ui.link("operator view", "/").classes("text-xs text-gray-300")
             ui.link("mission view", "/mission").classes("text-xs text-gray-300")  # MISSION_VIEW
         build_link_header()  # Link + ACFT pos strip
+        theme_toggle()
 
     with ui.tabs().classes("w-full") as tabs:
         ui.tab("Encoder")
@@ -2926,6 +2927,7 @@ def operator_page():
             ui.link("engineering view", "/engineering").classes("text-xs text-gray-300")
             ui.link("mission view", "/mission").classes("text-xs text-gray-300")  # MISSION_VIEW
         build_link_header()
+        theme_toggle()
     build_operator_sdr()
 
 
@@ -2946,6 +2948,7 @@ def mission_page():
             ui.link("operator view", "/").classes("text-xs text-gray-300")  # MISSION_VIEW
             ui.link("engineering view", "/engineering").classes("text-xs text-gray-300")  # MISSION_VIEW
         build_link_header()  # Link + ACFT pos strip
+        theme_toggle()
     from dpmg.mission.mission_tab import build_mission_tab, MODE_FLIGHT
     from dpmg.web.link_tab import MGR as link_mgr
     build_mission_tab(link_mgr, mode=MODE_FLIGHT)         # the flight view
@@ -2967,6 +2970,7 @@ def bitpipe_page():
             ui.link("operator view", "/").classes("text-xs text-gray-300")  # BITPIPE_VIEW
             ui.link("engineering view", "/engineering").classes("text-xs text-gray-300")  # BITPIPE_VIEW
         build_link_header()
+        theme_toggle()
     import os as _bp_os
     from dpmg.bitpipe.link_panel import build_link_panel
     build_link_panel(_bp_os.environ.get("DPMG_BITPIPE_CTL", "tcp:127.0.0.1:47898"),
