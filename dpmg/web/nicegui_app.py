@@ -2849,9 +2849,12 @@ def build_acm_tab():
         _refresh()
 
 
+from dpmg.web.theme import apply_theme  # noqa: E402
+
+
 @ui.page("/engineering")                                # Operator view is the default ("/")
 def main_page():
-    ui.add_head_html("<style>.q-card{gap:.5rem} body{background:#f3f4f6}</style>")
+    apply_theme()
     ui.add_head_html('<link rel="icon" type="image/svg+xml" href="/favicon.ico?v=2">')
     with ui.header().classes("items-center justify-between bg-slate-700"):
         with ui.row().classes("items-center gap-3"):
@@ -2915,7 +2918,7 @@ def main_page():
 @ui.page("/operator")                                   # Alias kept for existing bookmarks
 def operator_page():
     ui.page_title("DPMG Operator")
-    ui.add_head_html("<style>.q-card{gap:.5rem} body{background:#f3f4f6}</style>")
+    apply_theme()
     ui.add_head_html('<link rel="icon" type="image/svg+xml" href="/favicon.ico?v=2">')
     with ui.header().classes("items-center justify-between bg-slate-800"):
         with ui.row().classes("items-center gap-3"):
@@ -2935,7 +2938,7 @@ def mission_page():
     # discovery port. Plan autosave and the map store live under ~/.dpmg,
     # which launch_gui.sh bind-mounts from the host.
     ui.page_title("DPMG Mission")
-    ui.add_head_html("<style>.q-card{gap:.5rem} body{background:#f3f4f6}</style>")
+    apply_theme()
     ui.add_head_html('<link rel="icon" type="image/svg+xml" href="/favicon.ico?v=2">')
     with ui.header().classes("items-center justify-between bg-slate-700"):
         with ui.row().classes("items-center gap-3"):
@@ -2956,7 +2959,7 @@ def bitpipe_page():
     # DPMG_BITPIPE_CTL / _CHAT / _FILE, default the peer's TCP ports on
     # 127.0.0.1 (the GUI container uses host networking).
     ui.page_title("DPMG Bitpipe")
-    ui.add_head_html("<style>.q-card{gap:.5rem} body{background:#f3f4f6}</style>")
+    apply_theme()
     ui.add_head_html('<link rel="icon" type="image/svg+xml" href="/favicon.ico?v=2">')
     with ui.header().classes("items-center justify-between bg-slate-700"):
         with ui.row().classes("items-center gap-3"):

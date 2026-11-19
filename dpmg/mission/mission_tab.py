@@ -818,21 +818,46 @@ async def stop_all_tx(mgr, hosts) -> int:
 
 PAGE_CSS = """
 .mp-root { max-width: 1800px; margin: 0 auto; font-size: 13px; }
-.mp-root .q-card { box-shadow: 0 1px 3px rgba(0,0,0,.08); border-radius: 10px;
-                   border: 1px solid #e5e7eb; }
-.mp-root .mp-section { border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 6px;
+.mp-root .q-card { box-shadow: none; border: 1px solid #2c322c; }
+.mp-root .mp-section { border-top: 1px solid #2c322c; margin-top: 8px; padding-top: 6px;
                        width: 100%; }
-.mp-root .mp-section-title { font-size: 11px; font-weight: 700; color: #4b5563;
-                             text-transform: uppercase; letter-spacing: .04em; }
-.mp-root .mp-pill { border-radius: 999px; padding: 3px 12px; font-weight: 600;
+.mp-root .mp-section-title { font-size: 11px; font-weight: 700; color: #8d968b;
+                             text-transform: uppercase; letter-spacing: .08em; }
+.mp-root .mp-pill { padding: 3px 12px; font-weight: 600;
                     font-size: 12px; white-space: nowrap; }
-.mp-root .mp-cat-card { padding: 4px 6px; border-radius: 6px; cursor: pointer; }
-.mp-root .mp-cat-card:hover { background: #eff6ff; }
-.mp-root .mp-lane { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 6px; }
-.mp-root .mm-drop-hot { outline: 3px dashed #2563eb; outline-offset: -4px; }
-.mp-root .mp-bar { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+.mp-root .mp-cat-card { padding: 4px 6px; cursor: pointer; }
+.mp-root .mp-cat-card:hover { background: #1f241f; }
+.mp-root .mp-lane { background: #101310; border: 1px solid #2c322c; }
+.mp-root .mp-lane::after { content:''; position:absolute; top:0; bottom:0; left:var(--cx,-10px); width:1px;
+    background:#d0a644; opacity:.55; pointer-events:none; z-index:3; }
+.mp-root .mp-cursor-read { font:11px 'JetBrains Mono',Menlo,monospace; color:#d0a644; min-width:72px; text-align:right; }
+.mp-root .mp-bench { border:1px dashed #4a5340; background:#111410; padding:6px 8px; margin-bottom:6px; }
+.mp-root .mp-bench-title { font:600 11px 'JetBrains Mono',Menlo,monospace; letter-spacing:.14em; color:#d0a644; }
+.mp-root .mp-bench-zone { display:flex; flex-wrap:wrap; gap:6px; min-height:40px; align-items:center; padding:4px 0; }
+.mp-root .mp-bench-empty { color:#5d665a; font-size:11px; letter-spacing:.08em; text-transform:uppercase; }
+.mp-root .mp-bench-chip { display:flex; align-items:center; gap:8px; padding:4px 4px 4px 8px; color:#fff; cursor:grab;
+    border:1px solid rgba(0,0,0,.5); font-size:11px; font-weight:600; }
+.mp-root .mp-bench-dur { font:10px 'JetBrains Mono',Menlo,monospace; opacity:.85; }
+.mp-root .mp-bench-x { color:#fff !important; }
+.mp-root .mm-drop-hot { outline: 2px dashed #d0a644; outline-offset: -4px; }
+.mp-root .mp-bar { background: #1a1e1a; border: 1px solid #2c322c;
                    padding: 4px 8px; }
 """
+
+CURSOR_JS = """<script>
+document.addEventListener('mousemove',function(e){
+  const lane=e.target.closest&&e.target.closest('.mp-lane[data-total]');
+  const rd=document.getElementById('tl-cursor');
+  document.querySelectorAll('.mp-lane[data-total]').forEach(l=>{if(l!==lane)l.style.removeProperty('--cx');});
+  if(!lane){if(rd)rd.textContent='';return;}
+  const r=lane.getBoundingClientRect(),x=e.clientX-r.left;
+  lane.style.setProperty('--cx',x+'px');
+  if(!rd)return;
+  const t=Math.max(0,Math.min(1,x/r.width))*parseFloat(lane.dataset.total);
+  const h=Math.floor(t/3600),m=Math.floor(t%3600/60),s=Math.floor(t%60),p=n=>String(n).padStart(2,'0');
+  rd.textContent=(lane.dataset.clock==='1'||h>0)?p(h)+':'+p(m)+':'+p(s):p(m)+':'+p(s);
+});
+</script>"""
 
 
 def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
@@ -847,6 +872,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
     me.mount()
     ui.add_head_html(me.head_html())
     ui.add_css(PAGE_CSS)
+    ui.add_head_html(CURSOR_JS)
     root = ui.element("div").classes("mp-root w-full")
     root.__enter__()
     map_ui = {"panel": None, "sig": None, "warn": None, "pos": None,
@@ -4312,10 +4338,15 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                 if _tl_clock():
                     ui.button("show whole day", on_click=lambda: _whole_day()).props("dense flat").tooltip("show the full 24 h")
                 ui.button("fit all steps", on_click=lambda: _fit_steps()).props("dense flat").tooltip("zoom the timeline to every step")
+                ui.button(icon="chevron_left", on_click=lambda: _pan(-0.5)).props("dense flat").tooltip("pan left")
+                ui.button(icon="chevron_right", on_click=lambda: _pan(0.5)).props("dense flat").tooltip("pan right")
+                ui.button("to selected", icon="my_location", on_click=lambda: _jump_selected()).props("dense flat").tooltip("scroll to the selected step")
                 ui.label("UTC" if _tl_clock() else "relative").classes(
                     "text-xs text-gray-500 ml-2")
                 ui.label("wheel to zoom, shift-wheel to pan").classes(
                     "text-xs text-gray-400 ml-2")
+                ui.label("").props("id=tl-cursor").classes("mp-cursor-read ml-auto")
+            _bench()
             # each lane (and the ruler) gets its own horizontal scroller, so a
             # scrollbar sits under every radio. They are kept in lock-step by the
             # JS below, so the lanes stay time-aligned. Wheel zooms about the
@@ -4401,7 +4432,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
         with ui.element("div").style(
                 "position:relative;height:18px;width:100%;"
-                "border-bottom:1px solid #ccc"):
+                "border-bottom:1px solid #2c322c"):
             t = 0.0
             while t <= total + 0.1:
                 # keep the first and last labels inside the track instead of
@@ -4414,13 +4445,13 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     shift = "translateX(-50%)"
                 ui.label(_tl_label(t)).style(
                     f"position:absolute;left:{_pos(t, total, fit, px)};"
-                    f"font-size:10px;color:#888;transform:{shift}")
+                    f"font-size:10px;color:#8d968b;font-family:monospace;transform:{shift}")
                 t += tick
             # where the run is now, in plan time; _move_run_marker keeps it
             # current and hides it when nothing runs
             state["run_ruler"] = ui.label("").style(
                 "position:absolute;left:0;top:0;font-size:10px;font-weight:600;"
-                "color:#2563eb;background:#fff;padding:0 2px;transform:translateX(-50%);"
+                "color:#d0a644;background:#0d0f0d;padding:0 2px;transform:translateX(-50%);"
                 "display:none")
 
     def _location_strip():
@@ -4464,8 +4495,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                               else "")
                     rule = ("automatic" if mf.trigger_block(s).get("confirm") == "auto"
                             else "confirmed once" if sid in sess.confirmed_once else "needs confirm")
-                    border = ("3px solid #111827" if primary else "2px solid #f59e0b" if in_sel
-                              else "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.15)")
+                    border = ("2px solid #f2f2f2" if primary else "2px solid #f59e0b" if in_sel
+                              else "2px solid #dc2626" if bad else "1px solid rgba(0,0,0,0.45)")
                     color = "#b91c1c" if active else _group_color(s.get("technique", ""))
                     blk = ui.element("div").style(
                         f"position:relative;width:300px;height:{LANE_H - 14}px;background:{color};color:white;"
@@ -4511,11 +4542,12 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         tick = _nice_tick(total / 5.0 if fit else max(90.0 / px, total / 200.0))
         period = _span(tick, total, fit, px)
         rcol = _radio_color(rid)
-        lane = ui.element("div").classes("mp-lane").style(
+        lane = ui.element("div").classes("mp-lane").props(
+            f'data-total="{total:.1f}" data-clock="{1 if _tl_clock() else 0}"').style(
             f"position:relative;height:{LANE_H}px;width:100%;"
             f"border-left:5px solid {rcol};"
             + (f"background-color:{rcol}14;" if _is_selected_radio(rid) else "")
-            + f"background-image:repeating-linear-gradient(to right,#e5e7eb 0 1px,"
+            + f"background-image:repeating-linear-gradient(to right,#2a302a 0 1px,"
             f"transparent 1px {period})")
         lane.on("dragover.prevent", lambda e: None)
         # a click on the empty lane (not on a block) selects the radio
@@ -4540,7 +4572,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             # shown and moved by _move_run_marker while a plan runs
             state.setdefault("run_markers", []).append(ui.element("div").style(
                 f"position:absolute;left:0;top:0;width:2px;height:{LANE_H}px;"
-                "background:#2563eb;opacity:0.9;display:none;pointer-events:none;z-index:2"))
+                "background:#d0a644;opacity:0.9;display:none;pointer-events:none;z-index:2"))
             for step in mission()["steps"]:
                 if step.get("radio") == rid and not mf.is_location_task(step):
                     _step_block(step, total, fit, px)
@@ -4627,6 +4659,126 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             ui.label(f"{_tl_label(start)}-{_tl_label(stop)}").style(
                 "pointer-events:none;opacity:0.85;font-size:10px")
 
+    # planning timeline: a time-less holding lane above the radio lanes.
+    # Items keep a duration only; the drop point on a radio lane sets the start.
+    # Dragging into a lane copies, so the item stays staged for reuse.
+
+    def _staged():
+        return mission().setdefault("staged", [])
+
+    def _stage_item(technique, params=None, dur_s=None, radiates=None):
+        entry = catalog.get(technique)
+        if entry is None:
+            ui.notify(f"unknown technique {technique}", type="negative")
+            return
+        import copy as _copy
+        _staged().append({
+            "id": "stg-" + uuid.uuid4().hex[:6], "technique": technique,
+            "label": entry.label, "fresh": params is None,
+            "params": _copy.deepcopy(params) if params is not None else entry.fresh_params(),
+            "radiates": entry.radiates if radiates is None else bool(radiates),
+            "dur_s": round(float(dur_s if dur_s is not None else entry.default_dur), 1)})
+        audit.add("edit", f"staged {technique} on the planning timeline")
+        sess.autosave()
+        _refresh_timeline()
+
+    def _stage_step(sid):
+        st = _find_step(sid)
+        if st is None or mf.is_location_task(st):
+            return
+        _stage_item(st["technique"], st.get("params") or {},
+                    mf.step_stop_s(st) - mf.step_start_s(st), st.get("radiates"))
+
+    def _unstage(stg_id):
+        mission()["staged"] = [x for x in _staged() if x.get("id") != stg_id]
+        sess.autosave()
+        _refresh_timeline()
+
+    def _place_staged(stg_id, radio_id, start_s):
+        item = next((x for x in _staged() if x.get("id") == stg_id), None)
+        if item is None:
+            return
+        import copy as _copy
+        if item.get("fresh"):
+            # nothing filled in yet: the normal add path asks for the file
+            add_step(item["technique"], radio_id, start_s)
+            sid = state.get("selected")
+            st = _find_step(sid)
+            if st is not None:
+                st["schedule"]["stop_s"] = round(st["schedule"]["start_s"] + item["dur_s"], 1)
+                _revalidate()
+                _refresh_all()
+            return
+        ensure_radio(radio_id)
+        start_s = round(float(start_s), 1)
+        sid = _new_step_id()
+        mission()["steps"].append({
+            "id": sid, "radio": radio_id, "technique": item["technique"],
+            "radiates": item.get("radiates", False),
+            "params": _copy.deepcopy(item.get("params") or {}),
+            "schedule": {"start_s": start_s, "stop_s": round(start_s + item["dur_s"], 1)}})
+        state["selected"] = sid
+        state["sel"] = {sid}
+        audit.add("edit", f"placed staged {item['technique']} on {radio_id} at {_fmt_time(start_s)}")
+        _revalidate()
+        _refresh_all()
+
+    def _on_bench_drop(_e):
+        drag = state.get("drag")
+        state["drag"] = None
+        if not drag:
+            return
+        if drag["type"] == "new":
+            _stage_item(drag["technique"])
+        elif drag["type"] == "move":
+            _stage_step(drag["id"])
+        elif drag["type"] == "move_group":
+            for sid in drag.get("ids", []):
+                _stage_step(sid)
+
+    def _bench():
+        with ui.element("div").classes("mp-bench w-full"):
+            with ui.row().classes("items-center gap-2 w-full no-wrap"):
+                ui.label("PLANNING").classes("mp-bench-title")
+                ui.label("staging, no times. Drag a catalog item or a step here to keep it; "
+                         "drag a chip onto an RX/TX lane to place a copy there.") \
+                    .classes("text-xs text-gray-500")
+            zone = ui.element("div").classes("mp-bench-zone")
+            zone.on("dragover.prevent", lambda e: None)
+            zone.on("drop", _on_bench_drop, js_handler="(e)=>{e.preventDefault();emit();}")
+            with zone:
+                if not _staged():
+                    ui.label("drop signals here").classes("mp-bench-empty")
+                for item in _staged():
+                    chip = ui.element("div").classes("mp-bench-chip").props("draggable=true") \
+                        .style(f"background:{_group_color(item['technique'])}")
+                    chip.on("dragstart", lambda e, i=item["id"]: state.update(
+                        drag={"type": "staged", "id": i}))
+                    with chip:
+                        ui.label(item.get("label") or item["technique"]).classes("mp-bench-name")
+                        ui.label(_fmt_time(item["dur_s"]) if item["dur_s"] < 3600 else
+                                 f"{item['dur_s'] / 3600:.1f} h").classes("mp-bench-dur")
+                        ui.button(icon="close", on_click=lambda _e, i=item["id"]: _unstage(i)) \
+                            .props("dense flat round size=xs").classes("mp-bench-x") \
+                            .tooltip("remove from planning")
+
+    def _pan(frac):
+        ui.run_javascript(
+            "(()=>{const b=document.querySelector('.mission-hs');if(!b)return;"
+            f"b.scrollLeft+=b.clientWidth*{frac};}})()")
+
+    def _jump_selected():
+        st = _find_step(state.get("selected")) if state.get("selected") else None
+        if st is None:
+            ui.notify("select a step first", type="info")
+            return
+        if state["fit"]:
+            return
+        total = max(_tl_total(), 1.0)
+        ui.run_javascript(
+            "(()=>{const b=document.querySelector('.mission-hs');if(!b)return;"
+            f"b.scrollLeft=Math.max(0,{mf.step_start_s(st) * state['px_per_s']:.1f}-b.clientWidth/3);}})()")
+
     def _on_lane_drop(e, radio_id):
         x = 0.0
         lane_w = 0.0
@@ -4649,6 +4801,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             return
         if drag["type"] == "new":
             add_step(drag["technique"], radio_id, start_s)
+        elif drag["type"] == "staged":
+            _place_staged(drag["id"], radio_id, start_s)
         elif drag["type"] == "move":
             # moving to another lane changes the radio too
             sid = drag["id"]

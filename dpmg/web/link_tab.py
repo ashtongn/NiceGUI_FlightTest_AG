@@ -4329,7 +4329,7 @@ def build_operator_sdr():
         # frozen header row for the scrollable tables (inline + "view all")
         ui.add_css("""
             .sticky-head thead tr th { position: sticky; top: 0; z-index: 2;
-                background: #ffffff; }
+                background: #1a1e1a; }
         """)
 
         def _all_rows_dialog(title, cols, rows, key):
