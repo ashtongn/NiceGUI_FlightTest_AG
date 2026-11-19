@@ -1122,7 +1122,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
     sess = _session_for(mgr)
     me.mount()
     ui.add_head_html(me.head_html())
-    ui.add_css(PAGE_CSS)
+    ui.add_css(_theme.themed(PAGE_CSS))
     ui.add_css(_theme.TIMELINE_CSS)
     ui.add_head_html(CURSOR_JS)
     root = ui.element("div").classes("mp-root w-full")
@@ -4775,7 +4775,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         tick = _tl_tick(total)
         with ui.element("div").style(
                 "position:relative;height:18px;width:100%;"
-                "border-bottom:1px solid #2c322c"):
+                "border-bottom:1px solid var(--border)"):
             t = 0.0
             while t <= total + 0.1:
                 # keep the first and last labels inside the track instead of
@@ -4788,13 +4788,13 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     shift = "translateX(-50%)"
                 ui.label(_tl_label(t)).style(
                     f"position:absolute;left:{_pos(t, total)};"
-                    f"font-size:10px;color:#8d968b;font-family:monospace;transform:{shift}")
+                    f"font-size:10px;color:var(--muted);font-family:monospace;transform:{shift}")
                 t += tick
             # where the run is now, in plan time; _move_run_marker keeps it
             # current and hides it when nothing runs
             state["run_ruler"] = ui.label("").style(
                 "position:absolute;left:0;top:0;font-size:10px;font-weight:600;"
-                "color:#d0a644;background:#0d0f0d;padding:0 2px;transform:translateX(-50%);"
+                "color:var(--accent);background:var(--bg);padding:0 2px;transform:translateX(-50%);"
                 "display:none")
 
     def _location_strip():
@@ -4895,7 +4895,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             f"position:relative;height:{LANE_H}px;width:100%;"
             f"border-left:5px solid {rcol};"
             + (f"background-color:{rcol}14;" if _is_selected_radio(rid) else "")
-            + f"background-image:repeating-linear-gradient(to right,#2a302a 0 1px,"
+            + f"background-image:repeating-linear-gradient(to right,var(--grid) 0 1px,"
             f"transparent 1px {period})")
         lane.on("dragover.prevent", lambda e: None)
         # a click on the empty lane (not on a block) selects the radio; the
@@ -4922,7 +4922,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             # shown and moved by _move_run_marker while a plan runs
             state.setdefault("run_markers", []).append(ui.element("div").style(
                 f"position:absolute;left:0;top:0;width:2px;height:{LANE_H}px;"
-                "background:#d0a644;opacity:0.9;display:none;pointer-events:none;z-index:2"))
+                "background:var(--accent);opacity:0.9;display:none;pointer-events:none;z-index:2"))
             for step in mission()["steps"]:
                 if step.get("radio") == rid and not mf.is_location_task(step):
                     _step_block(step, total)
@@ -4994,8 +4994,8 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             ui.element("div").style(
                 f"position:absolute;left:{_pos(start, total)};top:7px;"
                 f"width:{_span(need, total)};height:{LANE_H - 14}px;border-radius:6px;"
-                "background:repeating-linear-gradient(45deg,#9ca3af55,#9ca3af55 6px,transparent 6px,"
-                "transparent 12px);border:1px dashed #6b7280;pointer-events:none").tooltip(
+                "background:repeating-linear-gradient(45deg,color-mix(in srgb,var(--muted) 33%,transparent),color-mix(in srgb,var(--muted) 33%,transparent) 6px,transparent 6px,"
+                "transparent 12px);border:1px dashed var(--faint);pointer-events:none").tooltip(
                 f"re-init, about {need:g} s: keep steps out of this time")
         # the step's true extent as a thin bar along the lane floor: the block
         # above it is held to a readable minimum width, so a short step's block
@@ -5516,7 +5516,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         ui.label("").classes("min-h-[0.5rem]")
         with ui.element("div").classes("w-full").style(
                 "position:sticky;bottom:0;background:var(--surface,#fff);padding:6px 0 2px;"
-                "border-top:1px solid var(--border,#e5e7eb);z-index:1"):
+                "border-top:1px solid var(--border);z-index:1"):
             with ui.row().classes("gap-2"):
                 apply_btn = ui.button(f"Apply to {n} selected", on_click=_apply) \
                     .props("dense color=primary").tooltip(
@@ -5914,7 +5914,7 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             # the buttons stay in view at the bottom of a long editor
             with ui.element("div").classes("w-full").style(
                     "position:sticky;bottom:0;background:var(--surface,#fff);padding:6px 0 2px;"
-                    "border-top:1px solid var(--border,#e5e7eb);z-index:1"):
+                    "border-top:1px solid var(--border);z-index:1"):
                 with ui.row().classes("gap-2"):
                     apply_btn = ui.button("Apply changes").props("dense color=primary").tooltip("write the amber fields into the plan")
                     ui.button("Delete step", icon="delete",

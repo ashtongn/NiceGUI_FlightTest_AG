@@ -4,8 +4,14 @@ Neutral graphite surfaces, hairline borders, one restrained steel-blue accent,
 uppercase tracked micro-labels, tight density, square corners. Call
 apply_theme() first in every @ui.page builder.
 """
+import colorsys
+import re
+
 from nicegui import ui
 
+# Every colour below is the DARK value. themed() turns a hex in a CSS string into
+# light-dark(<light twin>, <dark hex>), so one stylesheet serves both themes and
+# html[data-theme] (set before first paint) picks the side via color-scheme.
 BG = "#0d0f0d"        # page
 SURFACE = "#141714"   # cards / panels
 RAISED = "#1a1e1a"    # headers, inputs, table heads
@@ -41,6 +47,51 @@ TIMELINE_STAGED_BORDER = "#6A7560"     # dashed edge of a planning-bench chip
 TIMELINE_NOW = "#7FA650"               # the current-time line on the UTC day
 
 
+# named tokens: dark hex -> semantic CSS variable (defined per theme in TOKENS_CSS)
+_NAMED = {"0d0f0d": "bg", "141714": "surface", "1a1e1a": "raised", "2c322c": "border",
+          "d7dbe2": "text", "8d968b": "muted", "d0a644": "accent", "0b0d0b": "on-accent",
+          "4a5340": "border-hi", "6c7468": "placeholder", "111411": "sunken",
+          "0f120f": "sunken", "101310": "sunken", "111410": "sunken", "1f241f": "hover",
+          "262b20": "hover", "22261b": "hover", "22281f": "tip", "2b2512": "dirty",
+          "33300f": "sel-row", "0a0c0a": "strip", "7fa650": "ok", "e5484d": "err",
+          "e0a030": "warn", "303730": "scroll", "6b7a3a": "header-edge",
+          "2a302a": "grid", "5d665a": "faint", "6b7280": "faint"}
+
+
+def _flip(hex6: str) -> str:
+    """Light twin of a dark-theme colour: tinted fills become pale, light text
+    becomes deep, same hue."""
+    r, g, b = (int(hex6[i:i + 2], 16) / 255 for i in (0, 2, 4))
+    h, l, sat = colorsys.rgb_to_hls(r, g, b)
+    if l < 0.4:                     # a dark surface or tint -> a pale stone/tint
+        l, sat = 0.90 - 0.55 * l, min(sat, 0.45)
+    else:                           # light text / accent -> deep, readable on pale
+        l = 0.30
+    r, g, b = colorsys.hls_to_rgb(h, l, sat)
+    return "#%02x%02x%02x" % (round(r * 255), round(g * 255), round(b * 255))
+
+
+_HEX = re.compile(r"#([0-9a-fA-F]{6})([0-9a-fA-F]{2})?(?![0-9a-zA-Z_-])")
+
+
+def themed(css: str) -> str:
+    """Rewrite each #rrggbb[aa] in a CSS string so it follows the theme."""
+    def sub(m):
+        h, a = m.group(1).lower(), m.group(2) or ""
+        name = _NAMED.get(h)
+        if name and not a:
+            return f"var(--{name})"
+        if name:
+            return f"color-mix(in srgb, var(--{name}) {round(int(a, 16) / 2.55)}%, transparent)"
+        return f"light-dark(#{_flip(h)[1:]}{a}, #{h}{a})"
+    return _HEX.sub(sub, css)
+
+
+def T(color: str) -> str:
+    """themed() for an inline style value, e.g. T('background:#d0a644')."""
+    return themed(color)
+
+
 def timeline_kind(technique: str, group: str = "", radiates: bool = False) -> str:
     """The palette kind for a step: by technique, then catalog group, else
     radiating (tx) or not (rx)."""
@@ -48,7 +99,7 @@ def timeline_kind(technique: str, group: str = "", radiates: bool = False) -> st
             or ("tx" if radiates else "rx"))
 
 
-TIMELINE_CSS = f"""
+_TIMELINE_CSS_RAW = f"""
 .mp-root .mp-step:hover {{ filter:brightness(1.08); border-color:{ACCENT} !important; z-index:6; }}
 .mp-root .mp-step-offline {{ opacity:.55; background-image:repeating-linear-gradient(45deg,
     rgba(0,0,0,.30) 0 5px, transparent 5px 10px) !important; }}
@@ -59,9 +110,7 @@ TIMELINE_CSS = f"""
 .mp-root .mp-bench-chip:hover {{ opacity:1; }}
 """
 
-THEME_CSS = f"""
-:root {{ --bg:{BG}; --surface:{SURFACE}; --raised:{RAISED}; --border:{BORDER};
-  --text:{TEXT}; --muted:{MUTED}; --accent:{ACCENT}; }}
+THEME_CSS_RAW = f"""
 html, body, .q-layout, .q-page, .nicegui-content {{ background:var(--bg) !important; color:var(--text); }}
 body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica Neue',Arial,sans-serif;
   font-size:13px; letter-spacing:.01em; }}
@@ -81,6 +130,7 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .q-header {{ background:var(--raised) !important; border-bottom:1px solid var(--border); border-top:2px solid #6b7a3a; font-family:'JetBrains Mono','SF Mono',Menlo,monospace;
   box-shadow:none !important; text-transform:uppercase; letter-spacing:.08em; }}
 .q-header .text-lg {{ font-size:13px; font-weight:600; }}
+.q-header .text-white, .q-header .text-gray-300 {{ color:var(--text) !important; }}
 .q-header a {{ color:var(--muted) !important; text-decoration:none; font-size:11px; }}
 .q-header a:hover {{ color:var(--accent) !important; }}
 .q-tabs {{ background:var(--raised); border-bottom:1px solid var(--border); color:var(--muted); }}
@@ -117,7 +167,6 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .q-field--disabled .q-field__native, .q-field--disabled .q-field__label {{ color:var(--muted) !important; -webkit-text-fill-color:var(--muted); }}
 .q-field--error .q-field__control:after {{ border-color:#e5484d !important; }}
 .q-field.mp-dirty .q-field__control {{ background:#2b2512 !important; box-shadow:inset 0 0 0 1px var(--accent); }}
-.q-field input[type=number], input, textarea, select {{ color-scheme:dark; }}
 input:-webkit-autofill {{ -webkit-box-shadow:0 0 0 40px var(--raised) inset !important; -webkit-text-fill-color:var(--text); }}
 .q-checkbox__inner, .q-radio__inner, .q-toggle__inner {{ color:var(--muted); }}
 .q-checkbox__inner--truthy, .q-radio__inner--truthy {{ color:var(--accent) !important; }}
@@ -129,8 +178,9 @@ input:-webkit-autofill {{ -webkit-box-shadow:0 0 0 40px var(--raised) inset !imp
 .q-item.q-manual-focusable--focused > .q-focus-helper, .q-item:hover > .q-focus-helper {{ background:#262b20 !important; opacity:1 !important; }}
 .q-item--active, .q-menu .q-item.text-primary {{ color:var(--accent) !important; background:#22261b; }}
 .q-virtual-scroll__content .q-item {{ min-height:30px; }}
+.q-item__section {{ position:relative; z-index:1; }}
 .q-tooltip {{ background:#22281f !important; color:var(--text) !important; border:1px solid var(--border); font-size:11px; }}
-.q-dialog__backdrop {{ background:rgba(0,0,0,.6) !important; }}
+.q-dialog__backdrop {{ background:var(--backdrop) !important; }}
 .q-expansion-item__toggle-icon, .q-expansion-item .q-item__section--side .q-icon {{ color:var(--muted); }}
 .nicegui-code, .q-uploader__list, .q-uploader__header {{ background:#0f120f !important; color:var(--text); }}
 .q-badge {{ color:#0b0d0b; }}
@@ -249,11 +299,69 @@ body {{ padding-bottom:20px; }}
 """
 
 
+TIMELINE_CSS = themed(_TIMELINE_CSS_RAW)
+THEME_CSS = themed(THEME_CSS_RAW)
+
+# Semantic tokens, one set per theme. Light is a calm warm-stone paper theme:
+# no pure white, graphite text, a deep amber accent (AA on the stone panels).
+TOKENS_CSS = """
+:root, html[data-theme=dark] { color-scheme:dark;
+  --bg:#0d0f0d; --surface:#141714; --raised:#1a1e1a; --border:#2c322c; --border-hi:#4a5340;
+  --text:#d7dbe2; --muted:#8d968b; --faint:#5d665a; --accent:#d0a644; --on-accent:#0b0d0b;
+  --placeholder:#6c7468; --sunken:#101310; --hover:#1f241f; --tip:#22281f; --dirty:#2b2512;
+  --sel-row:#33300f; --strip:#0a0c0a; --ok:#7fa650; --err:#e5484d; --warn:#e0a030;
+  --scroll:#303730; --header-edge:#6b7a3a; --grid:#2a302a; --backdrop:rgba(0,0,0,.6);
+  --q-primary:#d0a644; --q-secondary:#6f786b; --q-accent:#d0a644; --q-positive:#7fa650;
+  --q-negative:#e5484d; --q-warning:#e0a030; --q-info:#d0a644; --q-dark:#1a1e1a; }
+html[data-theme=light] { color-scheme:light;
+  --bg:#e9e7e0; --surface:#f2f0ea; --raised:#e0ddd3; --border:#c4c0b3; --border-hi:#a39f90;
+  --text:#23271f; --muted:#5b6157; --faint:#7d8276; --accent:#7a5a0e; --on-accent:#f7f3e6;
+  --placeholder:#8a8b7e; --sunken:#e6e3da; --hover:#dad7cb; --tip:#f7f5ee; --dirty:#f1e3b8;
+  --sel-row:#e8d79f; --strip:#dedbd0; --ok:#4a7a2a; --err:#c23b40; --warn:#946810;
+  --scroll:#bcb8aa; --header-edge:#7c8c45; --grid:#d3cfc3; --backdrop:rgba(40,38,30,.35);
+  --q-primary:#7a5a0e; --q-secondary:#5b6157; --q-accent:#7a5a0e; --q-positive:#4a7a2a;
+  --q-negative:#c23b40; --q-warning:#946810; --q-info:#7a5a0e; --q-dark:#e0ddd3; }
+"""
+
+# runs before first paint: apply the saved theme, then keep Quasar's own dark
+# flag in step once Quasar has loaded. window.dpmgTheme.toggle() flips it.
+THEME_JS = """
+(function () {
+  var d = document.documentElement;
+  function saved() { try { return localStorage.getItem('dpmg-theme') === 'light' ? 'light' : 'dark'; }
+                     catch (e) { return 'dark'; } }
+  function apply(t) {
+    d.setAttribute('data-theme', t);
+    if (window.Quasar && Quasar.Dark) Quasar.Dark.set(t === 'dark');
+    document.querySelectorAll('[data-theme-btn]').forEach(function (b) {
+      b.title = t === 'dark' ? 'Switch to light theme' : 'Switch to dark theme';
+      var i = b.querySelector('.q-icon'); if (i) i.textContent = t === 'dark' ? 'light_mode' : 'dark_mode';
+    });
+  }
+  d.setAttribute('data-theme', saved());
+  window.dpmgTheme = { apply: apply,
+    toggle: function () { var t = d.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      try { localStorage.setItem('dpmg-theme', t); } catch (e) {} apply(t); } };
+  var n = 0, iv = setInterval(function () {
+    if (window.Quasar && Quasar.Dark) { apply(saved()); }
+    if ((window.Quasar && Quasar.Dark && document.querySelector('[data-theme-btn]')) || ++n > 100) clearInterval(iv);
+  }, 50);
+})();
+"""
+
+
+def theme_toggle() -> None:
+    """The dark/light switch for the header bar (call inside ui.header)."""
+    ui.button(icon="light_mode", on_click=lambda: ui.run_javascript("dpmgTheme.toggle()")) \
+        .props("flat dense round size=sm").classes("theme-toggle") \
+        .props('data-theme-btn="1"').tooltip("Switch theme")
+
+
 def apply_theme() -> None:
-    ui.dark_mode(True)
     ui.colors(primary=ACCENT, secondary="#6f786b", accent=ACCENT,
               positive="#7fa650", negative="#e5484d", warning="#e0a030",
               info=ACCENT, dark=RAISED)
+    ui.add_head_html(f"<script>{THEME_JS}</script><style>{TOKENS_CSS}</style>")
     # NiceGUI loads Quasar inside a cascade layer ("@layer theme, base,
     # quasar, ..."). Unlayered rules beat it for normal declarations, but for
     # !important ones the order flips and a layered rule wins, so Quasar's

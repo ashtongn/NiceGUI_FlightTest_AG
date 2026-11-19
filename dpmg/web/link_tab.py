@@ -42,6 +42,7 @@ from dpmg.link.acft_pos_multicast import MulticastPosListener, local_ipv4_addres
 from dpmg.link.aircraft_feeds import AircraftFeeds, PanelFields
 from dpmg.link.acft_pos_multicast import summary_text as acft_summary_text, fix_rows as acft_fix_rows
 from dpmg.link import feed_settings
+from dpmg.web.theme import themed as _themed
 
 log = logging.getLogger("link_tab")
 
@@ -794,8 +795,8 @@ def _build_psd_chart():
             "dataZoom": [
                 {"type": "inside", "xAxisIndex": 0, "filterMode": "none"},
                 {"type": "slider", "xAxisIndex": 0, "height": 10, "bottom": 4,
-                 "showDetail": False, "borderColor": "#2c322c",
-                 "backgroundColor": "#141714", "fillerColor": "rgba(208,166,68,0.18)",
+                 "showDetail": False, "borderColor": "rgba(128,128,128,0.4)",
+                 "backgroundColor": "rgba(128,128,128,0.12)", "fillerColor": "rgba(208,166,68,0.18)",
                  "handleSize": "140%", "moveHandleSize": 4,
                  "handleStyle": {"color": "#8a8f7a", "borderColor": "#8a8f7a"},
                  "dataBackground": {"lineStyle": {"opacity": 0},
@@ -3607,7 +3608,7 @@ def build_operator_sdr():
     ovlcur = {"v": None}                # last RX-overload colour state (avoid churn)
     synced = {"serial": None}           # which radio's live tuning we've pulled in
 
-    ui.add_css(_OPX_CSS)
+    ui.add_css(_themed(_OPX_CSS))
     # one colour per radio (by discovery order); the same colour is the band on
     # the radio's chip, and on every panel that drives it, so the radio in focus
     # is never in doubt
@@ -4456,10 +4457,10 @@ def build_operator_sdr():
         ctl_card.move(left_col)
 
         # frozen header row for the scrollable tables (inline + "view all")
-        ui.add_css("""
+        ui.add_css(_themed("""
             .sticky-head thead tr th { position: sticky; top: 0; z-index: 2;
                 background: #1a1e1a; }
-        """)
+        """))
 
         def _all_rows_dialog(title, cols, rows, key):
             with ui.dialog() as dlg, ui.card().classes("min-w-[28rem]"):
@@ -4866,7 +4867,7 @@ def build_operator_sdr():
             return
         tagcur["v"] = key
         if key is None:
-            txt, col = "NO RADIO", "#4a544b"
+            txt, col = "NO RADIO", "var(--faint)"
         else:
             txt, col = _name(key[0]), _color(key[0])
         for el in tagged:
