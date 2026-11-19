@@ -201,8 +201,13 @@ From the top down:
    Edited fields turn amber until you press Apply changes. Delete step removes
    the step.
 5. Move steps by dragging them along a lane or onto another radio's lane.
-   Ctrl-click selects several, dragging one of them moves them all, and the
-   Delete key removes the selection. The timeline zooms with the wheel over a
+   Shift-, Ctrl- or Cmd-click selects several, or drag a box across the lanes
+   from an empty spot (hold Shift to add to the selection). Dragging one of the
+   selected steps moves them all, the Delete key removes the selection and Esc
+   clears it. With several selected, the step editor edits them together: it
+   lists the settings they share (TX atten, RF center, priority, duration and
+   so on), "mixed" where they differ, and Apply writes only the fields you
+   changed to every selected step that has that setting. The timeline zooms with the wheel over a
    lane and with the zoom buttons. Show whole day and fit all steps reset the
    view.
 6. Sample rate. A radio keeps the rate it was brought up at, unless you set a
