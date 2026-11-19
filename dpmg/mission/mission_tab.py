@@ -1002,6 +1002,59 @@ PAGE_CSS = """
 .mp-root .mp-step-primary { z-index:5; }
 .mp-root .mp-step-line { pointer-events:none; white-space:nowrap; overflow:hidden;
                          text-overflow:ellipsis; max-width:100%; }
+/* view toolbar: Timeline / Map switch and the console, one 44 px row */
+.mp-root .mp-toolbar { display:flex; flex-wrap:wrap; width:100%; margin:12px 0 8px; }
+.mp-root .mp-seg { display:flex; border:1px solid var(--border); background:var(--raised); }
+.mp-root .mp-seg-btn { display:flex; align-items:center; justify-content:center; gap:8px;
+    min-width:140px; height:42px; padding:0 16px; cursor:pointer; user-select:none;
+    color:var(--muted); background:var(--raised); font-size:12px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; box-shadow:inset 0 -2px 0 transparent; }
+.mp-root .mp-seg-btn + .mp-seg-btn { border-left:1px solid var(--border); }
+.mp-root .mp-seg-btn .q-icon { font-size:20px; }
+.mp-root .mp-seg-btn:hover { background:#1f241f; color:var(--text); }
+.mp-root .mp-seg-btn.mp-seg-on { background:var(--surface); color:var(--accent);
+    box-shadow:inset 0 -2px 0 var(--accent); }
+.mp-root .mp-seg-btn:focus-visible { outline:1px solid var(--accent); outline-offset:-3px; }
+.mp-root .mp-console { flex:1; min-width:0; display:flex; flex-wrap:wrap; align-items:center;
+    gap:4px 10px; min-height:44px; padding:0 12px; background:var(--raised);
+    border:1px solid var(--border); border-left:0; }
+.mp-root .mp-clock { font:12px 'JetBrains Mono',Menlo,monospace; color:var(--text); letter-spacing:.04em; }
+.mp-root .mp-clock .q-icon { font-size:15px; color:var(--muted); }
+.mp-root .mp-console .q-chip { margin:0; }
+.mp-root .mp-console-act { color:var(--accent) !important; font-size:11px; padding:0 0 0 10px;
+    min-height:28px; border-left:1px solid var(--border); }
+.mp-root .mp-console-act .q-icon { font-size:16px; }
+.mp-root .mp-console-status { margin-left:auto; }
+.mp-root .mp-status { font:600 11px 'JetBrains Mono',Menlo,monospace; letter-spacing:.06em;
+    text-transform:uppercase; padding:2px 8px; border:1px solid currentColor; }
+.mp-root .mp-status .q-icon { font-size:14px; }
+.mp-root .mp-status-ok { color:#7fa650; border-color:#7fa65055; }
+.mp-root .mp-status-warn { color:#e0a030; border-color:#e0a03055; }
+.mp-root .mp-status-err { color:#e5484d; border-color:#e5484d77; background:#e5484d14; }
+/* Step editor / Audit log: Quasar tabs drawn as the same segmented control */
+.mp-root .mp-segtabs { background:transparent !important; border:0 !important; min-height:0; }
+.mp-root .mp-segtabs .q-tabs__content { flex:0 0 auto; border:1px solid var(--border);
+    background:var(--raised); overflow:hidden; }
+.mp-root .mp-segtabs .q-tab { min-width:140px; min-height:42px; height:42px; padding:0 16px;
+    color:var(--muted); background:var(--raised); font-size:12px; font-weight:600;
+    letter-spacing:.08em; text-transform:uppercase; opacity:1; }
+.mp-root .mp-segtabs .q-tab + .q-tab { border-left:1px solid var(--border); }
+.mp-root .mp-segtabs .q-tab__content { gap:8px; min-width:0; }
+.mp-root .mp-segtabs .q-tab__icon { font-size:20px; width:20px; height:20px; margin:0; }
+.mp-root .mp-segtabs .q-tab__label { font-size:12px; font-weight:600; letter-spacing:.08em; line-height:1; }
+.mp-root .mp-segtabs .q-tab:hover { background:#1f241f; color:var(--text); }
+.mp-root .mp-segtabs .q-tab--active, .mp-root .mp-segtabs .q-tab--active:hover {
+    background:var(--surface); color:var(--accent) !important; box-shadow:inset 0 -2px 0 var(--accent); }
+.mp-root .mp-segtabs .q-tab__indicator { display:none; }
+.mp-root .mp-segtabs .q-focus-helper { display:none; }
+@media (max-width: 1100px) {
+  .mp-root .mp-segtabs .q-tabs__content { flex:1 1 auto; }
+  .mp-root .mp-segtabs .q-tab { flex:1; }
+  .mp-root .mp-seg { width:100%; }
+  .mp-root .mp-seg-btn { flex:1; }
+  .mp-root .mp-console { flex-basis:100%; border-left:1px solid var(--border); border-top:0;
+      padding:6px 12px; }
+}
 .mp-root .mp-selcount { font-size: 11px; color: #d0a644; font-weight: 600; }
 """
 
@@ -2408,26 +2461,39 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         "w-full text-sm font-bold text-amber-900 bg-amber-100 rounded px-2 py-1")
     plan_changed_lbl.set_visibility(False)
 
-    # status strip: the console clock and each radio's clock as chips, then the
-    # conflict counts as chips; the conflict detail lines sit under it and fold
-    # away on a chip click
-    with ui.row().classes("items-center gap-2 w-full flex-wrap mp-bar"):
-        with ui.row().classes("items-center gap-1 flex-wrap"):
-            clock_strip = ui.row().classes("items-center gap-1 flex-wrap")
+    # the view toolbar: the Timeline / Map switch on the left, then the
+    # console block (the console clock and each radio's clock, the clock
+    # buttons, and the conflict status last). One row with one shared border;
+    # on a narrow screen the console wraps under a full-width switch. The
+    # conflict detail lines sit under it and fold away on a status click.
+    main_view = {"segs": {}}
+    with ui.element("div").classes("mp-toolbar"):
+        with ui.element("div").classes("mp-seg"):
+            for _name, _icon in (("Timeline", "view_timeline"), ("Map", "map")):
+                _seg = ui.element("div").classes("mp-seg-btn").props(
+                    f'role=button tabindex=0 aria-label="{_name}"')
+                _seg.on("click", lambda e, n=_name: _show_main(n))
+                _seg.on("keydown.enter", lambda e, n=_name: _show_main(n))
+                with _seg:
+                    ui.icon(_icon)
+                    ui.label(_name)
+                main_view["segs"][_name] = _seg
+        with ui.element("div").classes("mp-console"):
+            clock_strip = ui.row().classes("items-center gap-2 flex-wrap")
             # the two clock buttons are built once, here, and only the chips are
             # redrawn on the 5 s poll: a button rebuilt with the chips can lose a
             # click that lands during the rebuild.
             sync_btn = ui.button("Sync radio clocks", icon="sync",
                                  on_click=lambda: background_tasks.create(_sync_radio_clocks())) \
-                .props("dense flat no-caps") \
+                .props("dense flat").classes("mp-console-act") \
                 .tooltip("set every connected radio's OS clock to this console's UTC "
                          "(steps are keyed from the console clock either way)")
             ui.button("Set time by hand", icon="edit_calendar",
                       on_click=lambda: background_tasks.create(_set_time_dialog())) \
-                .props("dense flat no-caps") \
+                .props("dense flat").classes("mp-console-act") \
                 .tooltip("no internet, no GPS: type a UTC time and push it to the radios "
                          "and/or this console")
-        conflict_chips = ui.row().classes("items-center gap-1 flex-wrap")
+            conflict_chips = ui.row().classes("items-center gap-2 flex-wrap mp-console-status")
     conflict_box = ui.column().classes("w-full gap-0 px-2")
     state["conflicts_open"] = True
     # dialogs opened from inside the timeline (a drop) are parented here, so a
@@ -4019,10 +4085,6 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         # DOM (shown and hidden, not tab panels) so the map and its events
         # exist from the first paint whichever tab is open.
         with ui.column().classes("grow min-w-0 gap-2"):
-            with ui.tabs(value="Timeline", on_change=lambda e: _show_main(e.value)) \
-                    .props("dense no-caps").classes("w-full") as main_tabs:
-                ui.tab("Timeline", icon="view_timeline")
-                ui.tab("Map", icon="map")
             timeline_card = ui.card().classes("w-full min-w-0")
             with timeline_card:
                 with ui.row().classes("items-center gap-1 w-full no-wrap"):
@@ -4039,6 +4101,10 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
             map_card = _build_map_card()
 
             def _show_main(which):
+                for _n, _el in main_view["segs"].items():
+                    _el.classes(add="mp-seg-on" if _n == which else "",
+                                remove="" if _n == which else "mp-seg-on")
+                    _el.props(f'aria-pressed={"true" if _n == which else "false"}')
                 timeline_card.set_visibility(which == "Timeline")
                 map_card.set_visibility(which == "Map")
                 if which == "Map":
@@ -4046,12 +4112,14 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
                     ui.run_javascript("window.missionMap && window.missionMap.resize "
                                       "&& window.missionMap.resize()")
 
-            map_ui["show_map"] = lambda: main_tabs.set_value("Map")
+            map_ui["show_map"] = lambda: _show_main("Map")
             _show_main("Timeline")
 
-            with ui.tabs().props("dense no-caps").classes("w-full") as right_tabs:
-                tab_editor = ui.tab("Step editor")
-                tab_audit = ui.tab("Audit log")
+            # the same segmented look as the Timeline / Map switch
+            with ui.tabs().props("dense inline-label align=left") \
+                    .classes("w-full mp-segtabs") as right_tabs:
+                tab_editor = ui.tab("Step editor", icon="edit_note")
+                tab_audit = ui.tab("Audit log", icon="receipt_long")
             with ui.tab_panels(right_tabs, value=tab_editor).classes(
                     "w-full").props("keep-alive"):
                 with ui.tab_panel(tab_editor).classes("p-0"):
@@ -4112,15 +4180,21 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
         conflict_chips.clear()
         with conflict_chips:
             if not errs and not warns and not needs:
-                ui.chip("no conflicts", icon="check_circle", color="green-1",
-                        text_color="green-9").props("dense")
-            for n, word, color, tcol in ((len(errs), "error", "red-1", "red-9"),
-                                         (len(warns), "warning", "amber-1", "amber-10"),
-                                         (len(needs), "needs input", "amber-1", "amber-10")):
+                with ui.row().classes("items-center gap-1 no-wrap mp-status mp-status-ok"):
+                    ui.icon("check_circle")
+                    ui.label("no conflicts")
+            for n, word, kind, icon in ((len(errs), "error", "err", "error"),
+                                        (len(warns), "warning", "warn", "warning"),
+                                        (len(needs), "needs input", "warn", "edit_note")):
                 if n:
-                    ui.chip(f"{n} {word}{'' if n == 1 or word == 'needs input' else 's'}",
-                            color=color, text_color=tcol, on_click=_toggle) \
-                        .props("dense clickable").tooltip("show or hide the details")
+                    st = ui.row().classes(
+                        f"items-center gap-1 no-wrap mp-status mp-status-{kind} cursor-pointer") \
+                        .props("role=button tabindex=0") \
+                        .tooltip("show or hide the details")
+                    st.on("click", lambda e: _toggle())
+                    with st:
+                        ui.icon(icon)
+                        ui.label(f"{n} {word}{'' if n == 1 or word == 'needs input' else 's'}")
         conflict_box.clear()
         conflict_box.set_visibility(bool(errs or warns or needs) and state.get("conflicts_open", True))
         with conflict_box:
@@ -4137,8 +4211,10 @@ def build_mission_tab(mgr, mode: str = MODE_FLIGHT):
     def _refresh_clock_strip():
         clock_strip.clear()
         with clock_strip:
-            ui.chip(f"console UTC {_utc_now_hms()}", icon="schedule", color="grey-3",
-                    text_color="grey-9").props("dense")
+            with ui.row().classes("items-center gap-1 no-wrap mp-clock") \
+                    .tooltip("this console's clock, UTC: steps are keyed from it"):
+                ui.icon("schedule")
+                ui.label(f"CONSOLE UTC {_utc_now_hms()}")
             for serial, host in list(mgr.hosts.items()):
                 cl = state["radio_clock"].get(serial) or {}
                 clk = cl.get("ref_clock", "?")
