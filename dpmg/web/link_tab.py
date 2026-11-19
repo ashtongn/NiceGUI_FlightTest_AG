@@ -3505,6 +3505,9 @@ body:has(.opx-root) { overflow:hidden; padding-bottom:0 !important; min-height:0
 .opx-strip { flex:1; min-width:0; gap:8px; flex-wrap:nowrap; overflow-x:auto; align-items:stretch; }
 .opx-cmd .q-btn { align-self:center; height:40px; }
 .opx-ctl { gap:4px !important; }
+.opx-rxtx { flex-wrap:wrap; gap:8px 16px; align-items:flex-start; }
+.opx-half { flex:1 1 400px; min-width:0; }
+.opx-txhalf { border-left:1px solid var(--border); padding-left:16px !important; }
 .opx-count { font:11px 'JetBrains Mono',Menlo,monospace; color:var(--muted); align-self:center; white-space:nowrap; }
 .opx-chip { min-width:200px; gap:2px; flex:none; }
 .opx-chip.opx-sel { outline:1px solid var(--accent); outline-offset:-1px; }
@@ -3680,8 +3683,10 @@ def build_operator_sdr():
             # Antenna bias + GPS sky (shown with the GPSDO clock)
             gps_row = GpsAntennaRow(_host, lambda: clk_in.value, show_sky=True, poll=True)
             # RECEIVE: RX port + gain (what you receive / the spectrum source)
-            ui.label("RECEIVE").classes("text-xs font-bold text-green-700")
-            with ui.row().classes("items-center gap-3 flex-wrap"):
+            with ui.row().classes("opx-rxtx w-full") as rxtx_row:
+                rx_col = ui.column().classes("opx-half gap-1 p-0")
+            rx_lbl = ui.label("RECEIVE").classes("text-xs font-bold text-green-700")
+            with ui.row().classes("items-center gap-3 flex-wrap") as rx_row:
                 rxport_in = ui.select(_PORTS_G40, value="TRx1A", label="RX port") \
                     .props("dense outlined").classes("w-36")
                 _ppu.hook_tips(rxport_in)
@@ -3732,10 +3737,10 @@ def build_operator_sdr():
                                     format="%g").props("dense outlined").classes("w-52")
             fe_row.set_visibility(False)
             # tx_box hides for roles that never transmit
-            with ui.column().classes("w-full gap-2 p-0") as tx_box:
+            with ui.column().classes("opx-half opx-txhalf gap-1 p-0") as tx_box:
                 # TRANSMIT: where the jammer, IQ playback and custom waveforms key
-                ui.label("TRANSMIT  (jammer, IQ playback, custom waveforms key here)") \
-                    .classes("text-xs font-bold text-red-700")
+                ui.label("TRANSMIT").classes("text-xs font-bold text-red-700") \
+                    .tooltip("jammer, IQ playback and custom waveforms key here")
                 hd_lbl = ui.label("half-duplex radio: receive pauses while TX is keyed "
                                   "(spectrum freezes until Stop TX)") \
                     .classes("text-xs text-amber-700")
@@ -3756,9 +3761,15 @@ def build_operator_sdr():
                     txgain_sel.set_visibility(False)
                     portnote_lbl = ui.label("").classes("text-xs self-center")
             # actions
-            with ui.row().classes("items-center gap-3 flex-wrap"):
+            with ui.row().classes("items-center gap-3 flex-wrap") as act_row:
                 start_btn = ui.button("START", icon="play_arrow").props("color=positive")
                 stop_btn = ui.button("STOP RX").props("color=grey")
+                rx_on_cb.move(act_row)
+                portnote_lbl.move(act_row)
+                rx_lbl.move(rx_col)
+                rx_row.move(rx_col)
+                tx_box.move(rxtx_row)
+                rx_col.move(rxtx_row, target_index=0)
                 # no CLOSE button: START already tears down + re-inits the radio
                 # (service _do_init releases the previous session first), so the
                 # operator never has to release the card manually.
