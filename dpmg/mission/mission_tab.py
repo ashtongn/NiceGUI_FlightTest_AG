@@ -818,19 +818,18 @@ async def stop_all_tx(mgr, hosts) -> int:
 
 PAGE_CSS = """
 .mp-root { max-width: 1800px; margin: 0 auto; font-size: 13px; }
-.mp-root .q-card { box-shadow: 0 1px 3px rgba(0,0,0,.08); border-radius: 10px;
-                   border: 1px solid #e5e7eb; }
-.mp-root .mp-section { border-top: 1px solid #e5e7eb; margin-top: 8px; padding-top: 6px;
+.mp-root .q-card { box-shadow: none; border: 1px solid #2a2f38; }
+.mp-root .mp-section { border-top: 1px solid #2a2f38; margin-top: 8px; padding-top: 6px;
                        width: 100%; }
-.mp-root .mp-section-title { font-size: 11px; font-weight: 700; color: #4b5563;
-                             text-transform: uppercase; letter-spacing: .04em; }
-.mp-root .mp-pill { border-radius: 999px; padding: 3px 12px; font-weight: 600;
+.mp-root .mp-section-title { font-size: 11px; font-weight: 700; color: #8b93a1;
+                             text-transform: uppercase; letter-spacing: .08em; }
+.mp-root .mp-pill { padding: 3px 12px; font-weight: 600;
                     font-size: 12px; white-space: nowrap; }
-.mp-root .mp-cat-card { padding: 4px 6px; border-radius: 6px; cursor: pointer; }
-.mp-root .mp-cat-card:hover { background: #eff6ff; }
-.mp-root .mp-lane { background: #fafafa; border: 1px solid #e5e7eb; border-radius: 6px; }
-.mp-root .mm-drop-hot { outline: 3px dashed #2563eb; outline-offset: -4px; }
-.mp-root .mp-bar { background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 8px;
+.mp-root .mp-cat-card { padding: 4px 6px; cursor: pointer; }
+.mp-root .mp-cat-card:hover { background: #1f242c; }
+.mp-root .mp-lane { background: #12151a; border: 1px solid #2a2f38; }
+.mp-root .mm-drop-hot { outline: 2px dashed #5b9bd5; outline-offset: -4px; }
+.mp-root .mp-bar { background: #1b1f26; border: 1px solid #2a2f38;
                    padding: 4px 8px; }
 """
 
