@@ -777,7 +777,7 @@ def _build_psd_chart():
             # wider left gutter so the floating y-zoom buttons, the axis name
             # and the tick labels each sit in their own lane and stop covering
             # each other.
-            "grid": {"left": 100, "right": 20, "top": 34, "bottom": 60},
+            "grid": {"left": 100, "right": 20, "top": 34, "bottom": 74},
             # LineX brush selects a frequency span; brushEnd: the
             # carve panel reads the selected [f_lo, f_hi] and offers to save it.
             "toolbox": {"right": 10, "top": 0,
@@ -788,12 +788,20 @@ def _build_psd_chart():
                       "throttleType": "debounce", "throttleDelay": 200,
                       "brushStyle": {"color": "rgba(70,130,255,0.18)"}},
             "xAxis": {"type": "value", "name": "Frequency (Hz)",
-                      "scale": True, "nameLocation": "middle", "nameGap": 32},
+                      "scale": True, "nameLocation": "middle", "nameGap": 30},
             "yAxis": {"type": "value", "name": "PSD (dB/Hz)",
                       "scale": True, "nameLocation": "middle", "nameGap": 56},
             "dataZoom": [
                 {"type": "inside", "xAxisIndex": 0, "filterMode": "none"},
-                {"type": "slider", "xAxisIndex": 0, "height": 16, "bottom": 6},
+                {"type": "slider", "xAxisIndex": 0, "height": 10, "bottom": 4,
+                 "showDetail": False, "borderColor": "#2c322c",
+                 "backgroundColor": "#141714", "fillerColor": "rgba(208,166,68,0.18)",
+                 "handleSize": "140%", "moveHandleSize": 4,
+                 "handleStyle": {"color": "#8a8f7a", "borderColor": "#8a8f7a"},
+                 "dataBackground": {"lineStyle": {"opacity": 0},
+                                    "areaStyle": {"opacity": 0}},
+                 "selectedDataBackground": {"lineStyle": {"opacity": 0},
+                                            "areaStyle": {"opacity": 0}}},
             ],
             "series": [
                 {"type": "line", "showSymbol": False, "lineStyle": {"width": 1},
@@ -2097,7 +2105,7 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
         with ui.row().classes("items-center gap-2"):
             jbuild = ui.button("Build + load").props("color=primary")
             jtx = ui.button("TRANSMIT").props("color=negative")
-            jstop = ui.button("STOP").props("color=grey")
+            jstop = ui.button("STOP").props("color=grey-8 outline")
 
         _pmap = {"barrage": [], "noise": [p_bw, p_freq], "tone": [p_freq],
                  "comb": [p_spacing, p_ntones, p_freq],
@@ -2222,7 +2230,25 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
         # have seen TX active so a slow first heartbeat does not clear it early.
         _seen_tx = {"on": False}
 
+        _btn_on = {"v": None}
+
+        def _paint_btns():
+            host = get_host()
+            st = getattr(host, "status", None) if host is not None else None
+            on = bool(st is not None and st.flags & proto.Status.FLAG_TX_ACTIVE)
+            if on == _btn_on["v"]:
+                return
+            _btn_on["v"] = on
+            if on:        # transmitting: TRANSMIT muted + disabled, STOP is the action
+                jtx.props("color=grey-8 outline disable")
+                jstop.props(remove="outline disable").props("color=negative")
+            else:         # idle: TRANSMIT is the action, STOP is muted
+                jtx.props(remove="outline disable").props("color=negative")
+                jstop.props("color=grey-8 outline")
+            jtx.update(); jstop.update()
+
         def _watch_tx():
+            _paint_btns()
             if not jstat.text.startswith("JAMMING:"):
                 _seen_tx["on"] = False
                 return
@@ -2235,7 +2261,7 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
             elif _seen_tx["on"]:
                 jstat.set_text("jam stopped (TX off)")
                 _seen_tx["on"] = False
-        ui.timer(1.0, _watch_tx)
+        ui.timer(0.5, _watch_tx)
 
 
 def _fmt_bytes(b):
@@ -3464,6 +3490,62 @@ def build_custom_waveform_panel(get_host, get_txport=None, on_retune=None):
         _sync()
 
 
+# Operator console layout: a command strip (radio chips + STOP ALL TX), an
+# always-visible active-radio banner, then the controls and spectrum on the left
+# and a tabbed side rail on the right. Sized to the window so the page does not
+# scroll; every radio panel carries a tag in the radio's colour.
+_OPX_CSS = """
+body:has(.opx-root) { overflow:hidden; padding-bottom:0 !important; min-height:0 !important; height:100vh; }
+.nicegui-content:has(.opx-root) { padding:8px; }
+.opx-root { width:100%; height:calc(100vh - 95px); gap:8px; padding:8px; overflow:hidden;
+  flex-wrap:nowrap; align-items:stretch; }
+.opx-cmd { width:100%; flex:none; align-items:stretch; gap:10px; flex-wrap:nowrap; }
+.opx-title { font:600 11px 'JetBrains Mono',Menlo,monospace; letter-spacing:.14em; color:var(--muted);
+  align-self:center; white-space:nowrap; }
+.opx-strip { flex:1; min-width:0; gap:8px; flex-wrap:nowrap; overflow-x:auto; align-items:stretch; }
+.opx-cmd .q-btn { align-self:center; height:40px; }
+.opx-ctl { gap:4px !important; }
+.opx-rxtx { flex-wrap:wrap; gap:8px 16px; align-items:flex-start; }
+.opx-half { flex:1 1 400px; min-width:0; }
+.opx-txhalf { border-left:1px solid var(--border); padding-left:16px !important; }
+.opx-count { font:11px 'JetBrains Mono',Menlo,monospace; color:var(--muted); align-self:center; white-space:nowrap; }
+.opx-chip { min-width:200px; gap:2px; flex:none; }
+.opx-chip.opx-sel { outline:1px solid var(--accent); outline-offset:-1px; }
+.opx-chip .q-field__control { height:28px; }
+.opx-band { position:absolute; left:0; top:0; bottom:0; width:6px; }
+.opx-chip { position:relative; padding-left:14px !important; }
+.opx-health { color:var(--muted); }
+.opx-banner { width:100%; flex:none; flex-wrap:nowrap; align-items:center; gap:12px; padding:6px 12px;
+  background:var(--raised); border:1px solid var(--border); border-left:6px solid #4a544b; position:sticky; top:0; z-index:5; }
+.opx-kicker { font:600 10px 'JetBrains Mono',Menlo,monospace; letter-spacing:.14em; color:var(--muted); }
+.opx-active { font:700 18px 'JetBrains Mono',Menlo,monospace; color:var(--text); }
+.opx-serial { font:11px 'JetBrains Mono',Menlo,monospace; color:var(--muted); }
+.opx-alarm { font:700 14px Inter,Arial,sans-serif; color:#e5484d; }
+.opx-role { font-size:11px; color:var(--muted); }
+.opx-main { width:100%; flex:1; min-height:0; gap:8px; flex-wrap:nowrap; align-items:stretch; }
+.opx-left { flex:1; min-width:0; min-height:0; gap:8px; overflow-y:auto; flex-wrap:nowrap; }
+.opx-rail { width:26rem; flex:none; min-height:0; gap:0; border:1px solid var(--border); background:var(--surface);
+  flex-wrap:nowrap; border-left:4px solid var(--radio, #4a544b); }
+.opx-tabs { width:100%; background:var(--raised); border-bottom:1px solid var(--border); flex:none; }
+.opx-tabpanels { width:100%; flex:1; min-height:0; overflow-y:auto; background:transparent; }
+.opx-tp { padding:8px; }
+.opx-panel { border-left:4px solid var(--radio, #4a544b) !important; }
+.opx-rail .opx-panel { border-left-width:1px !important; }
+.opx-ph { align-items:center; gap:8px; flex-wrap:nowrap; }
+.opx-pt { font:600 10.5px Inter,Arial,sans-serif; letter-spacing:.1em; text-transform:uppercase; }
+.opx-tag { font:700 10px 'JetBrains Mono',Menlo,monospace; letter-spacing:.06em; padding:1px 7px; color:#0d0f0d;
+  background:#4a544b; white-space:nowrap; }
+.opx-spec { flex:1; min-height:14rem; }
+.opx-spec > .relative { flex:1; min-height:10rem; }
+.opx-spec .nicegui-echart { height:100%; }
+.opx-log { height:calc(100vh - 360px); min-height:8rem; }
+.opx-compare { width:100%; flex:1; min-height:0; display:grid; gap:8px; overflow:auto;
+  grid-template-columns:repeat(auto-fit,minmax(22rem,1fr)); grid-auto-rows:minmax(18rem,1fr); }
+.opx-cmpcol { padding:8px; gap:6px; min-height:0; background:var(--surface); border:1px solid var(--border); flex-wrap:nowrap; }
+.opx-cmpchart { flex:1; min-height:10rem; }
+"""
+
+
 def build_operator_sdr():
     """Operator view (served at /operator): a focus-view console for operating
     several radios at once: a STOP-ALL-TX bar, a selectable radio strip (color-
@@ -3525,32 +3607,58 @@ def build_operator_sdr():
     ovlcur = {"v": None}                # last RX-overload colour state (avoid churn)
     synced = {"serial": None}           # which radio's live tuning we've pulled in
 
-    with ui.column().classes("w-full max-w-[90rem] mx-auto gap-3 p-3"):
-        # top bar: STOP ALL TX + radio count
-        with ui.row().classes("w-full items-center justify-between"):
-            ui.label("Operator Console").classes("text-2xl font-bold text-slate-800")
-            with ui.row().classes("items-center gap-4"):
-                count_lbl = ui.label("0 radios").classes("text-lg font-mono text-gray-600")
-                stopall_btn = ui.button("STOP ALL TX", icon="dangerous") \
-                    .props("color=negative size=lg").classes("text-lg font-bold")
-        ui.label("RADIOS: click one to control it").classes(
-            "text-sm font-bold text-gray-500")
-        strip = ui.row().classes("w-full gap-3 flex-wrap")
-        # the aircraft feed's last fix, field by field (the header chip has the
-        # one line version); collapsed so the radio controls stay in reach
-        _build_operator_acft_panel()
-        ui.separator()
-        with ui.row().classes("items-center gap-2"):
-            # read-only: which radio is focused (name it on its card above)
-            focus_lbl = ui.label("no radio selected").classes("text-xl font-bold")
-            focus_serial_lbl = ui.label("").classes(
-                "text-xs font-mono text-gray-500 self-center")
-            tx_alarm_lbl = ui.label("").classes(
-                "text-xl font-bold text-red-600 self-center")
-            # the detail panel follows the focused radio's role (set in
-            # the engineering view); no picker here
-            role_note = ui.label("").classes("text-xs text-gray-600 self-center")
-        with ui.card().classes("w-full gap-2") as ctl_card:
+    ui.add_css(_OPX_CSS)
+    # one colour per radio (by discovery order); the same colour is the band on
+    # the radio's chip, and on every panel that drives it, so the radio in focus
+    # is never in doubt
+    _RADIO_COLORS = ("#d0a644", "#4fa3a5", "#8aa24a", "#8f9fd4")
+    rcolor = {}                          # serial: colour
+    tagged = []                          # [(element, kind)] re-coloured on refresh
+    tagcur = {"v": None}
+    vmode = {"v": "focus"}             # FOCUS (one radio, full controls) | COMPARE
+
+    def _color(serial):
+        if serial not in rcolor:
+            rcolor[serial] = _RADIO_COLORS[len(rcolor) % len(_RADIO_COLORS)]
+        return rcolor[serial]
+
+    def _rtag(kind="tag"):
+        """A radio tag: the focused radio's name on its colour. Shown in every
+        panel header, kept current by refresh()."""
+        el = ui.label("NO RADIO").classes("opx-tag")
+        tagged.append(el)
+        return el
+
+    with ui.column().classes("opx-root"):
+        # command strip: radios (colour-coded, click to control), count, STOP ALL TX
+        with ui.row().classes("opx-cmd"):
+            ui.label("OPERATOR CONSOLE").classes("opx-title")
+            strip = ui.row().classes("opx-strip")
+            count_lbl = ui.label("0 radios").classes("opx-count")
+            stopall_btn = ui.button("STOP ALL TX", icon="dangerous") \
+                .props("color=negative").classes("font-bold")
+        # active-radio banner: always visible, names the radio every panel below
+        # is driving
+        with ui.row().classes("opx-banner") as banner:
+            ui.label("ACTIVE RADIO").classes("opx-kicker")
+            focus_lbl = ui.label("no radio selected").classes("opx-active")
+            focus_serial_lbl = ui.label("").classes("opx-serial")
+            tx_alarm_lbl = ui.label("").classes("opx-alarm")
+            role_note = ui.label("").classes("opx-role")
+            ui.space()
+            view_tg = ui.toggle({"focus": "FOCUS", "compare": "COMPARE"},
+                                value="focus").props("dense no-caps unelevated")
+            view_tg.set_visibility(False)
+        with ui.row().classes("opx-main") as main_row:
+            left_col = ui.column().classes("opx-left")
+            rail = ui.column().classes("opx-rail")
+        cmp_row = ui.element("div").classes("opx-compare")
+        cmp_row.set_visibility(False)
+        cmp_cols = {}                    # serial: compare-view column refs
+        with ui.card().classes("w-full gap-2 opx-panel opx-ctl") as ctl_card:
+            with ui.row().classes("opx-ph"):
+                ui.label("RADIO CONTROL").classes("opx-pt")
+                _rtag()
             # TUNING: whole-radio settings shared by RX and TX (one RFIC
             #      clock, one center, one sample rate / RF bandwidth) ----
             ui.label("TUNING  (applies to RX and TX)").classes(
@@ -3575,8 +3683,10 @@ def build_operator_sdr():
             # Antenna bias + GPS sky (shown with the GPSDO clock)
             gps_row = GpsAntennaRow(_host, lambda: clk_in.value, show_sky=True, poll=True)
             # RECEIVE: RX port + gain (what you receive / the spectrum source)
-            ui.label("RECEIVE").classes("text-xs font-bold text-green-700")
-            with ui.row().classes("items-center gap-3 flex-wrap"):
+            with ui.row().classes("opx-rxtx w-full") as rxtx_row:
+                rx_col = ui.column().classes("opx-half gap-1 p-0")
+            rx_lbl = ui.label("RECEIVE").classes("text-xs font-bold text-green-700")
+            with ui.row().classes("items-center gap-3 flex-wrap") as rx_row:
                 rxport_in = ui.select(_PORTS_G40, value="TRx1A", label="RX port") \
                     .props("dense outlined").classes("w-36")
                 _ppu.hook_tips(rxport_in)
@@ -3627,10 +3737,10 @@ def build_operator_sdr():
                                     format="%g").props("dense outlined").classes("w-52")
             fe_row.set_visibility(False)
             # tx_box hides for roles that never transmit
-            with ui.column().classes("w-full gap-2 p-0") as tx_box:
+            with ui.column().classes("opx-half opx-txhalf gap-1 p-0") as tx_box:
                 # TRANSMIT: where the jammer, IQ playback and custom waveforms key
-                ui.label("TRANSMIT  (jammer, IQ playback, custom waveforms key here)") \
-                    .classes("text-xs font-bold text-red-700")
+                ui.label("TRANSMIT").classes("text-xs font-bold text-red-700") \
+                    .tooltip("jammer, IQ playback and custom waveforms key here")
                 hd_lbl = ui.label("half-duplex radio: receive pauses while TX is keyed "
                                   "(spectrum freezes until Stop TX)") \
                     .classes("text-xs text-amber-700")
@@ -3651,9 +3761,15 @@ def build_operator_sdr():
                     txgain_sel.set_visibility(False)
                     portnote_lbl = ui.label("").classes("text-xs self-center")
             # actions
-            with ui.row().classes("items-center gap-3 flex-wrap"):
+            with ui.row().classes("items-center gap-3 flex-wrap") as act_row:
                 start_btn = ui.button("START", icon="play_arrow").props("color=positive")
                 stop_btn = ui.button("STOP RX").props("color=grey")
+                rx_on_cb.move(act_row)
+                portnote_lbl.move(act_row)
+                rx_lbl.move(rx_col)
+                rx_row.move(rx_col)
+                tx_box.move(rxtx_row)
+                rx_col.move(rxtx_row, target_index=0)
                 # no CLOSE button: START already tears down + re-inits the radio
                 # (service _do_init releases the previous session first), so the
                 # operator never has to release the card manually.
@@ -3731,6 +3847,7 @@ def build_operator_sdr():
             # floods "parent slot deleted" and breaks refresh).
             sensor_lbl = ui.label("").classes("font-mono text-xs text-gray-600")
             sensor_lbl.set_visibility(False)
+
 
         # Widgets that follow the radio (keys = view_sync.op_fields)
         vguard = _vs.EditGuard()
@@ -4125,26 +4242,35 @@ def build_operator_sdr():
             0.5 s telemetry refresh, so the strip is updated in place, not rebuilt)."""
             with strip:
                 card = ui.card().classes(
-                    "cursor-pointer border-2 p-3 min-w-[190px] bg-slate-50 border-slate-300")
+                    "cursor-pointer border-2 p-2 opx-chip bg-slate-50 border-slate-300") \
+                    
             card.on("click", lambda s=serial: sel.update(serial=s))
             with card:
+                ui.element("div").classes("opx-band").style(f"background:{_color(serial)}")
                 # the bold name box is the rename field (edit + Enter/leave to apply)
                 name = ui.input(value=_name(serial)).props("borderless dense") \
                     .classes("text-lg font-bold w-full") \
                     .tooltip("edit this radio's name; clear to use its serial")
                 name.on("keydown.enter", lambda e, s=serial, i=name: _save_card_name(s, i))
                 name.on("blur", lambda e, s=serial, i=name: _save_card_name(s, i))
-                serial_lbl = ui.label("").classes("text-xs font-mono text-gray-500")
-                type_lbl = ui.label(_HOST_TXT.get(h.host_type, "?")).classes(
-                    "text-xs text-gray-600")
-                role_lbl = ui.label("").classes("text-xs")
-                state_lbl = ui.label("").classes("text-base font-bold")
-                link_lbl = ui.label("").classes("text-xs font-bold")
-                pos_lbl = ui.label("").classes("text-xs font-mono")
+                with ui.row().classes("items-center gap-2 no-wrap"):
+                    state_lbl = ui.label("").classes("text-sm font-bold")
+                    link_lbl = ui.label("").classes("text-xs font-bold")
+                with ui.row().classes("items-center gap-2 no-wrap"):
+                    serial_lbl = ui.label("").classes("text-xs font-mono text-gray-500")
+                    type_lbl = ui.label(_HOST_TXT.get(h.host_type, "?")).classes(
+                        "text-xs text-gray-600")
+                    role_lbl = ui.label("").classes("text-xs")
+                    hbtn = ui.button("HEALTH", icon="monitor_heart") \
+                        .props("flat dense size=xs no-caps").classes("opx-health")
+                hmenu = ui.menu().props("anchor=\"bottom left\" self=\"top left\"")
+                hbtn.on("click.stop", lambda e, m=hmenu: m.open())
+            with hmenu, ui.column().classes("gap-0 p-2"):
                 temp_lbl = ui.label("").classes("text-xs font-mono") \
                     .tooltip("Radio host chip temperature (Jetson Orin junction, the hottest point on the module). "
                              f"Amber from {_ht.WARN_C:.0f} C, red from {_ht.HOT_C:.0f} C; "
                              "the module throttles at 99 C and shuts down at 104 C")
+                pos_lbl = ui.label("").classes("text-xs font-mono")
                 card_temp_lbl = ui.label("").classes("text-xs font-mono") \
                     .tooltip("Radio card temperatures (NV100 card A / card B, or the B200's own sensor), read while "
                              f"the radio is started. Amber from {_ht.CARD_WARN_C:.0f} C, "
@@ -4203,21 +4329,21 @@ def build_operator_sdr():
             else:
                 cls = "bg-slate-50 border-slate-300"
             refs["card"].classes(
-                replace=f"cursor-pointer border-2 p-3 min-w-[190px] {cls} "
-                + ("ring-4 ring-primary" if serial == sel["serial"] else ""))
+                replace=f"cursor-pointer border-2 p-2 opx-chip {cls} "
+                + ("opx-sel" if serial == sel["serial"] else ""))
             refs["serial_lbl"].set_text(serial if labels.get(serial) else "")
             _rec = _rec_state.text(serial)       # receive-only capture in progress
             if tx_on:
                 refs["state_lbl"].set_text("TRANSMITTING" + (f" + {_rec}" if _rec
                                                              else rx_off_note(h.radio_state)))
-                refs["state_lbl"].classes(replace="text-base font-bold text-red-600")
+                refs["state_lbl"].classes(replace="text-sm font-bold text-red-600")
             elif _rec:
                 refs["state_lbl"].set_text(f"RECORDING ({_rec[4:]})")
-                refs["state_lbl"].classes(replace="text-base font-bold text-red-600")
+                refs["state_lbl"].classes(replace="text-sm font-bold text-red-600")
             else:
                 txt, _c = _STATE_TXT.get(h.radio_state, ("?", ""))
                 refs["state_lbl"].set_text(txt + rx_off_note(h.radio_state))
-                refs["state_lbl"].classes(replace="text-base font-bold")
+                refs["state_lbl"].classes(replace="text-sm font-bold")
             _ltxt, _lcol = link_text(h.connected, host_config(h))
             refs["link_lbl"].set_text(_ltxt)
             refs["link_lbl"].classes(replace="text-xs font-bold " + _lcol)
@@ -4279,10 +4405,11 @@ def build_operator_sdr():
                 None: "text-gray-400", "ok": "text-green-700",
                 "warm": "text-amber-600 font-bold", "hot": "text-red-600 font-bold"}[hlvl])
 
-        with ui.card().classes("w-full"):
+        with ui.card().classes("w-full opx-panel opx-spec") as spec_card:
             with ui.row().classes("w-full items-center justify-between"):
                 with ui.row().classes("items-center gap-3"):
                     ui.label("Spectrum").classes("text-base font-bold")
+                    _rtag()
                     # peak-hold (max-hold): accumulate the highest value per bin so
                     # narrow / intermittent spikes stand out and persist
                     pk_cb = ui.checkbox("Peak hold").props("dense")
@@ -4325,6 +4452,8 @@ def build_operator_sdr():
             # the toolbox "clear" button (and tool deactivation) fire chart:brush
             # with empty areas: reset the readout so it doesn't linger
             psd_chart.on("chart:brush", _on_sel)
+        spec_card.move(left_col)
+        ctl_card.move(left_col)
 
         # frozen header row for the scrollable tables (inline + "view all")
         ui.add_css("""
@@ -4367,11 +4496,35 @@ def build_operator_sdr():
             # rate_in first refreshes the Sample-rate control at the top of page
             rate_in.value = int(rate_hz)
             return bool(await _start())
-        with ui.row().classes("w-full gap-3 items-start flex-wrap"):
-            with ui.column().classes("flex-1 min-w-[22rem]") as play_col:
+        # side rail: one tab per secondary panel, so nothing stacks below the fold
+        with rail:
+            with ui.tabs().props("dense no-caps align=left inline-label") \
+                    .classes("opx-tabs") as rtabs:
+                t_det = ui.tab("DETECT")
+                t_iq = ui.tab("IQ PLAYBACK")
+                t_jam = ui.tab("JAMMER")
+                t_log = ui.tab("LOG")
+                t_acft = ui.tab("ACFT")
+            with ui.tab_panels(rtabs, value=t_det).classes("opx-tabpanels"):
+                p_det = ui.tab_panel(t_det).classes("opx-tp")
+                p_iq = ui.tab_panel(t_iq).classes("opx-tp")
+                p_jam = ui.tab_panel(t_jam).classes("opx-tp")
+                p_log = ui.tab_panel(t_log).classes("opx-tp")
+                p_acft = ui.tab_panel(t_acft).classes("opx-tp")
+        with p_acft:
+            _build_operator_acft_panel()
+        with p_iq:
+            with ui.column().classes("w-full opx-tx") as play_col:
+                with ui.row().classes("opx-ph"):
+                    ui.label("IQ PLAYBACK").classes("opx-pt")
+                    _rtag()
                 build_iq_playback_panel(_host, get_txport=_get_txport,
                                         on_retune=_apply_retune, on_reinit=_reinit_at)
-            with ui.column().classes("flex-1 min-w-[22rem]") as jam_col:
+        with p_jam:
+            with ui.column().classes("w-full opx-tx") as jam_col:
+                with ui.row().classes("opx-ph"):
+                    ui.label("JAMMER").classes("opx-pt")
+                    _rtag()
                 build_jammer_panel(_host, title="Jammer", get_txport=_get_txport)
             # Custom waveforms (hidden):
             # with ui.column().classes("flex-1 min-w-[22rem]"):
@@ -4388,6 +4541,14 @@ def build_operator_sdr():
             play_col.set_visibility(_role.shows(r, "playback"))
             jam_col.set_visibility(_role.shows(r, "jammer"))
             det_row.set_visibility(_role.shows(r, "detections"))
+            t_iq.set_visibility(_role.shows(r, "playback"))
+            t_jam.set_visibility(_role.shows(r, "jammer"))
+            t_det.set_visibility(_role.shows(r, "detections"))
+            _hidden = {"DETECT": not _role.shows(r, "detections"),
+                       "IQ PLAYBACK": not _role.shows(r, "playback"),
+                       "JAMMER": not _role.shows(r, "jammer")}
+            if _hidden.get(rtabs.value):
+                rtabs.set_value(t_log)
             bp_link.set_visibility(_role.shows(r, "bitpipe") and r != "any")
             role_note.set_text("" if r == "any" else info["help"])
 
@@ -4404,10 +4565,12 @@ def build_operator_sdr():
         bp_link.set_visibility(False)
 
         # detections / decodes, side by side
-        with ui.row().classes("w-full gap-3") as det_row:
-            with ui.card().classes("flex-1"):
+        with ui.column().classes("w-full gap-2") as det_row:
+            with ui.card().classes("w-full opx-panel"):
                 with ui.row().classes("items-center justify-between w-full"):
-                    ui.label("Detections").classes("text-sm font-bold")
+                    with ui.row().classes("items-center gap-2"):
+                        ui.label("Detections").classes("text-sm font-bold")
+                        _rtag()
                     det_more = ui.button("view all").props(
                         "flat dense size=sm no-caps").classes("text-xs")
                 # keep the inline view short (newest 10) with a fixed height so a
@@ -4430,9 +4593,11 @@ def build_operator_sdr():
                                      _DET_COLS, rows, "freq")
                 det_more.on_click(_show_all_dets)
                 det_more.set_visibility(False)   # shown once >10 detections cached
-            with ui.card().classes("flex-1"):
+            with ui.card().classes("w-full opx-panel"):
                 with ui.row().classes("items-center justify-between w-full"):
-                    ui.label("Decodes").classes("text-sm font-bold")
+                    with ui.row().classes("items-center gap-2"):
+                        ui.label("Decodes").classes("text-sm font-bold")
+                        _rtag()
                     dec_more = ui.button("view all").props(
                         "flat dense size=sm no-caps").classes("text-xs")
                 watch_table = ui.table(columns=_DEC_COLS, rows=[], row_key="n") \
@@ -4445,20 +4610,24 @@ def build_operator_sdr():
                                      _DEC_COLS, rows, "n")
                 dec_more.on_click(_show_all_decodes)
                 dec_more.set_visibility(False)   # shown once >10 decode bands
+        det_row.move(p_det)
         dec_all = {"rows": []}   # full decode set for the "view all" dialog
 
-        # logging (bottom): one button opens a popup to pick what to log
-        ui.separator()
-        with ui.row().classes("items-center gap-3"):
+        # logging: one button opens a popup to pick what to log
+        with ui.row().classes("items-center gap-3") as log_row:
             log_btn = ui.button("Log information", icon="description") \
                 .props("color=primary")
             log_state_lbl = ui.label("logging off").classes(
                 "font-mono text-xs self-center text-gray-600")
         # activity log lives down here by the logging controls (out of the way
         # of the detections/decodes + TX panels up top)
-        with ui.card().classes("w-full"):
-            ui.label("Activity log").classes("text-sm font-bold")
-            act_log = ui.log(max_lines=60).classes("w-full h-40 text-xs")
+        with ui.card().classes("w-full opx-panel opx-logcard") as log_card:
+            with ui.row().classes("items-center gap-2"):
+                ui.label("Activity log").classes("text-sm font-bold")
+                _rtag()
+            act_log = ui.log(max_lines=60).classes("w-full text-xs opx-log")
+        log_row.move(p_log)
+        log_card.move(p_log)
         with ui.dialog() as log_dlg, ui.card().classes("gap-2 min-w-[360px]"):
             ui.label("Log information").classes("text-lg font-bold")
             ui.label("Pick what to record, and where to store it.").classes(
@@ -4678,6 +4847,93 @@ def build_operator_sdr():
                           if pend else "")
         pend_lbl.set_visibility(bool(pend))
 
+    def _follow_view(n):
+        """COMPARE needs two or more radios; with fewer, fall back to FOCUS."""
+        view_tg.set_visibility(n >= 2)
+        if n < 2 and vmode["v"] != "focus":
+            view_tg.set_value("focus")
+        want = vmode["v"] == "compare"
+        main_row.set_visibility(not want)
+        cmp_row.set_visibility(want)
+
+    view_tg.on_value_change(lambda e: vmode.update(v=e.value or "focus"))
+
+    def _refresh_tags(host):
+        """Name + colour on every panel tag for the focused radio, and the
+        active-radio banner's colour band."""
+        key = (host.serial, _name(host.serial)) if host is not None else None
+        if key == tagcur["v"]:
+            return
+        tagcur["v"] = key
+        if key is None:
+            txt, col = "NO RADIO", "#4a544b"
+        else:
+            txt, col = _name(key[0]), _color(key[0])
+        for el in tagged:
+            el.set_text(txt)
+            el.style(f"background:{col}")
+        for el in (banner, left_col, rail):
+            el.style(f"--radio:{col}")
+        banner.style(f"border-left-color:{col}")
+
+    def _pick_radio(serial):
+        sel.update(serial=serial)
+        view_tg.set_value("focus")
+
+    def _refresh_compare(hosts):
+        """COMPARE: one read-only column per radio (name on its colour band, state,
+        tuning, live spectrum). Click a header to focus that radio."""
+        if vmode["v"] != "compare":
+            return
+        for serial in list(cmp_cols):
+            if serial not in hosts:
+                cmp_cols[serial]["col"].delete(); del cmp_cols[serial]
+        for serial in sorted(hosts):
+            if serial not in cmp_cols:
+                col = _color(serial)
+                with cmp_row:
+                    box = ui.column().classes("opx-panel opx-cmpcol").style(
+                        f"border-top:3px solid {col}")
+                with box:
+                    with ui.row().classes("opx-ph cursor-pointer w-full") as hd:
+                        ui.label(_name(serial)).classes("opx-tag").style(f"background:{col}")
+                        ui.label("click to control").classes("opx-serial")
+                    hd.on("click", lambda s=serial: _pick_radio(s))
+                    st_l = ui.label("").classes("text-sm font-bold")
+                    tune_l = ui.label("").classes("font-mono text-xs")
+                    ch = ui.echart({
+                        "animation": False,
+                        "grid": {"left": 46, "right": 10, "top": 8, "bottom": 22},
+                        "xAxis": {"type": "value", "scale": True,
+                                  "axisLabel": {"formatter": "{value}"}},
+                        "yAxis": {"type": "value", "scale": True},
+                        "series": [{"type": "line", "showSymbol": False,
+                                    "lineStyle": {"width": 1, "color": col}, "data": []}],
+                    }).classes("w-full opx-cmpchart")
+                    det_l = ui.label("").classes("font-mono text-xs")
+                cmp_cols[serial] = {"col": box, "st": st_l, "tune": tune_l,
+                                    "chart": ch, "det": det_l}
+        for serial, h in hosts.items():
+            r = cmp_cols.get(serial)
+            if r is None:
+                continue
+            s = h.status
+            tx_on = bool(s is not None and s.flags & proto.Status.FLAG_TX_ACTIVE)
+            txt, _c = _STATE_TXT.get(h.radio_state, ("?", ""))
+            r["st"].set_text(("TRANSMITTING" if tx_on else txt)
+                             + ("" if h.connected else "  (LINK LOST)"))
+            r["st"].classes(replace="text-sm font-bold" + (" text-red-600" if tx_on else ""))
+            if s is not None and s.sample_rate_hz:
+                r["tune"].set_text(f"{s.center_hz/1e6:.4f} MHz  |  {s.sample_rate_hz/1e6:g} MSps")
+            else:
+                r["tune"].set_text("not initialized")
+            v = h.psd
+            if v is not None:
+                r["chart"].options["series"][0]["data"] = [
+                    [float(a), float(b)] for a, b in zip(v.freqs_hz / 1e6, v.psd_db)]
+                r["chart"].update()
+            r["det"].set_text(f"{len(h.detections)} detections")
+
     def refresh():
         hosts = MGR.hosts
         count_lbl.set_text(f"{len(hosts)} radio(s)")
@@ -4703,7 +4959,10 @@ def build_operator_sdr():
         for serial, h in hosts.items():     # refresh every card in place
             _update_card(cards[serial], serial, h)
 
+        _follow_view(len(hosts))
+        _refresh_compare(hosts)
         host = _host()
+        _refresh_tags(host)
         if host is None:
             focus_lbl.set_text("no radio selected")
             tx_alarm_lbl.set_text("")
