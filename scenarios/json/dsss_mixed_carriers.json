@@ -1,0 +1,46 @@
+{
+ "name": "dsss_mixed_carriers",
+ "description": "4 users on BPSK / QPSK / OQPSK / pi4-QPSK carriers, one Gold n=6 set (63 chips) at 2400 Bd, +300 kHz; set peak xcorr 17/63, predicted MUI SNR >= 13.6 dB",
+ "sample_rate_hz": 1920000,
+ "loop_s": 0.3,
+ "code_set": {
+  "kind": "gold",
+  "n": 6,
+  "count": 4,
+  "length": 63
+ },
+ "dsss": {
+  "symbol_rate": 2400,
+  "samples_per_chip": 2,
+  "offset_hz": 300000,
+  "amplitude": 0.8,
+  "stagger_chips": 11
+ },
+ "users": [
+  {
+   "id": "U01",
+   "code": 0,
+   "carrier": "bpsk",
+   "message": "U01 BPSK"
+  },
+  {
+   "id": "U02",
+   "code": 1,
+   "carrier": "qpsk",
+   "message": "U02 QPSK"
+  },
+  {
+   "id": "U03",
+   "code": 2,
+   "carrier": "oqpsk",
+   "message": "U03 OQPSK"
+  },
+  {
+   "id": "U04",
+   "code": 3,
+   "carrier": "pi4qpsk",
+   "message": "U04 PI4"
+  }
+ ],
+ "signals": []
+}

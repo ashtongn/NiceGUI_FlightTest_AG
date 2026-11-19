@@ -1,0 +1,157 @@
+{
+ "name": "mod_coding_card",
+ "description": "Modulation and coding test card: 13 signals across 1.92 MSps, one modulation/coding each, readable messages for the channelizer decode table. Loopback: TX TRx1B -> 50 dB pad -> RX TRx1A.",
+ "sample_rate_hz": 1920000,
+ "center_freq_hz": 425025000.0,
+ "signals": [
+  {
+   "modulation": "FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -650000.0,
+   "message": "C01 OK",
+   "amplitude": 0.25,
+   "name": "C01 FSK uncoded"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -550000.0,
+   "message": "C02 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "conv",
+    "rate": "1/2"
+   },
+   "name": "C02 FSK conv 1/2"
+  },
+  {
+   "modulation": "4FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 1296,
+   "offset_hz": -450000.0,
+   "message": "C03 OK",
+   "amplitude": 0.25,
+   "dibit_mapping": "binary",
+   "fec": {
+    "type": "conv",
+    "rate": "3/4"
+   },
+   "name": "C03 4FSK conv 3/4"
+  },
+  {
+   "modulation": "BPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -350000.0,
+   "message": "C04 OK",
+   "amplitude": 0.25,
+   "name": "C04 BPSK uncoded"
+  },
+  {
+   "modulation": "BPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -250000.0,
+   "message": "C05 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "rs"
+   },
+   "name": "C05 BPSK RS(255,223)"
+  },
+  {
+   "modulation": "QPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -150000.0,
+   "message": "C06 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "conv",
+    "rate": "1/2"
+   },
+   "name": "C06 QPSK conv 1/2"
+  },
+  {
+   "modulation": "QPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -50000.0,
+   "message": "C07 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "ldpc",
+    "code": "qc-r12"
+   },
+   "name": "C07 QPSK LDPC 1/2"
+  },
+  {
+   "modulation": "OQPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 50000.0,
+   "message": "C08 OK",
+   "amplitude": 0.25,
+   "name": "C08 OQPSK uncoded"
+  },
+  {
+   "modulation": "pi/4-QPSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 150000.0,
+   "message": "C09 OK",
+   "amplitude": 0.25,
+   "name": "C09 pi/4-QPSK uncoded"
+  },
+  {
+   "modulation": "8PSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 250000.0,
+   "message": "C10 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "rs+conv",
+    "rate": "1/2"
+   },
+   "name": "C10 8PSK RS + conv 1/2"
+  },
+  {
+   "modulation": "16QAM",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 350000.0,
+   "message": "C11 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "conv",
+    "rate": "3/4"
+   },
+   "name": "C11 16QAM conv 3/4"
+  },
+  {
+   "modulation": "16APSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 450000.0,
+   "message": "C12 OK",
+   "amplitude": 0.25,
+   "fec": {
+    "type": "tpc",
+    "code": "eH(16,11)^2"
+   },
+   "name": "C12 16APSK TPC 16"
+  },
+  {
+   "modulation": "DSSS",
+   "symbol_rate": 2400,
+   "tone_spacing_hz": 5000,
+   "offset_hz": 650000.0,
+   "message": "C13 OK",
+   "amplitude": 0.25,
+   "name": "C13 DSSS uncoded"
+  }
+ ]
+}

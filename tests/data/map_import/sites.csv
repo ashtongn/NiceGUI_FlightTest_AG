@@ -1,0 +1,5 @@
+Name,Latitude,Longitude,Radius_km,notes
+Alpha,32.22,-110.97,0.5,first
+Bravo,32.30,-110.90,,second
+Charlie,not a number,-110.80,1,bad row
+Delta,32.40,-110.70,2,fourth

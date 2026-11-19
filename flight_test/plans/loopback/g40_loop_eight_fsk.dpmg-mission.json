@@ -1,0 +1,219 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Loopback: eight FSK signals at once, TRx1B to TRx1A",
+ "notes": "One G40, cable TRx1B to TRx1A through the pad. One scenario with eight FSK signals 200 kHz apart, keyed together for 26 s at TX attenuation 30 dB. The radio decodes all eight: LOOP FSK 1 to LOOP FSK 8.",
+ "authorization": {
+  "reference": "BENCH-LOOPBACK",
+  "note": "cabled bench loopback: TX jack to RX jack through a pad, no antenna, no amplifier"
+ },
+ "anchor": {
+  "mode": "on_tx"
+ },
+ "radios": [
+  {
+   "id": "G40-LOOP",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000
+  }
+ ],
+ "steps": [
+  {
+   "id": "loop_rx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -700000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 1",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -500000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 2",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 3",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 4",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 5",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 6",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 7",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 700000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 8",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 65.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -700000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 1",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -500000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 2",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 3",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 4",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 5",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 6",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 7",
+       "tone_spacing_hz": 5000
+      },
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 700000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK 8",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 91.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  }
+ ]
+}

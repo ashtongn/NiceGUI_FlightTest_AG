@@ -1,0 +1,220 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: seven jammers at 1.92 MS/s",
+ "notes": "One step per jammer type, 10 s each with 6 s clear between, radio at 1.92 MS/s, TX attenuation 30 dB. FieldFox on the coupled port, wide span, one screenshot per step.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "j192_01_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 15.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_02_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 320000.0,
+    "center": 240000.0
+   },
+   "schedule": {
+    "start_s": 21.0,
+    "stop_s": 31.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_03_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 240000.0
+   },
+   "schedule": {
+    "start_s": 37.0,
+    "stop_s": 47.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_04_comb",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 120000.0,
+    "n_tones": 8,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 53.0,
+    "stop_s": 63.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_05_swept",
+   "radio": "G40-AX3G",
+   "technique": "jammer.swept",
+   "radiates": true,
+   "params": {
+    "kind": "swept",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "span": 1536000.0,
+    "sweep_period_s": 0.001,
+    "noise_bw": 0.0,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 69.0,
+    "stop_s": 79.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_06_chirp",
+   "radio": "G40-AX3G",
+   "technique": "jammer.chirp",
+   "radiates": true,
+   "params": {
+    "kind": "chirp",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "f0": -768000.0,
+    "f1": 768000.0
+   },
+   "schedule": {
+    "start_s": 85.0,
+    "stop_s": 95.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j192_07_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "qpsk",
+    "sym_rate": 480000.0,
+    "sym_duty": 1.0,
+    "rolloff": 0.35,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 101.0,
+    "stop_s": 111.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

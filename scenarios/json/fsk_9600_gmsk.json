@@ -1,0 +1,14 @@
+{
+ "name": "fsk_9600_gmsk",
+ "description": "9600-baud narrow FSK (GMSK-ish, 4.8 kHz)",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "FSK",
+   "symbol_rate": 9600,
+   "tone_spacing_hz": 4800,
+   "offset_hz": 200000,
+   "message": "9600 FSK"
+  }
+ ]
+}

@@ -1,0 +1,14 @@
+{
+ "name": "4fsk_wide",
+ "description": "wide 4FSK 4800 sym/s, 6 kHz outer spacing",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "4FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 2000,
+   "offset_hz": 200000,
+   "message": "4FSK WIDE"
+  }
+ ]
+}

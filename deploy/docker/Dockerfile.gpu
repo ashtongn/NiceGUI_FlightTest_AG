@@ -1,0 +1,20 @@
+# Dockerfile.gpu: GPU channelizer service container (L4T + CuPy)
+# Build (context = repo root):  docker build -f deploy/docker/Dockerfile.gpu -t dpmg-gpu .
+FROM nvcr.io/nvidia/l4t-jetpack:r35.4.1
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# CuPy for CUDA 11.x (prebuilt aarch64 wheel), plus IPC + numpy
+RUN pip3 install --no-cache-dir --ignore-installed \
+        "numpy>=1.20,<1.29" \
+        cupy-cuda11x \
+        posix_ipc
+
+WORKDIR /app
+COPY dpmg/gpu/gpu_channelizer2.py /app/gpu_channelizer2.py
+COPY dpmg/gpu/gpu_service.py /app/gpu_service.py
+
+CMD ["python3", "/app/gpu_service.py"]

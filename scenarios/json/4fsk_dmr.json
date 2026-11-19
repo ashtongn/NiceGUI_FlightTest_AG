@@ -1,0 +1,14 @@
+{
+ "name": "4fsk_dmr",
+ "description": "DMR-class 4FSK 4800 sym/s, +-1.944/0.648 kHz (spacing 1296)",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "4FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 1296,
+   "offset_hz": 200000,
+   "message": "DMR 4FSK"
+  }
+ ]
+}

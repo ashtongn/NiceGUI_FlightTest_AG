@@ -1,0 +1,196 @@
+# rf_frontend.example.yaml: external PA enable / TX-RX switch / PA fault input /
+# USB attenuator for the Matchstiq G40.  Copy to rf_frontend.yaml next to
+# dpmg_service.py (on the radio: /app_svc/rf_frontend.yaml) and edit.  The service
+# reads it at start-up and on the `frontend_reload` command (PA is forced LOW,
+# all lines released, then re-mapped), so a socket pin can be moved while testing
+# without restarting the service.  Path override: --frontend-config PATH or
+# DPMG_FRONTEND_CONFIG=PATH.  CLI flags (--frontend, --pa-line, --tr-line,
+# --tr-mode, --pa-fault-line, --atten) only override what is here.
+#
+# Unknown keys are rejected with an error naming the key.  Any `line` /
+# `fallback_line` may be written three ways:
+#   logical name  : cpu-gp-out1      (device-tree gpio-line-names, like `gpiofind`)
+#   Tegra pad name: PG.06            (what `gpioinfo` prints on JetPack 6 if no name)
+#   bare offset   : 41               (integer line offset on that chip)
+# The first form is tried, then `fallback_line`; `frontend_status` reports the
+# resolved chip + offset for every line so you can confirm what is really driven.
+#
+# G40 27-pin GPIO socket (Epiq G-Series HW User Manual v1.5, Table 12 + p.40).
+# All signals are 3.3 V after the carrier's level translators.  The +3.3 V pins
+# are limited to 33 mA each: enough for a logic input or an LED, not a PA supply.
+#
+#  socket  name           source          chip        pad      logical name        dir      notes
+# -------------  --------------  ----------  -------  ------------------  -------
+#    17    CPU_GP_OUT_1   Orin NX         gpiochip0   PG.06    cpu-gp-out1         out      default PA enable
+#    15    CPU_GP_OUT_2   Orin NX         gpiochip0   PN.01    cpu-gp-out2         out      default TX/RX switch (sw)
+#    16    CPU_GPIO       Orin NX         gpiochip0   PP.06    cpu-gpio            in/out   direction = aon PCC.03
+#                                         gpiochip1   PCC.03   cpu-gpio-direction  out      high = cpu-gpio is output
+#    18    CPU_GP_IN      Orin NX         gpiochip1   PCC.01   cpu-gp-in           in       default PA fault input
+#     9    NVA_TR_N_1     NV100 card A    (FPGA)      -        -                   out      T/R proxy, chan 1 (hw timed)
+#     7    NVA_TR_N_2     NV100 card A    (FPGA)      -        -                   out      T/R proxy, chan 2
+#     8    NVB_TR_N_1     NV100 card B    (FPGA)      -        -                   out      T/R proxy, chan 1
+#    10    NVB_TR_N_2     NV100 card B    (FPGA)      -        -                   out      T/R proxy, chan 2
+#    11    NVA_GPIO_3     NV100 card A    (FPGA)      -        dir-nva-gpio3 (gpiochip2, direction only)   needs FPGA support
+#     5    NVA_GPIO_8     NV100 card A    (FPGA)      -        dir-nva-gpio8 (gpiochip2, direction only)
+#     6    NVB_GPIO_3     NV100 card B    (FPGA)      -        dir-nvb-gpio3 (gpiochip2, direction only)
+#    12    NVB_GPIO_8     NV100 card B    (FPGA)      -        dir-nvb-gpio8 (gpiochip2, direction only)
+#   1,2,26 +3.3 V (33 mA)      3,4,13,14,19,20 GND      21-25,27 SPI0 + I2C-1 (/dev/spidev0.0, /dev/i2c-1)
+#
+# gpiochip0 = tegra234-gpio (164 lines), gpiochip1 = tegra234-gpio-aon (32),
+# gpiochip2 = pca9685@44 carrier expander (dir-*, ant-bias-en, LEDs; leave alone).
+
+config_version: 1
+
+# none  = feature off (no front-end lines touched)
+# gpio  = drive real lines through libgpiod
+# mock  = same sequencing over an in-memory GPIO (GUI/bench testing, no hardware)
+frontend: none
+
+# PA enable: forced LOW at open/close/exit/any error and by the watchdog.
+pa_enable:
+  chip: gpiochip0
+  line: cpu-gp-out1          # socket pin 17
+  fallback_line: PG.06
+  active_high: true          # true: line HIGH = PA on.  Use false for an active-low enable.
+  settle_ms: 2               # PA-on to first RF sample (and PA-off to switch to RX)
+  hang_ms: 20                # burst (SINGLE_SHOT) only: keep the PA keyed this long after the burst
+  mode: level                # level: line held at the keyed level.  heartbeat: line toggles
+                             # while keyed, only with a permit board between G40 and HPA
+  heartbeat_hz: 200          # heartbeat mode only: toggle rate
+
+# TX/RX switch.  mode: proxy = the NV100 TR_N lines (socket 7-10) drive the switch
+# in hardware and software only tracks the state; gpio = software drives `line`.
+tr_switch:
+  mode: proxy
+  chip: gpiochip0
+  line: cpu-gp-out2          # socket pin 15 (gpio mode only)
+  fallback_line: PN.01
+  tx_level: 1                # line level that selects transmit (1 = high)
+  settle_ms: 1               # switch settle before the PA is keyed
+
+# PA fault / ready input.  When enabled and asserted the PA is never keyed and a
+# keyed PA is dropped by the watchdog thread.
+pa_fault_in:
+  enabled: false
+  chip: gpiochip1
+  line: cpu-gp-in            # socket pin 18
+  fallback_line: PCC.01
+  active_low: true           # fault asserted when the line reads LOW
+
+# T/R switch analog readback (optional).  A digital input cannot tell a valid
+# switch level from a floating or half-driven one: it still reads 0 or 1.  An I2C
+# ADC on the socket's I2C-1 bus reads the real control voltage, so a half-rail
+# level (dead level shifter, open wire) is caught and keying is refused.  Sense at
+# the switch control node after the level shifter, not the G40 output pin.  Windows
+# are in node volts (after the divider).  enabled: false leaves the front end as is.
+# tr_readback:
+#   enabled: true
+#   transport: i2c            # i2c (ADS1015/ADS1115) | mock
+#   bus: /dev/i2c-1
+#   address: 0x48             # ADS1x15 ADDR pin: 0x48..0x4B
+#   channel: 0                # single-ended AIN0..AIN3
+#   full_scale_v: 4.096       # ADS1x15 PGA range (picks the nearest setting)
+#   divider: 2.0              # 2:1 divider so a 5 V node reads 2.5 V at the ADC
+#   settle_ms: 2              # wait after the switch moves, before the read
+#   tx_window_v: [2.7, 5.5]   # node volts that count as TX
+#   rx_window_v: [-0.5, 0.8]  # node volts that count as RX (leave a dead band between)
+
+# HPA temperature and supply current (optional, display only).  The Empower 1189's
+# DB9 carries two analog monitor outputs: pin 3 temperature (10 mV per degree C on a
+# 0.5 V offset) and pin 2 supply current (25 mV per 100 mA; about 0.3 A in shutdown,
+# 1.5 A quiescent once enabled).  Both stay under 2.5 V, so they go straight into
+# two spare channels of the tr_readback ADS1115 (same bus and address) at the
+# 4.096 V range.  Share ground with the HPA.  A missing chip or module shows as
+# "not fitted" on the Payload tab; it never refuses a key.  Wiring and the deploy
+# steps: docs/GPIO_FRONTEND.md.
+# hpa_monitor:
+#   enabled: true
+#   transport: i2c            # i2c (ADS1015/ADS1115) | mock
+#   bus: /dev/i2c-1
+#   address: 0x48             # the tr_readback chip; a second chip goes at 0x49..0x4B
+#   temp_channel: 1           # AIN1 from DB9 pin 3 (temperature)
+#   current_channel: 2        # AIN2 from DB9 pin 2 (supply current)
+#   full_scale_v: 4.096
+#   temp_offset_v: 0.5        # T [C] = (V - temp_offset_v) / temp_v_per_c
+#   temp_v_per_c: 0.01
+#   current_v_per_a: 0.25     # I [A] = (V - current_offset_v) / current_v_per_a
+#   current_offset_v: 0.0
+#   poll_s: 2                 # a status call re-reads the chip at most this often
+#   warn_c: 70                # Payload tab warns above this (the 1189 derates from 85 C)
+#   valid_when_off: false     # the 1189's outputs read nonsense while it is shut down, so a reading
+#                             # shows only while keyed; true if a meter proves otherwise
+
+# PA keyed with no send() for this long: PA dropped (0 disables).  A single
+# long waveform extends the deadline by its own duration, so only a stalled TX
+# loop trips it.
+watchdog_ms: 500
+
+# Mini-Circuits RCDAT-6G-120H.  transport: none | auto | hidraw | http | mock
+#   auto:   the service looks for it on USB (VID 20ce PID 0023) every 2 s while
+#           the front end is open and opens it when it is plugged in, with no
+#           reload.  On attach it only reads model, serial and attenuation; it
+#           never sets a value (startup_db is not written).  path: auto takes
+#           the single unit found; with two or more plugged in none is opened
+#           until path names one (/dev/hidrawN).  Unplugged = dropped again, and
+#           with a payload: section every key is refused until it is back.
+#   hidraw: path = /dev/hidrawN (or "auto" to find VID 20ce PID 0023), opened
+#           once at start and on frontend_reload
+#   http:   url  = http://<attenuator-ip>   (USB cable still needed for power)
+atten:
+  transport: none
+  path: auto
+  url: http://192.168.0.40
+  startup_db: 120            # applied with `atten_set startup=true`; keep max for PA work
+  max_db: 120
+  step_db: 0.05
+
+# Port map (optional): how each SMA jack is connected and what it may be used for.
+# Present = the service refuses anything else, for every client: an init, or a command
+# that keys or listens, on a jack whose role does not allow it (start_tx, jammer, IQ and
+# scenario playback, record and replay, armed transceive and transponder, armed checkout,
+# bitpipe, mission steps). The GUI greys those jacks out and shows the chain as a tooltip.
+# Absent = no restriction.  role: tx | rx | txrx | none.  chain: plain text, at most 140
+# characters.  A jack not listed counts as none.  A bare role is fine (TRx1A: rx).  At least
+# one jack must allow RX, since the radio always opens an RX channel.  frontend_reload picks
+# up a change.  This section works with frontend: none too.  The engineering view's G40 ports
+# lockout panel rewrites this section (set_ports); a comment inside it does not survive that,
+# the rest of the file does.  Details: docs/GPIO_FRONTEND.md.
+# ports:
+#   TRx2B: {role: tx, chain: "20 dB pad, HPA, T/R switch, antenna"}
+#   TRx1A: {role: rx, chain: "splitter, LNA, RX attenuator, T/R switch, antenna"}
+#   TRx2A: {role: rx, chain: "splitter, LNA, RX attenuator, T/R switch, antenna"}
+#   TRx1B: none
+
+# Payload guard (optional): RX front-end protection on every PA key (the /payload
+# page, the Tools panel PA ON, frontend_set from a script, a TX run).  Present =
+# the RX attenuator goes to its maximum (120 dB) before the switch moves, and
+# before the HPA is enabled the service reads the T/R switch line back (TX) and
+# the attenuator back (at its maximum).  It stays there for all of TX: lower
+# settings are refused and the HPA drops if the attenuator goes away or reads
+# low.  After unkey (HPA off: switch RX) the operator's value is restored.  The
+# minimum safe value computed from payload_profiles.yaml (HPA at Psat, guaranteed
+# switch isolation, worst frequency in the band, protection margin) limits the
+# attenuator's power-on value.  auto_protect: false refuses the key instead of
+# raising it.  Needs
+# tr_switch.mode: gpio and an attenuator; otherwise keying is refused.  A
+# broken or missing profile file also refuses every key (fail closed).
+# payload:
+#   profile: P2               # P1 (1208) | P2 (1189) | P2b (1189, 3 TX ports combined, RX on TRx2B) | P3 (1211)
+#   profiles_file: payload_profiles.yaml   # default: next to payload_budget.py
+#   auto_protect: true
+#   restore_rx_atten: true
+#   protect_db: 120           # default and minimum: atten max_db (its power-on value)
+#   margin_db: 10             # default: payload_profiles.yaml protection.margin_db
+#   min_rx_atten_db: 20       # optional floor on top of the computed value
+#   require_tr_readback: true # also require the ADC switch readback to read TX
+#   # Load power limit (optional).  When the HPA keys into a bench load or pad,
+#   # a small pad (the 2 W / +33 dBm ones) is good only for G40-level power, not
+#   # the HPA's saturated output.  Set the load rating and the guard refuses to
+#   # key until the G40 TX attenuation is high enough to keep the delivered power
+#   # under it; if no TX attenuation in range is enough (HPA into a small pad), it
+#   # refuses to key at all, so use a higher-power load.  Leave unset = no limit.
+#   load_power_dbm: 33        # the load/pad power rating in dBm (2 W = +33 dBm)
+#   load_margin_db: 3         # keep this far under the rating (default: protection margin)
+#   load_point: antenna       # where the load connects: antenna (default) | switch | hpa
+#   tx_atten_max_db: 41.75    # G40 TX attenuation range top (default 41.75)
+#   tx_atten_step_db: 0.25    # G40 TX attenuation step (default 0.25)

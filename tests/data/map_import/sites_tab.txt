@@ -1,0 +1,2 @@
+site	x	y
+Tower	-111.7	33.3

@@ -1,0 +1,767 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Loopback: nine comm waveforms in turn, TRx1B to TRx1A",
+ "notes": "One G40, cable TRx1B to TRx1A through the pad. Nine waveforms one after the other, each keyed for 13 s at TX attenuation 30 dB and decoded by the same radio: FSK, 4FSK, BPSK, QPSK, OQPSK, 8PSK, 16QAM, then QPSK and FSK with rate 1/2 convolutional coding.",
+ "authorization": {
+  "reference": "BENCH-LOOPBACK",
+  "note": "cabled bench loopback: TX jack to RX jack through a pad, no antenna, no amplifier"
+ },
+ "anchor": {
+  "mode": "on_tx"
+ },
+ "radios": [
+  {
+   "id": "G40-LOOP",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000
+  }
+ ],
+ "steps": [
+  {
+   "id": "loop_rx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 65.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 78.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx02",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "LOOP 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 83.0,
+    "stop_s": 86.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx02",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "LOOP 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 86.0,
+    "stop_s": 99.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx03",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "LOOP BPSK"
+      }
+     ]
+    },
+    "spec_name": "loop3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 104.0,
+    "stop_s": 107.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx03",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "LOOP BPSK"
+      }
+     ]
+    },
+    "spec_name": "loop3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 107.0,
+    "stop_s": 120.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx04",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "LOOP QPSK"
+      }
+     ]
+    },
+    "spec_name": "loop4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 125.0,
+    "stop_s": 128.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx04",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "LOOP QPSK"
+      }
+     ]
+    },
+    "spec_name": "loop4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 128.0,
+    "stop_s": 141.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx05",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "LOOP OQPSK"
+      }
+     ]
+    },
+    "spec_name": "loop5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 146.0,
+    "stop_s": 149.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx05",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "LOOP OQPSK"
+      }
+     ]
+    },
+    "spec_name": "loop5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 149.0,
+    "stop_s": 162.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx06",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "LOOP 8PSK"
+      }
+     ]
+    },
+    "spec_name": "loop6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 167.0,
+    "stop_s": 170.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx06",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "LOOP 8PSK"
+      }
+     ]
+    },
+    "spec_name": "loop6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 170.0,
+    "stop_s": 183.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx07",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "LOOP 16QAM"
+      }
+     ]
+    },
+    "spec_name": "loop7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 188.0,
+    "stop_s": 191.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx07",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "LOOP 16QAM"
+      }
+     ]
+    },
+    "spec_name": "loop7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 191.0,
+    "stop_s": 204.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx08",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "LOOP QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "loop8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 209.0,
+    "stop_s": 212.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx08",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "LOOP QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "loop8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 212.0,
+    "stop_s": 225.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_rx09",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "loop9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 230.0,
+    "stop_s": 233.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx09",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "loop9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 233.0,
+    "stop_s": 246.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  }
+ ]
+}

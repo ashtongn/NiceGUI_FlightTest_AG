@@ -1,0 +1,15 @@
+{
+ "name": "fsk_afsk_bell202",
+ "description": "Bell-202 AFSK 1200 baud, 1200/2200 Hz",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "FSK",
+   "symbol_rate": 1200,
+   "tone_spacing_hz": 1000,
+   "tone_center_hz": 1700,
+   "offset_hz": 150000,
+   "message": "AFSK BELL202"
+  }
+ ]
+}

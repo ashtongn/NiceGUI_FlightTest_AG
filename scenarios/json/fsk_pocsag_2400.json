@@ -1,0 +1,14 @@
+{
+ "name": "fsk_pocsag_2400",
+ "description": "POCSAG-class FSK 2400 baud, 9 kHz shift",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "FSK",
+   "symbol_rate": 2400,
+   "tone_spacing_hz": 9000,
+   "offset_hz": 150000,
+   "message": "POCSAG 2400"
+  }
+ ]
+}

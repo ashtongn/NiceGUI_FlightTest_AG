@@ -1,0 +1,234 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: steps at UTC clock times",
+ "notes": "Five comm steps at clock times from 17:00 UTC on 2026-11-17, two minutes apart, 30 s each, the message naming its slot. On the day set the date and move the five steps in the mission view. Keyed from the console clock; check it against the aircraft feed time and a GPS time first.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "clock",
+  "date": "2026-11-17",
+  "tz": "UTC"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "utc01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "utc1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "UTC SLOT 1 1700"
+      }
+     ]
+    },
+    "spec_name": "utc1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 61200.0,
+    "stop_s": 61230.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "utc02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "utc2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "UTC SLOT 2 1702"
+      }
+     ]
+    },
+    "spec_name": "utc2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 61320.0,
+    "stop_s": 61350.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "utc03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "utc3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "UTC SLOT 3 1704"
+      }
+     ]
+    },
+    "spec_name": "utc3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 61440.0,
+    "stop_s": 61470.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "utc04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "utc4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "UTC SLOT 4 1706"
+      }
+     ]
+    },
+    "spec_name": "utc4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 61560.0,
+    "stop_s": 61590.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "utc05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "utc5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 4800,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "UTC SLOT 5 1708"
+      }
+     ]
+    },
+    "spec_name": "utc5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 61680.0,
+    "stop_s": 61710.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

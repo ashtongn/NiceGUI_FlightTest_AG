@@ -1,0 +1,43 @@
+{
+ "name": "dsss_4user_bpsk",
+ "description": "4-user BPSK-DSSS CDMA overlay, Gold n=5 (31 chips) at 2400 Bd, +300 kHz; set peak xcorr 9/31, predicted MUI SNR >= 9.7 dB (equal power)",
+ "sample_rate_hz": 1920000,
+ "loop_s": 0.25,
+ "code_set": {
+  "kind": "gold",
+  "n": 5,
+  "count": 4,
+  "length": 31
+ },
+ "dsss": {
+  "symbol_rate": 2400,
+  "samples_per_chip": 2,
+  "offset_hz": 300000,
+  "carrier": "bpsk",
+  "amplitude": 0.8,
+  "stagger_chips": 7
+ },
+ "users": [
+  {
+   "id": "U01",
+   "code": 0,
+   "message": "U01 PING"
+  },
+  {
+   "id": "U02",
+   "code": 1,
+   "message": "U02 PING"
+  },
+  {
+   "id": "U03",
+   "code": 2,
+   "message": "U03 PING"
+  },
+  {
+   "id": "U04",
+   "code": 3,
+   "message": "U04 PING"
+  }
+ ],
+ "signals": []
+}

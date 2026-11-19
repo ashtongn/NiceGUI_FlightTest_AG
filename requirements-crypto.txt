@@ -1,0 +1,25 @@
+# DPMG secure messaging (TRANSEC programme).
+# pyca/cryptography is the only cryptographic dependency: DPMG writes protocol
+# glue (dpmg/secure/), never primitives. Needed on the x86 ground station only
+# (GUI image, bench, dev host): the radio holds no keys, never encrypts or
+# decrypts, and needs no crypto library to parse and forward sealed frames.
+#
+#   AEAD: AES-256-GCM-SIV (RFC 8452, nonce-misuse resistant) through
+#   cryptography's AESGCMSIV. It needs an OpenSSL >= 3.2 backend; the PyPI
+#   wheels bundle one (48.0.0+ bundle OpenSSL 4.0.x), a conda / distro build on
+#   OpenSSL 3.0 imports AESGCMSIV but fails the start-up self-test, and
+#   encryption then stays off.
+#
+#   cryptography 48.0.0 (2026-05-04) is the floor: first release with ML-KEM /
+#   ML-DSA. 50.0.2 (2026-09-30, OpenSSL 4.0.3) is current and runs
+#   in the GUI image and the dev host's miniconda base; manylinux aarch64 abi3
+#   wheels exist on PyPI for every release listed.
+#   Python >= 3.9.
+#
+# The start-up check (dpmg/secure/crypto_env.py) logs the library, backend and
+# the AES-256-GCM-SIV / HKDF known-answer self-test, and refuses to enable
+# encryption when the self-test fails.
+#
+# Install (dev host / GUI image):
+#   pip install -r requirements-crypto.txt
+cryptography>=48.0.0,<51

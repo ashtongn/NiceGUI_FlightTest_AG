@@ -1,0 +1,42 @@
+{
+ "capture": "G40 data/captures/mfm_cap_dsss_none_r1.c64 (2026-10-19, Setup A, 1.92 MSps, centre 425.025 MHz)",
+ "channelized": "300 kHz offset, integer decimation 27 (the worker's 72 kHz gate rate) -> fs_out 71111.1111 Hz",
+ "fs_out": 71111.11111111111,
+ "message": "DSSS none R1",
+ "plan": {
+  "schema_version": 1,
+  "description": "mfm_dsss_U",
+  "compose": {
+   "tx_radio": "g40",
+   "sample_rate_hz": 1920000.0,
+   "center_freq_hz": 425025000.0,
+   "rf_bandwidth_hz": 1536000.0
+  },
+  "entries": [
+   {
+    "name": "DSSS@+300k",
+    "modulation": "DSSS",
+    "params": {
+     "symbol_rate": 2400.0,
+     "tone_spacing_hz": 5000.0,
+     "spread_factor": 15
+    },
+    "offset_hz": 300000.0,
+    "power_db": 0.0,
+    "role": "known",
+    "decode": true,
+    "frame": {
+     "sync_bits": "1011001000111011",
+     "max_sync_errors": 2,
+     "has_length": true,
+     "crc": "CRC-16-CCITT"
+    },
+    "meta": {
+     "samples_per_bit": 30,
+     "tone_center_hz": 0.0
+    },
+    "band_hz": 72000.0
+   }
+  ]
+ }
+}

@@ -1,0 +1,49 @@
+{
+ "name": "fsk_sweep",
+ "description": "6 FSK: symbol-rate x tone-spacing sweep across 1.4 MHz",
+ "sample_rate_hz": 1920000,
+ "signals": [
+  {
+   "modulation": "FSK",
+   "symbol_rate": 1200,
+   "tone_spacing_hz": 2000,
+   "offset_hz": -700000.0,
+   "message": "FSK 1200/2000"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 2400,
+   "tone_spacing_hz": 3000,
+   "offset_hz": -420000.0,
+   "message": "FSK 2400/3000"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -140000.0,
+   "message": "FSK 4800/5000"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 10000,
+   "offset_hz": 140000.0,
+   "message": "FSK 4800/10000"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 9600,
+   "tone_spacing_hz": 8000,
+   "offset_hz": 420000.0,
+   "message": "FSK 9600/8000"
+  },
+  {
+   "modulation": "FSK",
+   "symbol_rate": 2400,
+   "tone_spacing_hz": 12000,
+   "offset_hz": 700000.0,
+   "message": "FSK 2400/12000"
+  }
+ ]
+}

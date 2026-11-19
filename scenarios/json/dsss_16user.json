@@ -1,0 +1,107 @@
+{
+ "name": "dsss_16user",
+ "description": "16-user BPSK-DSSS CDMA overlay, Gold n=7 (127 chips) at 1200 Bd, +300 kHz, short messages; set peak xcorr 17/127, predicted MUI SNR >= 9.2 dB (equal power, 15 interferers)",
+ "sample_rate_hz": 1920000.0,
+ "center_freq_hz": 425025000.0,
+ "loop_s": 0.4,
+ "signals": [],
+ "code_set": {
+  "kind": "gold",
+  "n": 7,
+  "count": 16,
+  "form": "fibonacci",
+  "state": 1,
+  "length": 127
+ },
+ "dsss": {
+  "symbol_rate": 1200.0,
+  "samples_per_chip": 2,
+  "offset_hz": 300000.0,
+  "carrier": "bpsk",
+  "amplitude": 0.8,
+  "stagger_chips": 9,
+  "spacing_hz": 0.0
+ },
+ "users": [
+  {
+   "id": "U01",
+   "code": 0,
+   "message": "U01"
+  },
+  {
+   "id": "U02",
+   "code": 1,
+   "message": "U02"
+  },
+  {
+   "id": "U03",
+   "code": 2,
+   "message": "U03"
+  },
+  {
+   "id": "U04",
+   "code": 3,
+   "message": "U04"
+  },
+  {
+   "id": "U05",
+   "code": 4,
+   "message": "U05"
+  },
+  {
+   "id": "U06",
+   "code": 5,
+   "message": "U06"
+  },
+  {
+   "id": "U07",
+   "code": 6,
+   "message": "U07"
+  },
+  {
+   "id": "U08",
+   "code": 7,
+   "message": "U08"
+  },
+  {
+   "id": "U09",
+   "code": 8,
+   "message": "U09"
+  },
+  {
+   "id": "U10",
+   "code": 9,
+   "message": "U10"
+  },
+  {
+   "id": "U11",
+   "code": 10,
+   "message": "U11"
+  },
+  {
+   "id": "U12",
+   "code": 11,
+   "message": "U12"
+  },
+  {
+   "id": "U13",
+   "code": 12,
+   "message": "U13"
+  },
+  {
+   "id": "U14",
+   "code": 13,
+   "message": "U14"
+  },
+  {
+   "id": "U15",
+   "code": 14,
+   "message": "U15"
+  },
+  {
+   "id": "U16",
+   "code": 15,
+   "message": "U16"
+  }
+ ]
+}

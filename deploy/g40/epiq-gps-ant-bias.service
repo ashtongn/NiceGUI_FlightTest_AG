@@ -1,0 +1,24 @@
+# Enables the 3.3 V GPS antenna bias at boot (active antenna only).
+# Opt-in: installing this makes bias on the boot default. No deploy script
+# installs it, and the bias stays off unless an operator turns it on
+# (GUI checkbox, with a confirm). Install only by an explicit decision for a
+# known active antenna.
+# The JP6 / Epiq BSP 1.3.0 boot leaves ant-bias-en off; this turns it on.
+# Some passive antennas are a DC short at the connector; do not install with one.
+# Install on the G40 host (needs sudo):
+#   sudo cp epiq-gps-ant-bias.service /etc/systemd/system/
+#   sudo systemctl daemon-reload && sudo systemctl enable --now epiq-gps-ant-bias.service
+# Check: i2cget -f -y 1 0x44 0x17 reads 0x00 = bias on, 0x10 = bias off
+# (gpioset releasing the line leaves the pin low = bias on, so an exit-mode
+# gpioset is enough for on; the GUI checkbox can still switch it later.)
+[Unit]
+Description=Enable 3.3 V GPS antenna bias (active antenna)
+After=epiq-gps-boot-config.service
+
+[Service]
+Type=oneshot
+RemainAfterExit=yes
+ExecStart=/usr/bin/bash -c "/usr/bin/gpioset --active-low $(/usr/bin/gpiofind ant-bias-en)=1"
+
+[Install]
+WantedBy=multi-user.target

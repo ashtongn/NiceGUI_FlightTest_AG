@@ -1,0 +1,742 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: 25 jammers at 30.72 MS/s, then 25 at once",
+ "notes": "25 single jammer steps across the band, 10 s each with 6 s clear between, then one step of 20 s with a 25 tone comb (1 MHz apart, 24 MHz wide) so all 25 lines show at once. Radio at 30.72 MS/s, TX attenuation 30 dB. FieldFox on the coupled port, wide span, one screenshot per step.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 30720000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "j3072_01_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 15.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_02_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 3072000.0,
+    "center": -9216000.0
+   },
+   "schedule": {
+    "start_s": 21.0,
+    "stop_s": 31.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_03_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 3072000.0,
+    "center": -3072000.0
+   },
+   "schedule": {
+    "start_s": 37.0,
+    "stop_s": 47.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_04_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 3072000.0,
+    "center": 3072000.0
+   },
+   "schedule": {
+    "start_s": 53.0,
+    "stop_s": 63.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_05_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 3072000.0,
+    "center": 9216000.0
+   },
+   "schedule": {
+    "start_s": 69.0,
+    "stop_s": 79.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_06_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": -10752000.0
+   },
+   "schedule": {
+    "start_s": 85.0,
+    "stop_s": 95.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_07_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": -6144000.0
+   },
+   "schedule": {
+    "start_s": 101.0,
+    "stop_s": 111.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_08_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 117.0,
+    "stop_s": 127.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_09_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 6144000.0
+   },
+   "schedule": {
+    "start_s": 133.0,
+    "stop_s": 143.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_10_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 10752000.0
+   },
+   "schedule": {
+    "start_s": 149.0,
+    "stop_s": 159.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_11_comb",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 1920000.0,
+    "n_tones": 8,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 165.0,
+    "stop_s": 175.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_12_comb",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 960000.0,
+    "n_tones": 12,
+    "center": -6144000.0
+   },
+   "schedule": {
+    "start_s": 181.0,
+    "stop_s": 191.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_13_comb",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 3840000.0,
+    "n_tones": 4,
+    "center": 6144000.0
+   },
+   "schedule": {
+    "start_s": 197.0,
+    "stop_s": 207.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_14_swept",
+   "radio": "G40-AX3G",
+   "technique": "jammer.swept",
+   "radiates": true,
+   "params": {
+    "kind": "swept",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "span": 24576000.0,
+    "sweep_period_s": 0.001,
+    "noise_bw": 0.0,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 213.0,
+    "stop_s": 223.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_15_swept",
+   "radio": "G40-AX3G",
+   "technique": "jammer.swept",
+   "radiates": true,
+   "params": {
+    "kind": "swept",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "span": 12288000.0,
+    "sweep_period_s": 0.01,
+    "noise_bw": 0.0,
+    "center": -6144000.0
+   },
+   "schedule": {
+    "start_s": 229.0,
+    "stop_s": 239.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_16_swept",
+   "radio": "G40-AX3G",
+   "technique": "jammer.swept",
+   "radiates": true,
+   "params": {
+    "kind": "swept",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "span": 12288000.0,
+    "sweep_period_s": 0.0001,
+    "noise_bw": 0.0,
+    "center": 6144000.0
+   },
+   "schedule": {
+    "start_s": 245.0,
+    "stop_s": 255.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_17_chirp",
+   "radio": "G40-AX3G",
+   "technique": "jammer.chirp",
+   "radiates": true,
+   "params": {
+    "kind": "chirp",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "f0": -12288000.0,
+    "f1": 12288000.0
+   },
+   "schedule": {
+    "start_s": 261.0,
+    "stop_s": 271.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_18_chirp",
+   "radio": "G40-AX3G",
+   "technique": "jammer.chirp",
+   "radiates": true,
+   "params": {
+    "kind": "chirp",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "f0": 12288000.0,
+    "f1": -12288000.0
+   },
+   "schedule": {
+    "start_s": 277.0,
+    "stop_s": 287.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_19_chirp",
+   "radio": "G40-AX3G",
+   "technique": "jammer.chirp",
+   "radiates": true,
+   "params": {
+    "kind": "chirp",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "f0": -3072000.0,
+    "f1": 3072000.0
+   },
+   "schedule": {
+    "start_s": 293.0,
+    "stop_s": 303.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_20_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "qpsk",
+    "sym_rate": 7680000.0,
+    "sym_duty": 1.0,
+    "rolloff": 0.35,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 309.0,
+    "stop_s": 319.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_21_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "bpsk",
+    "sym_rate": 1920000.0,
+    "sym_duty": 1.0,
+    "rolloff": 0.35,
+    "center": -7680000.0
+   },
+   "schedule": {
+    "start_s": 325.0,
+    "stop_s": 335.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_22_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "8psk",
+    "sym_rate": 960000.0,
+    "sym_duty": 1.0,
+    "rolloff": 0.35,
+    "center": 7680000.0
+   },
+   "schedule": {
+    "start_s": 341.0,
+    "stop_s": 351.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_23_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "qpsk",
+    "sym_rate": 3840000.0,
+    "sym_duty": 0.5,
+    "rolloff": 0.35,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 357.0,
+    "stop_s": 367.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_24_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 1000.0,
+    "duty": 0.2
+   },
+   "schedule": {
+    "start_s": 373.0,
+    "stop_s": 383.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_25_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 100.0,
+    "duty": 0.5,
+    "freq": -3072000.0
+   },
+   "schedule": {
+    "start_s": 389.0,
+    "stop_s": 399.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "j3072_26_comb25",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 1000000.0,
+    "n_tones": 25,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 405.0,
+    "stop_s": 425.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

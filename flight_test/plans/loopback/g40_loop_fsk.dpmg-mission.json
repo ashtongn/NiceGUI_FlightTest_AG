@@ -1,0 +1,107 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Loopback: one FSK message, TRx1B to TRx1A",
+ "notes": "One G40, cable TRx1B to TRx1A through the pad. The radio is set to the two jacks in the first minute, then keys one FSK message for 13 s at TX attenuation 30 dB and decodes it itself: LOOP FSK in the Decodes table.",
+ "authorization": {
+  "reference": "BENCH-LOOPBACK",
+  "note": "cabled bench loopback: TX jack to RX jack through a pad, no antenna, no amplifier"
+ },
+ "anchor": {
+  "mode": "on_tx"
+ },
+ "radios": [
+  {
+   "id": "G40-LOOP",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000
+  }
+ ],
+ "steps": [
+  {
+   "id": "loop_rx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "loop1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 65.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "loop_tx01",
+   "radio": "G40-LOOP",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "loop1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "LOOP FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "loop1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 78.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  }
+ ]
+}

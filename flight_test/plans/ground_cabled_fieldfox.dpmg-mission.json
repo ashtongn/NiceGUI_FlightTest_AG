@@ -1,0 +1,287 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: one step per waveform for the FieldFox",
+ "notes": "Spot tone, the seven jammers and one QPSK comm, 20 s each with 15 s clear, at TX attenuation 30 dB and 30.72 MS/s. Move the FieldFox marker and take one screenshot per step.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 30720000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "ff_00_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 1000000.0
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 25.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_01_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 40.0,
+    "stop_s": 60.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_02_noise",
+   "radio": "G40-AX3G",
+   "technique": "jammer.noise",
+   "radiates": true,
+   "params": {
+    "kind": "noise",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "bw": 5120000.0,
+    "center": 3840000.0
+   },
+   "schedule": {
+    "start_s": 75.0,
+    "stop_s": 95.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_03_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 110.0,
+    "stop_s": 130.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_04_comb",
+   "radio": "G40-AX3G",
+   "technique": "jammer.comb",
+   "radiates": true,
+   "params": {
+    "kind": "comb",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "spacing": 1920000.0,
+    "n_tones": 8,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 145.0,
+    "stop_s": 165.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_05_swept",
+   "radio": "G40-AX3G",
+   "technique": "jammer.swept",
+   "radiates": true,
+   "params": {
+    "kind": "swept",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "span": 24576000.0,
+    "sweep_period_s": 0.001,
+    "noise_bw": 0.0,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 180.0,
+    "stop_s": 200.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_06_chirp",
+   "radio": "G40-AX3G",
+   "technique": "jammer.chirp",
+   "radiates": true,
+   "params": {
+    "kind": "chirp",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "f0": -12288000.0,
+    "f1": 12288000.0
+   },
+   "schedule": {
+    "start_s": 215.0,
+    "stop_s": 235.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_07_modulated",
+   "radio": "G40-AX3G",
+   "technique": "jammer.modulated",
+   "radiates": true,
+   "params": {
+    "kind": "modulated",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "mod": "qpsk",
+    "sym_rate": 7680000.0,
+    "sym_duty": 1.0,
+    "rolloff": 0.35,
+    "center": 0.0
+   },
+   "schedule": {
+    "start_s": 250.0,
+    "stop_s": 270.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ff_08_qpsk",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ff_qpsk",
+     "sample_rate_hz": 30720000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.05,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 1000000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "GROUND QPSK"
+      }
+     ]
+    },
+    "spec_name": "ff_qpsk",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 285.0,
+    "stop_s": 305.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

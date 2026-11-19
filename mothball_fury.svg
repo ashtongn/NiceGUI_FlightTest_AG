@@ -1,0 +1,124 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- MOTHBALL FURY project badge: a fierce moth over an RF glow. -->
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="42%" r="65%">
+      <stop offset="0%" stop-color="#2b1a4e"/>
+      <stop offset="55%" stop-color="#161033"/>
+      <stop offset="100%" stop-color="#0a0820"/>
+    </radialGradient>
+    <linearGradient id="wing" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ffd23f"/>
+      <stop offset="45%" stop-color="#ff8c1a"/>
+      <stop offset="100%" stop-color="#d7263d"/>
+    </linearGradient>
+    <linearGradient id="wingdark" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#ff9d2e"/>
+      <stop offset="100%" stop-color="#8f1d3a"/>
+    </linearGradient>
+    <radialGradient id="glow" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#ff8c1a" stop-opacity="0.55"/>
+      <stop offset="70%" stop-color="#ff8c1a" stop-opacity="0.12"/>
+      <stop offset="100%" stop-color="#ff8c1a" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="body" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#4a3b2a"/>
+      <stop offset="100%" stop-color="#241a10"/>
+    </linearGradient>
+    <path id="ringtext" d="M 256,462 A 206,206 0 0 1 256,50 A 206,206 0 0 1 256,462" fill="none"/>
+  </defs>
+
+  <!-- badge -->
+  <circle cx="256" cy="256" r="252" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="252" fill="none" stroke="#ff8c1a" stroke-width="6"/>
+  <circle cx="256" cy="256" r="238" fill="none" stroke="#ffd23f" stroke-width="2" stroke-opacity="0.5"/>
+
+  <!-- RF wave arcs behind the moth -->
+  <g stroke="#7ee0ff" fill="none" stroke-linecap="round" opacity="0.6">
+    <path d="M 130 150 A 178 178 0 0 1 382 150" stroke-width="4" stroke-dasharray="10 14"/>
+    <path d="M 158 178 A 138 138 0 0 1 354 178" stroke-width="3.5" stroke-dasharray="8 12" opacity="0.75"/>
+    <path d="M 186 206 A 99 99 0 0 1 326 206" stroke-width="3" stroke-dasharray="6 10" opacity="0.55"/>
+  </g>
+
+  <!-- heat glow -->
+  <ellipse cx="256" cy="300" rx="190" ry="150" fill="url(#glow)"/>
+
+  <g id="moth">
+    <!-- upper wings: swept, flame-scalloped trailing edges -->
+    <path fill="url(#wing)" stroke="#5e0f1f" stroke-width="5" stroke-linejoin="round"
+          d="M 244 268
+             C 210 210 150 168 96 162
+             C 60 158 38 176 44 204
+             C 50 234 76 246 100 258
+             C 84 262 70 274 74 290
+             C 80 312 108 314 130 312
+             C 118 322 114 336 126 344
+             C 142 354 168 344 188 330
+             C 208 316 230 296 244 280 Z"/>
+    <path fill="url(#wing)" stroke="#5e0f1f" stroke-width="5" stroke-linejoin="round"
+          d="M 268 268
+             C 302 210 362 168 416 162
+             C 452 158 474 176 468 204
+             C 462 234 436 246 412 258
+             C 428 262 442 274 438 290
+             C 432 312 404 314 382 312
+             C 394 322 398 336 386 344
+             C 370 354 344 344 324 330
+             C 304 316 282 296 268 280 Z"/>
+
+    <!-- lower wings -->
+    <path fill="url(#wingdark)" stroke="#5e0f1f" stroke-width="5" stroke-linejoin="round"
+          d="M 246 296
+             C 226 322 196 352 168 368
+             C 146 380 128 378 124 362
+             C 120 346 136 330 152 318
+             C 172 302 214 288 240 284 Z"/>
+    <path fill="url(#wingdark)" stroke="#5e0f1f" stroke-width="5" stroke-linejoin="round"
+          d="M 266 296
+             C 286 322 316 352 344 368
+             C 366 380 384 378 388 362
+             C 392 346 376 330 360 318
+             C 340 302 298 288 272 284 Z"/>
+
+    <!-- wing eye-spots (angry) -->
+    <g>
+      <circle cx="152" cy="222" r="26" fill="#161033" opacity="0.9"/>
+      <circle cx="152" cy="222" r="26" fill="none" stroke="#ffd23f" stroke-width="4"/>
+      <circle cx="158" cy="216" r="8" fill="#ff4d2e"/>
+      <circle cx="360" cy="222" r="26" fill="#161033" opacity="0.9"/>
+      <circle cx="360" cy="222" r="26" fill="none" stroke="#ffd23f" stroke-width="4"/>
+      <circle cx="354" cy="216" r="8" fill="#ff4d2e"/>
+    </g>
+
+    <!-- body: fuzzy thorax + segmented abdomen -->
+    <ellipse cx="256" cy="258" rx="26" ry="34" fill="url(#body)" stroke="#120c06" stroke-width="4"/>
+    <path fill="url(#body)" stroke="#120c06" stroke-width="4" stroke-linejoin="round"
+          d="M 256 288 C 272 296 276 330 268 360 C 264 378 260 390 256 398
+             C 252 390 248 378 244 360 C 236 330 240 296 256 288 Z"/>
+    <g stroke="#120c06" stroke-width="3" opacity="0.7">
+      <path d="M 242 316 L 270 316"/>
+      <path d="M 240 336 L 272 336"/>
+      <path d="M 244 356 L 268 356"/>
+    </g>
+
+    <!-- head + furious eyes -->
+    <circle cx="256" cy="222" r="20" fill="#241a10" stroke="#120c06" stroke-width="4"/>
+    <path d="M 236 212 L 252 222 L 238 226 Z" fill="#ffd23f"/>
+    <path d="M 276 212 L 260 222 L 274 226 Z" fill="#ffd23f"/>
+
+    <!-- feathered antennae -->
+    <g stroke="#241a10" stroke-width="5" fill="none" stroke-linecap="round">
+      <path d="M 246 208 C 226 178 208 158 186 142"/>
+      <path d="M 266 208 C 286 178 304 158 326 142"/>
+    </g>
+    <g stroke="#241a10" stroke-width="3" stroke-linecap="round">
+      <path d="M 216 172 L 204 164"/><path d="M 226 184 L 213 177"/><path d="M 205 160 L 194 153"/>
+      <path d="M 296 172 L 308 164"/><path d="M 286 184 L 299 177"/><path d="M 307 160 L 318 153"/>
+    </g>
+  </g>
+
+  <!-- title ring -->
+  <text font-family="Arial, Helvetica, sans-serif" font-size="34" font-weight="bold"
+        fill="#ffd23f" letter-spacing="6">
+    <textPath href="#ringtext" startOffset="25%" text-anchor="middle">MOTHBALL FURY</textPath>
+  </text>
+</svg>

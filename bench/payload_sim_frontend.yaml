@@ -1,0 +1,20 @@
+# Simulator front end for the Payload tab of the engineering view (no hardware touched):
+#   python3 dpmg_service.py --serial G40-PAYLOAD-SIM --kind g40 --simulate \
+#       --cmd-port 47832 --discovery-port 47843 --broadcast 127.0.0.1 \
+#       --frontend-config bench/payload_sim_frontend.yaml
+#   python3 run_gui_link.py 8082 47843      then open http://localhost:8082/engineering, Payload tab
+frontend: mock
+watchdog_ms: 500
+pa_enable: {line: cpu-gp-out1, fallback_line: PG.06, active_high: false, settle_ms: 2, hang_ms: 20}
+tr_switch: {mode: gpio, line: cpu-gp-out2, fallback_line: PN.01, tx_level: 1, settle_ms: 1}
+pa_fault_in: {enabled: false}
+atten: {transport: mock, max_db: 120, step_db: 0.05, startup_db: 120}
+hpa_monitor: {enabled: true, transport: mock}   # 1189 temperature + supply current, simulated
+payload:
+  profile: P1                 # P1 | P2 | P2b | P3 (payload_profiles.yaml)
+  # profiles_file: payload_profiles.yaml   # default: next to payload_budget.py
+  auto_protect: true          # raise the RX attenuator to protect_db before keying
+  restore_rx_atten: true      # put the operator's value back after unkey
+  # protect_db: 120           # default = attenuator max (its power-on value)
+  # margin_db: 10             # default = payload_profiles.yaml protection.margin_db
+  # min_rx_atten_db: 20       # optional floor on top of the computed value

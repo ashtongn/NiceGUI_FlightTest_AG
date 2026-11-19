@@ -1,0 +1,16 @@
+{
+  "name": "two_signals_fec",
+  "description": "An FSK signal and a coded QPSK signal side by side",
+  "sample_rate_hz": 1920000,
+  "center_freq_hz": 915000000,
+  "loop_s": 0.25,
+  "peak_fs": 0.45,
+  "signals": [
+    {"name": "FSK plain", "modulation": "FSK", "symbol_rate": 4800,
+     "tone_spacing_hz": 5000, "offset_hz": -200000, "amplitude": 0.8,
+     "message": "PLAIN"},
+    {"name": "QPSK coded", "modulation": "QPSK", "symbol_rate": 9600,
+     "offset_hz": 200000, "amplitude": 0.8, "message": "CODED",
+     "fec": {"type": "conv", "rate": "1/2"}}
+  ]
+}

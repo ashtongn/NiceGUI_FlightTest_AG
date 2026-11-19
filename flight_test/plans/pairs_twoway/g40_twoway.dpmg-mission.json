@@ -1,0 +1,1302 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Pair G40, both ways in turn: G40-AX3G and G40-AX35, ground on two jacks",
+ "notes": "7 comm waveforms, each sent down and then up. Down: G40-AX3G keys on TRx2B through the HPA at TX attenuation 10 dB for 13 s and G40-AX35 decodes on TRx1A. Up: G40-AX35 keys on TRx1B into the ground HPA at TX attenuation 30 dB for 13 s and G40-AX3G decodes on TRx1A through the payload RX chain, RX attenuator 0 dB. G40-AX35 receives on TRx1A and transmits on TRx1B, each on its own antenna. Both radios are set to their two jacks in the first minute and are not re-initialized between the directions. Starts on Run mission: the first downlink keys at 01:08, the first uplink at 01:29, the last step ends at 05:54. Set the ground TX attenuation for the ground HPA before keying.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "open air: the payload on its antenna, the ground G40 on its own TX and RX antennas"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-18"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "G40-AX35",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.22:47810"
+  }
+ ],
+ "steps": [
+  {
+   "id": "dl_rx01",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "COMM BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 82.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "COMM BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 68.0,
+    "stop_s": 81.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "UPLINK BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 86.0,
+    "stop_s": 103.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx01",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "UPLINK BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 89.0,
+    "stop_s": 102.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx02",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 107.0,
+    "stop_s": 124.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 110.0,
+    "stop_s": 123.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 128.0,
+    "stop_s": 145.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx02",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 131.0,
+    "stop_s": 144.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx03",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "COMM OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 149.0,
+    "stop_s": 166.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "COMM OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 152.0,
+    "stop_s": 165.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "UPLINK OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 170.0,
+    "stop_s": 187.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx03",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "UPLINK OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 173.0,
+    "stop_s": 186.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx04",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "COMM 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 191.0,
+    "stop_s": 208.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "COMM 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 194.0,
+    "stop_s": 207.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "UPLINK 8PSK"
+      }
+     ]
+    },
+    "spec_name": "ul4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 212.0,
+    "stop_s": 229.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx04",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "UPLINK 8PSK"
+      }
+     ]
+    },
+    "spec_name": "ul4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 215.0,
+    "stop_s": 228.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx05",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 233.0,
+    "stop_s": 250.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 236.0,
+    "stop_s": 249.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 254.0,
+    "stop_s": 271.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx05",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 257.0,
+    "stop_s": 270.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx06",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 275.0,
+    "stop_s": 292.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 278.0,
+    "stop_s": 291.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 296.0,
+    "stop_s": 313.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx06",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 299.0,
+    "stop_s": 312.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_rx07",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 317.0,
+    "stop_s": 334.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "dl_tx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 10.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 320.0,
+    "stop_s": 333.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 338.0,
+    "stop_s": 355.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_tx07",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 341.0,
+    "stop_s": 354.0
+   },
+   "ports": {
+    "rx": "TRx1A",
+    "tx": "TRx1B"
+   }
+  }
+ ]
+}

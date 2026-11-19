@@ -1,0 +1,5513 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Cabled pair X40 ground: G40-AX3G and X40-B00S, one timeline",
+ "notes": "Both radios keyed from this ground station on one network, starting together on Run mission: downlink, G40-AX3G keys each comm waveform for 13 s and X40-B00S (x40) decodes on RXB1; then uplink, X40-B00S keys its waveforms on TXA1 at 0 dB and G40-AX3G decodes on TRx1A through the payload RX chain, RX attenuator 0 dB; then X40-B00S holds one decode step for every area message while the air radio's location tasks key along the route (arm the triggers, feed on). The areas are typed in the step editor once the route is known. Cabled ground layer (CFG-G1): the ground radio on the 50 dB pad from the coupler's coupled port. The uplink reaches J0 down by the pad and the coupling, about 80 dB, so it keys at a low TX attenuation and the payload RX attenuator is open; the payload guard still sets 120 dB whenever the payload keys. Not for the open air layer. Sections from Run mission: downlink 00:00:05 to 00:03:01 (8 waveforms), uplink from 00:03:56 (7 waveforms), range gate decode from 00:07:00 for 60 min.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "X40-B00S",
+   "type": "x40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 50000000
+  }
+ ],
+ "steps": [
+  {
+   "id": "dl_rx01",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 100000,
+       "offset_hz": -600000,
+       "amplitude": 0.9,
+       "message": "WIDE FSK",
+       "tone_spacing_hz": 100000
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 22.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 100000,
+       "offset_hz": -600000,
+       "amplitude": 0.9,
+       "message": "WIDE FSK",
+       "tone_spacing_hz": 100000
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 8.0,
+    "stop_s": 21.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx02",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 100000,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "WIDE BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 27.0,
+    "stop_s": 44.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 100000,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "WIDE BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 30.0,
+    "stop_s": 43.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx03",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 450000,
+       "amplitude": 0.9,
+       "message": "WIDE QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 49.0,
+    "stop_s": 66.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 450000,
+       "amplitude": 0.9,
+       "message": "WIDE QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 52.0,
+    "stop_s": 65.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx04",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 100000,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "WIDE 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 71.0,
+    "stop_s": 88.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 100000,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "WIDE 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 74.0,
+    "stop_s": 87.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx05",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 600000,
+       "amplitude": 0.9,
+       "message": "WIDE QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 93.0,
+    "stop_s": 110.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 600000,
+       "amplitude": 0.9,
+       "message": "WIDE QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 96.0,
+    "stop_s": 109.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx06",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 115.0,
+    "stop_s": 132.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 118.0,
+    "stop_s": 131.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx07",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 137.0,
+    "stop_s": 154.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 140.0,
+    "stop_s": 153.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx08",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 159.0,
+    "stop_s": 176.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "dl_tx08",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 162.0,
+    "stop_s": 175.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "ul_rx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "UPLINK BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 236.0,
+    "stop_s": 253.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx01",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "UPLINK BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 239.0,
+    "stop_s": 252.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 258.0,
+    "stop_s": 275.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx02",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 261.0,
+    "stop_s": 274.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "UPLINK OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 280.0,
+    "stop_s": 297.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx03",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "UPLINK OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 283.0,
+    "stop_s": 296.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "UPLINK 8PSK"
+      }
+     ]
+    },
+    "spec_name": "ul4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 302.0,
+    "stop_s": 319.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx04",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "UPLINK 8PSK"
+      }
+     ]
+    },
+    "spec_name": "ul4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 305.0,
+    "stop_s": 318.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 324.0,
+    "stop_s": 341.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx05",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "ul5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 327.0,
+    "stop_s": 340.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 346.0,
+    "stop_s": 363.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx06",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "ul6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 349.0,
+    "stop_s": 362.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "ul_rx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "ul7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 0.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 368.0,
+    "stop_s": 385.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "ul_tx07",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "ul7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "UPLINK DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "ul7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 0.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 371.0,
+    "stop_s": 384.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  },
+  {
+   "id": "loc_rx_areas",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "areas_all",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 05 KM"
+      }
+     ]
+    },
+    "spec_name": "areas_all",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 420.0,
+    "stop_s": 4020.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "loc_r05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r05",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 05 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r05",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.899993,
+       43.652429
+      ],
+      [
+       -112.898141,
+       43.652312
+      ],
+      [
+       -112.896293,
+       43.652161
+      ],
+      [
+       -112.894451,
+       43.651977
+      ],
+      [
+       -112.892616,
+       43.65176
+      ],
+      [
+       -112.890789,
+       43.651509
+      ],
+      [
+       -112.888971,
+       43.651226
+      ],
+      [
+       -112.887164,
+       43.65091
+      ],
+      [
+       -112.885368,
+       43.650562
+      ],
+      [
+       -112.883585,
+       43.650181
+      ],
+      [
+       -112.881815,
+       43.649768
+      ],
+      [
+       -112.880061,
+       43.649323
+      ],
+      [
+       -112.878322,
+       43.648847
+      ],
+      [
+       -112.8766,
+       43.648339
+      ],
+      [
+       -112.874896,
+       43.647801
+      ],
+      [
+       -112.873211,
+       43.647232
+      ],
+      [
+       -112.871547,
+       43.646633
+      ],
+      [
+       -112.869903,
+       43.646004
+      ],
+      [
+       -112.868282,
+       43.645345
+      ],
+      [
+       -112.866684,
+       43.644657
+      ],
+      [
+       -112.86511,
+       43.643941
+      ],
+      [
+       -112.863562,
+       43.643197
+      ],
+      [
+       -112.86204,
+       43.642424
+      ],
+      [
+       -112.860544,
+       43.641625
+      ],
+      [
+       -112.859077,
+       43.640799
+      ],
+      [
+       -112.857639,
+       43.639946
+      ],
+      [
+       -112.856231,
+       43.639068
+      ],
+      [
+       -112.854853,
+       43.638165
+      ],
+      [
+       -112.853507,
+       43.637237
+      ],
+      [
+       -112.852193,
+       43.636285
+      ],
+      [
+       -112.850913,
+       43.63531
+      ],
+      [
+       -112.849667,
+       43.634311
+      ],
+      [
+       -112.848455,
+       43.633291
+      ],
+      [
+       -112.847279,
+       43.632249
+      ],
+      [
+       -112.84614,
+       43.631186
+      ],
+      [
+       -112.845037,
+       43.630103
+      ],
+      [
+       -112.843972,
+       43.629001
+      ],
+      [
+       -112.842945,
+       43.627879
+      ],
+      [
+       -112.841958,
+       43.62674
+      ],
+      [
+       -112.84101,
+       43.625582
+      ],
+      [
+       -112.840102,
+       43.624409
+      ],
+      [
+       -112.839235,
+       43.623219
+      ],
+      [
+       -112.838409,
+       43.622013
+      ],
+      [
+       -112.837625,
+       43.620794
+      ],
+      [
+       -112.836883,
+       43.61956
+      ],
+      [
+       -112.836184,
+       43.618314
+      ],
+      [
+       -112.835528,
+       43.617055
+      ],
+      [
+       -112.834916,
+       43.615785
+      ],
+      [
+       -112.834348,
+       43.614504
+      ],
+      [
+       -112.833824,
+       43.613213
+      ],
+      [
+       -112.833344,
+       43.611913
+      ],
+      [
+       -112.83291,
+       43.610605
+      ],
+      [
+       -112.83252,
+       43.60929
+      ],
+      [
+       -112.832177,
+       43.607967
+      ],
+      [
+       -112.831878,
+       43.60664
+      ],
+      [
+       -112.831626,
+       43.605307
+      ],
+      [
+       -112.83142,
+       43.60397
+      ],
+      [
+       -112.831259,
+       43.602629
+      ],
+      [
+       -112.831145,
+       43.601287
+      ],
+      [
+       -112.831078,
+       43.599942
+      ],
+      [
+       -112.831056,
+       43.598597
+      ],
+      [
+       -112.831081,
+       43.597252
+      ],
+      [
+       -112.831152,
+       43.595907
+      ],
+      [
+       -112.831269,
+       43.594565
+      ],
+      [
+       -112.831433,
+       43.593224
+      ],
+      [
+       -112.831643,
+       43.591888
+      ],
+      [
+       -112.831898,
+       43.590555
+      ],
+      [
+       -112.832199,
+       43.589228
+      ],
+      [
+       -112.832546,
+       43.587906
+      ],
+      [
+       -112.832939,
+       43.586591
+      ],
+      [
+       -112.833376,
+       43.585283
+      ],
+      [
+       -112.833858,
+       43.583984
+      ],
+      [
+       -112.834385,
+       43.582694
+      ],
+      [
+       -112.834956,
+       43.581414
+      ],
+      [
+       -112.835571,
+       43.580145
+      ],
+      [
+       -112.836229,
+       43.578887
+      ],
+      [
+       -112.836931,
+       43.577641
+      ],
+      [
+       -112.837675,
+       43.576408
+      ],
+      [
+       -112.838461,
+       43.575189
+      ],
+      [
+       -112.839289,
+       43.573985
+      ],
+      [
+       -112.840158,
+       43.572796
+      ],
+      [
+       -112.841067,
+       43.571623
+      ],
+      [
+       -112.842017,
+       43.570467
+      ],
+      [
+       -112.843006,
+       43.569329
+      ],
+      [
+       -112.844034,
+       43.568208
+      ],
+      [
+       -112.8451,
+       43.567107
+      ],
+      [
+       -112.846204,
+       43.566025
+      ],
+      [
+       -112.847344,
+       43.564963
+      ],
+      [
+       -112.848521,
+       43.563922
+      ],
+      [
+       -112.849733,
+       43.562903
+      ],
+      [
+       -112.85098,
+       43.561906
+      ],
+      [
+       -112.85226,
+       43.560932
+      ],
+      [
+       -112.853574,
+       43.559982
+      ],
+      [
+       -112.85492,
+       43.559055
+      ],
+      [
+       -112.856297,
+       43.558153
+      ],
+      [
+       -112.857705,
+       43.557276
+      ],
+      [
+       -112.859142,
+       43.556425
+      ],
+      [
+       -112.860609,
+       43.5556
+      ],
+      [
+       -112.862103,
+       43.554801
+      ],
+      [
+       -112.863624,
+       43.55403
+      ],
+      [
+       -112.87061,
+       43.561463
+      ],
+      [
+       -112.869342,
+       43.562106
+      ],
+      [
+       -112.868097,
+       43.562771
+      ],
+      [
+       -112.866875,
+       43.563459
+      ],
+      [
+       -112.865677,
+       43.564168
+      ],
+      [
+       -112.864504,
+       43.564899
+      ],
+      [
+       -112.863356,
+       43.565651
+      ],
+      [
+       -112.862235,
+       43.566423
+      ],
+      [
+       -112.86114,
+       43.567215
+      ],
+      [
+       -112.860073,
+       43.568027
+      ],
+      [
+       -112.859034,
+       43.568858
+      ],
+      [
+       -112.858024,
+       43.569708
+      ],
+      [
+       -112.857043,
+       43.570575
+      ],
+      [
+       -112.856093,
+       43.57146
+      ],
+      [
+       -112.855173,
+       43.572361
+      ],
+      [
+       -112.854285,
+       43.573279
+      ],
+      [
+       -112.853429,
+       43.574213
+      ],
+      [
+       -112.852604,
+       43.575162
+      ],
+      [
+       -112.851813,
+       43.576125
+      ],
+      [
+       -112.851055,
+       43.577103
+      ],
+      [
+       -112.850331,
+       43.578094
+      ],
+      [
+       -112.849642,
+       43.579097
+      ],
+      [
+       -112.848987,
+       43.580113
+      ],
+      [
+       -112.848367,
+       43.58114
+      ],
+      [
+       -112.847782,
+       43.582179
+      ],
+      [
+       -112.847234,
+       43.583227
+      ],
+      [
+       -112.846722,
+       43.584285
+      ],
+      [
+       -112.846246,
+       43.585352
+      ],
+      [
+       -112.845807,
+       43.586427
+      ],
+      [
+       -112.845406,
+       43.58751
+      ],
+      [
+       -112.845041,
+       43.588599
+      ],
+      [
+       -112.844715,
+       43.589695
+      ],
+      [
+       -112.844426,
+       43.590796
+      ],
+      [
+       -112.844175,
+       43.591903
+      ],
+      [
+       -112.843962,
+       43.593013
+      ],
+      [
+       -112.843788,
+       43.594127
+      ],
+      [
+       -112.843651,
+       43.595244
+      ],
+      [
+       -112.843554,
+       43.596363
+      ],
+      [
+       -112.843495,
+       43.597483
+      ],
+      [
+       -112.843474,
+       43.598604
+      ],
+      [
+       -112.843493,
+       43.599725
+      ],
+      [
+       -112.843549,
+       43.600846
+      ],
+      [
+       -112.843645,
+       43.601965
+      ],
+      [
+       -112.843778,
+       43.603082
+      ],
+      [
+       -112.843951,
+       43.604196
+      ],
+      [
+       -112.844161,
+       43.605306
+      ],
+      [
+       -112.84441,
+       43.606413
+      ],
+      [
+       -112.844697,
+       43.607515
+      ],
+      [
+       -112.845021,
+       43.608611
+      ],
+      [
+       -112.845383,
+       43.609701
+      ],
+      [
+       -112.845783,
+       43.610784
+      ],
+      [
+       -112.84622,
+       43.61186
+      ],
+      [
+       -112.846694,
+       43.612927
+      ],
+      [
+       -112.847204,
+       43.613985
+      ],
+      [
+       -112.847751,
+       43.615034
+      ],
+      [
+       -112.848333,
+       43.616073
+      ],
+      [
+       -112.848952,
+       43.617101
+      ],
+      [
+       -112.849605,
+       43.618117
+      ],
+      [
+       -112.850294,
+       43.619122
+      ],
+      [
+       -112.851016,
+       43.620113
+      ],
+      [
+       -112.851773,
+       43.621091
+      ],
+      [
+       -112.852563,
+       43.622056
+      ],
+      [
+       -112.853386,
+       43.623005
+      ],
+      [
+       -112.854242,
+       43.62394
+      ],
+      [
+       -112.855129,
+       43.624859
+      ],
+      [
+       -112.856048,
+       43.625761
+      ],
+      [
+       -112.856998,
+       43.626647
+      ],
+      [
+       -112.857978,
+       43.627515
+      ],
+      [
+       -112.858988,
+       43.628365
+      ],
+      [
+       -112.860026,
+       43.629197
+      ],
+      [
+       -112.861093,
+       43.630009
+      ],
+      [
+       -112.862188,
+       43.630802
+      ],
+      [
+       -112.86331,
+       43.631576
+      ],
+      [
+       -112.864458,
+       43.632328
+      ],
+      [
+       -112.865631,
+       43.63306
+      ],
+      [
+       -112.86683,
+       43.63377
+      ],
+      [
+       -112.868052,
+       43.634459
+      ],
+      [
+       -112.869298,
+       43.635125
+      ],
+      [
+       -112.870567,
+       43.635768
+      ],
+      [
+       -112.871857,
+       43.636389
+      ],
+      [
+       -112.873169,
+       43.636986
+      ],
+      [
+       -112.8745,
+       43.637559
+      ],
+      [
+       -112.875851,
+       43.638107
+      ],
+      [
+       -112.87722,
+       43.638631
+      ],
+      [
+       -112.878607,
+       43.639131
+      ],
+      [
+       -112.880011,
+       43.639605
+      ],
+      [
+       -112.881431,
+       43.640054
+      ],
+      [
+       -112.882866,
+       43.640476
+      ],
+      [
+       -112.884314,
+       43.640873
+      ],
+      [
+       -112.885777,
+       43.641244
+      ],
+      [
+       -112.887251,
+       43.641588
+      ],
+      [
+       -112.888737,
+       43.641905
+      ],
+      [
+       -112.890233,
+       43.642196
+      ],
+      [
+       -112.891739,
+       43.642459
+      ],
+      [
+       -112.893254,
+       43.642695
+      ],
+      [
+       -112.894776,
+       43.642903
+      ],
+      [
+       -112.896305,
+       43.643084
+      ],
+      [
+       -112.89784,
+       43.643238
+      ],
+      [
+       -112.899379,
+       43.643363
+      ],
+      [
+       -112.900922,
+       43.643461
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "once"
+   }
+  },
+  {
+   "id": "loc_r10",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r10",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 10 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r10",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.874147,
+       43.694898
+      ],
+      [
+       -112.872336,
+       43.694579
+      ],
+      [
+       -112.87053,
+       43.694242
+      ],
+      [
+       -112.868731,
+       43.693888
+      ],
+      [
+       -112.866939,
+       43.693515
+      ],
+      [
+       -112.865154,
+       43.693125
+      ],
+      [
+       -112.863376,
+       43.692718
+      ],
+      [
+       -112.861607,
+       43.692292
+      ],
+      [
+       -112.859845,
+       43.69185
+      ],
+      [
+       -112.858093,
+       43.69139
+      ],
+      [
+       -112.856349,
+       43.690913
+      ],
+      [
+       -112.854614,
+       43.690418
+      ],
+      [
+       -112.852889,
+       43.689907
+      ],
+      [
+       -112.851173,
+       43.689378
+      ],
+      [
+       -112.849468,
+       43.688833
+      ],
+      [
+       -112.847773,
+       43.688271
+      ],
+      [
+       -112.846089,
+       43.687692
+      ],
+      [
+       -112.844416,
+       43.687097
+      ],
+      [
+       -112.842754,
+       43.686485
+      ],
+      [
+       -112.841105,
+       43.685857
+      ],
+      [
+       -112.839467,
+       43.685213
+      ],
+      [
+       -112.837841,
+       43.684552
+      ],
+      [
+       -112.836229,
+       43.683876
+      ],
+      [
+       -112.834629,
+       43.683184
+      ],
+      [
+       -112.833042,
+       43.682476
+      ],
+      [
+       -112.831469,
+       43.681752
+      ],
+      [
+       -112.82991,
+       43.681013
+      ],
+      [
+       -112.828364,
+       43.680259
+      ],
+      [
+       -112.826834,
+       43.679489
+      ],
+      [
+       -112.825317,
+       43.678704
+      ],
+      [
+       -112.823816,
+       43.677905
+      ],
+      [
+       -112.82233,
+       43.677091
+      ],
+      [
+       -112.82086,
+       43.676262
+      ],
+      [
+       -112.819405,
+       43.675419
+      ],
+      [
+       -112.817967,
+       43.674561
+      ],
+      [
+       -112.816545,
+       43.673689
+      ],
+      [
+       -112.815139,
+       43.672804
+      ],
+      [
+       -112.81375,
+       43.671904
+      ],
+      [
+       -112.812379,
+       43.670991
+      ],
+      [
+       -112.811025,
+       43.670065
+      ],
+      [
+       -112.809688,
+       43.669125
+      ],
+      [
+       -112.808369,
+       43.668172
+      ],
+      [
+       -112.807069,
+       43.667206
+      ],
+      [
+       -112.805786,
+       43.666228
+      ],
+      [
+       -112.804523,
+       43.665237
+      ],
+      [
+       -112.803278,
+       43.664233
+      ],
+      [
+       -112.802052,
+       43.663218
+      ],
+      [
+       -112.800846,
+       43.66219
+      ],
+      [
+       -112.799659,
+       43.66115
+      ],
+      [
+       -112.798492,
+       43.660099
+      ],
+      [
+       -112.797344,
+       43.659037
+      ],
+      [
+       -112.796217,
+       43.657963
+      ],
+      [
+       -112.79511,
+       43.656878
+      ],
+      [
+       -112.794024,
+       43.655783
+      ],
+      [
+       -112.792959,
+       43.654676
+      ],
+      [
+       -112.791914,
+       43.65356
+      ],
+      [
+       -112.790891,
+       43.652433
+      ],
+      [
+       -112.789889,
+       43.651296
+      ],
+      [
+       -112.788909,
+       43.650149
+      ],
+      [
+       -112.78795,
+       43.648993
+      ],
+      [
+       -112.787014,
+       43.647828
+      ],
+      [
+       -112.786099,
+       43.646653
+      ],
+      [
+       -112.785207,
+       43.645469
+      ],
+      [
+       -112.784337,
+       43.644277
+      ],
+      [
+       -112.783489,
+       43.643076
+      ],
+      [
+       -112.782665,
+       43.641867
+      ],
+      [
+       -112.781863,
+       43.64065
+      ],
+      [
+       -112.781084,
+       43.639425
+      ],
+      [
+       -112.780329,
+       43.638193
+      ],
+      [
+       -112.779596,
+       43.636953
+      ],
+      [
+       -112.791055,
+       43.633474
+      ],
+      [
+       -112.791721,
+       43.634601
+      ],
+      [
+       -112.792408,
+       43.635722
+      ],
+      [
+       -112.793116,
+       43.636835
+      ],
+      [
+       -112.793845,
+       43.637941
+      ],
+      [
+       -112.794595,
+       43.63904
+      ],
+      [
+       -112.795365,
+       43.640132
+      ],
+      [
+       -112.796156,
+       43.641216
+      ],
+      [
+       -112.796968,
+       43.642292
+      ],
+      [
+       -112.797799,
+       43.643359
+      ],
+      [
+       -112.798651,
+       43.644419
+      ],
+      [
+       -112.799522,
+       43.64547
+      ],
+      [
+       -112.800414,
+       43.646512
+      ],
+      [
+       -112.801325,
+       43.647546
+      ],
+      [
+       -112.802255,
+       43.64857
+      ],
+      [
+       -112.803205,
+       43.649585
+      ],
+      [
+       -112.804173,
+       43.650591
+      ],
+      [
+       -112.805161,
+       43.651586
+      ],
+      [
+       -112.806167,
+       43.652573
+      ],
+      [
+       -112.807192,
+       43.653549
+      ],
+      [
+       -112.808235,
+       43.654514
+      ],
+      [
+       -112.809296,
+       43.65547
+      ],
+      [
+       -112.810375,
+       43.656415
+      ],
+      [
+       -112.811472,
+       43.657349
+      ],
+      [
+       -112.812586,
+       43.658272
+      ],
+      [
+       -112.813718,
+       43.659184
+      ],
+      [
+       -112.814867,
+       43.660085
+      ],
+      [
+       -112.816032,
+       43.660975
+      ],
+      [
+       -112.817215,
+       43.661853
+      ],
+      [
+       -112.818414,
+       43.662719
+      ],
+      [
+       -112.819629,
+       43.663573
+      ],
+      [
+       -112.82086,
+       43.664415
+      ],
+      [
+       -112.822107,
+       43.665245
+      ],
+      [
+       -112.823369,
+       43.666063
+      ],
+      [
+       -112.824647,
+       43.666868
+      ],
+      [
+       -112.82594,
+       43.66766
+      ],
+      [
+       -112.827247,
+       43.66844
+      ],
+      [
+       -112.82857,
+       43.669206
+      ],
+      [
+       -112.829906,
+       43.669959
+      ],
+      [
+       -112.831257,
+       43.6707
+      ],
+      [
+       -112.832622,
+       43.671426
+      ],
+      [
+       -112.834,
+       43.67214
+      ],
+      [
+       -112.835391,
+       43.672839
+      ],
+      [
+       -112.836796,
+       43.673525
+      ],
+      [
+       -112.838213,
+       43.674197
+      ],
+      [
+       -112.839643,
+       43.674854
+      ],
+      [
+       -112.841086,
+       43.675498
+      ],
+      [
+       -112.84254,
+       43.676127
+      ],
+      [
+       -112.844006,
+       43.676742
+      ],
+      [
+       -112.845484,
+       43.677342
+      ],
+      [
+       -112.846972,
+       43.677928
+      ],
+      [
+       -112.848472,
+       43.678499
+      ],
+      [
+       -112.849983,
+       43.679055
+      ],
+      [
+       -112.851503,
+       43.679596
+      ],
+      [
+       -112.853034,
+       43.680122
+      ],
+      [
+       -112.854575,
+       43.680633
+      ],
+      [
+       -112.856125,
+       43.681129
+      ],
+      [
+       -112.857684,
+       43.681609
+      ],
+      [
+       -112.859252,
+       43.682074
+      ],
+      [
+       -112.860829,
+       43.682523
+      ],
+      [
+       -112.862414,
+       43.682957
+      ],
+      [
+       -112.864008,
+       43.683375
+      ],
+      [
+       -112.865609,
+       43.683778
+      ],
+      [
+       -112.867217,
+       43.684164
+      ],
+      [
+       -112.868833,
+       43.684535
+      ],
+      [
+       -112.870455,
+       43.684889
+      ],
+      [
+       -112.872084,
+       43.685228
+      ],
+      [
+       -112.87372,
+       43.68555
+      ],
+      [
+       -112.875361,
+       43.685856
+      ],
+      [
+       -112.877008,
+       43.686146
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "auto"
+   }
+  },
+  {
+   "id": "loc_r15",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r15",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 15 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r15",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.850354,
+       43.736859
+      ],
+      [
+       -112.848565,
+       43.736478
+      ],
+      [
+       -112.846781,
+       43.736086
+      ],
+      [
+       -112.845002,
+       43.735681
+      ],
+      [
+       -112.843229,
+       43.735264
+      ],
+      [
+       -112.841461,
+       43.734836
+      ],
+      [
+       -112.839699,
+       43.734395
+      ],
+      [
+       -112.837943,
+       43.733942
+      ],
+      [
+       -112.836192,
+       43.733478
+      ],
+      [
+       -112.834448,
+       43.733001
+      ],
+      [
+       -112.83271,
+       43.732513
+      ],
+      [
+       -112.830978,
+       43.732013
+      ],
+      [
+       -112.829253,
+       43.731502
+      ],
+      [
+       -112.827535,
+       43.730978
+      ],
+      [
+       -112.825824,
+       43.730443
+      ],
+      [
+       -112.824119,
+       43.729897
+      ],
+      [
+       -112.822422,
+       43.729339
+      ],
+      [
+       -112.820732,
+       43.728769
+      ],
+      [
+       -112.81905,
+       43.728188
+      ],
+      [
+       -112.817375,
+       43.727596
+      ],
+      [
+       -112.815709,
+       43.726992
+      ],
+      [
+       -112.81405,
+       43.726377
+      ],
+      [
+       -112.812399,
+       43.725751
+      ],
+      [
+       -112.810756,
+       43.725114
+      ],
+      [
+       -112.809122,
+       43.724465
+      ],
+      [
+       -112.807496,
+       43.723806
+      ],
+      [
+       -112.805879,
+       43.723135
+      ],
+      [
+       -112.80427,
+       43.722454
+      ],
+      [
+       -112.802671,
+       43.721761
+      ],
+      [
+       -112.801081,
+       43.721058
+      ],
+      [
+       -112.7995,
+       43.720344
+      ],
+      [
+       -112.797928,
+       43.71962
+      ],
+      [
+       -112.796365,
+       43.718884
+      ],
+      [
+       -112.794813,
+       43.718139
+      ],
+      [
+       -112.79327,
+       43.717382
+      ],
+      [
+       -112.791737,
+       43.716616
+      ],
+      [
+       -112.790214,
+       43.715839
+      ],
+      [
+       -112.788701,
+       43.715051
+      ],
+      [
+       -112.787199,
+       43.714254
+      ],
+      [
+       -112.785707,
+       43.713446
+      ],
+      [
+       -112.784225,
+       43.712628
+      ],
+      [
+       -112.782755,
+       43.7118
+      ],
+      [
+       -112.781295,
+       43.710962
+      ],
+      [
+       -112.779846,
+       43.710115
+      ],
+      [
+       -112.778408,
+       43.709257
+      ],
+      [
+       -112.776981,
+       43.70839
+      ],
+      [
+       -112.775566,
+       43.707513
+      ],
+      [
+       -112.774162,
+       43.706627
+      ],
+      [
+       -112.77277,
+       43.705731
+      ],
+      [
+       -112.771389,
+       43.704826
+      ],
+      [
+       -112.770021,
+       43.703912
+      ],
+      [
+       -112.768664,
+       43.702988
+      ],
+      [
+       -112.767319,
+       43.702055
+      ],
+      [
+       -112.765987,
+       43.701113
+      ],
+      [
+       -112.764666,
+       43.700162
+      ],
+      [
+       -112.763359,
+       43.699202
+      ],
+      [
+       -112.762063,
+       43.698233
+      ],
+      [
+       -112.760781,
+       43.697256
+      ],
+      [
+       -112.759511,
+       43.69627
+      ],
+      [
+       -112.758254,
+       43.695275
+      ],
+      [
+       -112.75701,
+       43.694272
+      ],
+      [
+       -112.755779,
+       43.69326
+      ],
+      [
+       -112.754561,
+       43.69224
+      ],
+      [
+       -112.764013,
+       43.686395
+      ],
+      [
+       -112.765154,
+       43.687351
+      ],
+      [
+       -112.766308,
+       43.688299
+      ],
+      [
+       -112.767475,
+       43.68924
+      ],
+      [
+       -112.768653,
+       43.690172
+      ],
+      [
+       -112.769844,
+       43.691096
+      ],
+      [
+       -112.771046,
+       43.692013
+      ],
+      [
+       -112.772261,
+       43.692921
+      ],
+      [
+       -112.773487,
+       43.693821
+      ],
+      [
+       -112.774724,
+       43.694712
+      ],
+      [
+       -112.775974,
+       43.695595
+      ],
+      [
+       -112.777234,
+       43.69647
+      ],
+      [
+       -112.778506,
+       43.697336
+      ],
+      [
+       -112.779789,
+       43.698193
+      ],
+      [
+       -112.781084,
+       43.699041
+      ],
+      [
+       -112.782389,
+       43.699881
+      ],
+      [
+       -112.783705,
+       43.700712
+      ],
+      [
+       -112.785032,
+       43.701534
+      ],
+      [
+       -112.786369,
+       43.702347
+      ],
+      [
+       -112.787717,
+       43.70315
+      ],
+      [
+       -112.789075,
+       43.703945
+      ],
+      [
+       -112.790444,
+       43.70473
+      ],
+      [
+       -112.791823,
+       43.705506
+      ],
+      [
+       -112.793212,
+       43.706273
+      ],
+      [
+       -112.79461,
+       43.70703
+      ],
+      [
+       -112.796019,
+       43.707778
+      ],
+      [
+       -112.797437,
+       43.708516
+      ],
+      [
+       -112.798864,
+       43.709244
+      ],
+      [
+       -112.800302,
+       43.709963
+      ],
+      [
+       -112.801748,
+       43.710672
+      ],
+      [
+       -112.803203,
+       43.711371
+      ],
+      [
+       -112.804668,
+       43.71206
+      ],
+      [
+       -112.806141,
+       43.712739
+      ],
+      [
+       -112.807623,
+       43.713409
+      ],
+      [
+       -112.809114,
+       43.714068
+      ],
+      [
+       -112.810614,
+       43.714717
+      ],
+      [
+       -112.812121,
+       43.715355
+      ],
+      [
+       -112.813637,
+       43.715984
+      ],
+      [
+       -112.815161,
+       43.716602
+      ],
+      [
+       -112.816693,
+       43.71721
+      ],
+      [
+       -112.818233,
+       43.717808
+      ],
+      [
+       -112.819781,
+       43.718395
+      ],
+      [
+       -112.821336,
+       43.718971
+      ],
+      [
+       -112.822898,
+       43.719537
+      ],
+      [
+       -112.824468,
+       43.720092
+      ],
+      [
+       -112.826045,
+       43.720637
+      ],
+      [
+       -112.827629,
+       43.721171
+      ],
+      [
+       -112.82922,
+       43.721694
+      ],
+      [
+       -112.830818,
+       43.722206
+      ],
+      [
+       -112.832422,
+       43.722707
+      ],
+      [
+       -112.834033,
+       43.723198
+      ],
+      [
+       -112.83565,
+       43.723678
+      ],
+      [
+       -112.837273,
+       43.724146
+      ],
+      [
+       -112.838902,
+       43.724604
+      ],
+      [
+       -112.840537,
+       43.72505
+      ],
+      [
+       -112.842178,
+       43.725486
+      ],
+      [
+       -112.843824,
+       43.72591
+      ],
+      [
+       -112.845476,
+       43.726323
+      ],
+      [
+       -112.847133,
+       43.726725
+      ],
+      [
+       -112.848796,
+       43.727116
+      ],
+      [
+       -112.850463,
+       43.727495
+      ],
+      [
+       -112.852135,
+       43.727863
+      ],
+      [
+       -112.853812,
+       43.72822
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "auto"
+   }
+  },
+  {
+   "id": "loc_r20",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r20",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 20 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r20",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.828297,
+       43.779024
+      ],
+      [
+       -112.826515,
+       43.77862
+      ],
+      [
+       -112.824738,
+       43.778207
+      ],
+      [
+       -112.822964,
+       43.777784
+      ],
+      [
+       -112.821195,
+       43.777352
+      ],
+      [
+       -112.81943,
+       43.776911
+      ],
+      [
+       -112.817669,
+       43.776462
+      ],
+      [
+       -112.815913,
+       43.776003
+      ],
+      [
+       -112.814162,
+       43.775534
+      ],
+      [
+       -112.812415,
+       43.775057
+      ],
+      [
+       -112.810673,
+       43.774571
+      ],
+      [
+       -112.808936,
+       43.774076
+      ],
+      [
+       -112.807204,
+       43.773572
+      ],
+      [
+       -112.805478,
+       43.773059
+      ],
+      [
+       -112.803756,
+       43.772537
+      ],
+      [
+       -112.802039,
+       43.772006
+      ],
+      [
+       -112.800328,
+       43.771466
+      ],
+      [
+       -112.798622,
+       43.770918
+      ],
+      [
+       -112.796922,
+       43.77036
+      ],
+      [
+       -112.795227,
+       43.769794
+      ],
+      [
+       -112.793538,
+       43.769219
+      ],
+      [
+       -112.791854,
+       43.768636
+      ],
+      [
+       -112.790177,
+       43.768043
+      ],
+      [
+       -112.788505,
+       43.767442
+      ],
+      [
+       -112.78684,
+       43.766833
+      ],
+      [
+       -112.78518,
+       43.766215
+      ],
+      [
+       -112.783527,
+       43.765588
+      ],
+      [
+       -112.78188,
+       43.764953
+      ],
+      [
+       -112.78024,
+       43.764309
+      ],
+      [
+       -112.778606,
+       43.763656
+      ],
+      [
+       -112.776978,
+       43.762996
+      ],
+      [
+       -112.775357,
+       43.762327
+      ],
+      [
+       -112.773743,
+       43.761649
+      ],
+      [
+       -112.772135,
+       43.760963
+      ],
+      [
+       -112.770534,
+       43.760269
+      ],
+      [
+       -112.76894,
+       43.759567
+      ],
+      [
+       -112.767354,
+       43.758857
+      ],
+      [
+       -112.765774,
+       43.758138
+      ],
+      [
+       -112.764202,
+       43.757411
+      ],
+      [
+       -112.762636,
+       43.756676
+      ],
+      [
+       -112.761079,
+       43.755933
+      ],
+      [
+       -112.759528,
+       43.755182
+      ],
+      [
+       -112.757985,
+       43.754423
+      ],
+      [
+       -112.75645,
+       43.753656
+      ],
+      [
+       -112.754922,
+       43.752881
+      ],
+      [
+       -112.753402,
+       43.752098
+      ],
+      [
+       -112.75189,
+       43.751307
+      ],
+      [
+       -112.750386,
+       43.750508
+      ],
+      [
+       -112.74889,
+       43.749702
+      ],
+      [
+       -112.747401,
+       43.748888
+      ],
+      [
+       -112.745921,
+       43.748067
+      ],
+      [
+       -112.74445,
+       43.747237
+      ],
+      [
+       -112.742986,
+       43.7464
+      ],
+      [
+       -112.741531,
+       43.745556
+      ],
+      [
+       -112.740084,
+       43.744704
+      ],
+      [
+       -112.738645,
+       43.743845
+      ],
+      [
+       -112.737216,
+       43.742978
+      ],
+      [
+       -112.735795,
+       43.742104
+      ],
+      [
+       -112.734382,
+       43.741222
+      ],
+      [
+       -112.732979,
+       43.740334
+      ],
+      [
+       -112.741215,
+       43.733591
+      ],
+      [
+       -112.742552,
+       43.734438
+      ],
+      [
+       -112.743897,
+       43.735277
+      ],
+      [
+       -112.745251,
+       43.736109
+      ],
+      [
+       -112.746612,
+       43.736935
+      ],
+      [
+       -112.747982,
+       43.737753
+      ],
+      [
+       -112.74936,
+       43.738564
+      ],
+      [
+       -112.750746,
+       43.739369
+      ],
+      [
+       -112.75214,
+       43.740165
+      ],
+      [
+       -112.753542,
+       43.740955
+      ],
+      [
+       -112.754951,
+       43.741738
+      ],
+      [
+       -112.756368,
+       43.742513
+      ],
+      [
+       -112.757793,
+       43.743281
+      ],
+      [
+       -112.759226,
+       43.744041
+      ],
+      [
+       -112.760666,
+       43.744794
+      ],
+      [
+       -112.762113,
+       43.745539
+      ],
+      [
+       -112.763568,
+       43.746277
+      ],
+      [
+       -112.76503,
+       43.747008
+      ],
+      [
+       -112.7665,
+       43.747731
+      ],
+      [
+       -112.767976,
+       43.748446
+      ],
+      [
+       -112.76946,
+       43.749154
+      ],
+      [
+       -112.77095,
+       43.749853
+      ],
+      [
+       -112.772448,
+       43.750546
+      ],
+      [
+       -112.773952,
+       43.75123
+      ],
+      [
+       -112.775463,
+       43.751907
+      ],
+      [
+       -112.776981,
+       43.752575
+      ],
+      [
+       -112.778505,
+       43.753236
+      ],
+      [
+       -112.780036,
+       43.753889
+      ],
+      [
+       -112.781573,
+       43.754535
+      ],
+      [
+       -112.783117,
+       43.755172
+      ],
+      [
+       -112.784667,
+       43.755801
+      ],
+      [
+       -112.786223,
+       43.756422
+      ],
+      [
+       -112.787786,
+       43.757035
+      ],
+      [
+       -112.789354,
+       43.75764
+      ],
+      [
+       -112.790928,
+       43.758237
+      ],
+      [
+       -112.792509,
+       43.758825
+      ],
+      [
+       -112.794095,
+       43.759406
+      ],
+      [
+       -112.795687,
+       43.759978
+      ],
+      [
+       -112.797284,
+       43.760542
+      ],
+      [
+       -112.798887,
+       43.761098
+      ],
+      [
+       -112.800495,
+       43.761645
+      ],
+      [
+       -112.802109,
+       43.762185
+      ],
+      [
+       -112.803729,
+       43.762715
+      ],
+      [
+       -112.805353,
+       43.763238
+      ],
+      [
+       -112.806983,
+       43.763752
+      ],
+      [
+       -112.808617,
+       43.764257
+      ],
+      [
+       -112.810257,
+       43.764754
+      ],
+      [
+       -112.811901,
+       43.765243
+      ],
+      [
+       -112.813551,
+       43.765723
+      ],
+      [
+       -112.815205,
+       43.766194
+      ],
+      [
+       -112.816864,
+       43.766657
+      ],
+      [
+       -112.818527,
+       43.767112
+      ],
+      [
+       -112.820195,
+       43.767557
+      ],
+      [
+       -112.821867,
+       43.767994
+      ],
+      [
+       -112.823543,
+       43.768423
+      ],
+      [
+       -112.825224,
+       43.768843
+      ],
+      [
+       -112.826909,
+       43.769254
+      ],
+      [
+       -112.828598,
+       43.769656
+      ],
+      [
+       -112.83029,
+       43.77005
+      ],
+      [
+       -112.831987,
+       43.770435
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "auto"
+   }
+  },
+  {
+   "id": "loc_r25",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r25",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 25 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r25",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.804534,
+       43.820747
+      ],
+      [
+       -112.802761,
+       43.820321
+      ],
+      [
+       -112.800992,
+       43.819888
+      ],
+      [
+       -112.799226,
+       43.819448
+      ],
+      [
+       -112.797464,
+       43.819
+      ],
+      [
+       -112.795706,
+       43.818546
+      ],
+      [
+       -112.793951,
+       43.818083
+      ],
+      [
+       -112.7922,
+       43.817614
+      ],
+      [
+       -112.790453,
+       43.817137
+      ],
+      [
+       -112.78871,
+       43.816653
+      ],
+      [
+       -112.78697,
+       43.816161
+      ],
+      [
+       -112.785235,
+       43.815662
+      ],
+      [
+       -112.783504,
+       43.815157
+      ],
+      [
+       -112.781776,
+       43.814643
+      ],
+      [
+       -112.780053,
+       43.814123
+      ],
+      [
+       -112.778335,
+       43.813595
+      ],
+      [
+       -112.77662,
+       43.813061
+      ],
+      [
+       -112.77491,
+       43.812519
+      ],
+      [
+       -112.773204,
+       43.81197
+      ],
+      [
+       -112.771502,
+       43.811414
+      ],
+      [
+       -112.769806,
+       43.810851
+      ],
+      [
+       -112.768113,
+       43.81028
+      ],
+      [
+       -112.766425,
+       43.809703
+      ],
+      [
+       -112.764742,
+       43.809119
+      ],
+      [
+       -112.763064,
+       43.808527
+      ],
+      [
+       -112.76139,
+       43.807929
+      ],
+      [
+       -112.759722,
+       43.807324
+      ],
+      [
+       -112.758058,
+       43.806711
+      ],
+      [
+       -112.756399,
+       43.806092
+      ],
+      [
+       -112.754745,
+       43.805466
+      ],
+      [
+       -112.753096,
+       43.804833
+      ],
+      [
+       -112.751453,
+       43.804193
+      ],
+      [
+       -112.749814,
+       43.803546
+      ],
+      [
+       -112.748181,
+       43.802893
+      ],
+      [
+       -112.746553,
+       43.802232
+      ],
+      [
+       -112.74493,
+       43.801565
+      ],
+      [
+       -112.743313,
+       43.800891
+      ],
+      [
+       -112.741701,
+       43.80021
+      ],
+      [
+       -112.740095,
+       43.799523
+      ],
+      [
+       -112.738494,
+       43.798829
+      ],
+      [
+       -112.736899,
+       43.798128
+      ],
+      [
+       -112.73531,
+       43.797421
+      ],
+      [
+       -112.733726,
+       43.796707
+      ],
+      [
+       -112.732148,
+       43.795986
+      ],
+      [
+       -112.730576,
+       43.795259
+      ],
+      [
+       -112.729009,
+       43.794525
+      ],
+      [
+       -112.727449,
+       43.793785
+      ],
+      [
+       -112.725894,
+       43.793038
+      ],
+      [
+       -112.724346,
+       43.792285
+      ],
+      [
+       -112.722804,
+       43.791525
+      ],
+      [
+       -112.721268,
+       43.790759
+      ],
+      [
+       -112.719738,
+       43.789986
+      ],
+      [
+       -112.718214,
+       43.789207
+      ],
+      [
+       -112.716696,
+       43.788422
+      ],
+      [
+       -112.715185,
+       43.78763
+      ],
+      [
+       -112.71368,
+       43.786832
+      ],
+      [
+       -112.712182,
+       43.786028
+      ],
+      [
+       -112.71069,
+       43.785218
+      ],
+      [
+       -112.718208,
+       43.778047
+      ],
+      [
+       -112.719642,
+       43.778826
+      ],
+      [
+       -112.721083,
+       43.7796
+      ],
+      [
+       -112.72253,
+       43.780367
+      ],
+      [
+       -112.723983,
+       43.781128
+      ],
+      [
+       -112.725442,
+       43.781883
+      ],
+      [
+       -112.726907,
+       43.782632
+      ],
+      [
+       -112.728378,
+       43.783374
+      ],
+      [
+       -112.729855,
+       43.784111
+      ],
+      [
+       -112.731338,
+       43.784841
+      ],
+      [
+       -112.732826,
+       43.785565
+      ],
+      [
+       -112.734321,
+       43.786283
+      ],
+      [
+       -112.735821,
+       43.786995
+      ],
+      [
+       -112.737327,
+       43.787701
+      ],
+      [
+       -112.738839,
+       43.7884
+      ],
+      [
+       -112.740356,
+       43.789093
+      ],
+      [
+       -112.741879,
+       43.789779
+      ],
+      [
+       -112.743407,
+       43.790459
+      ],
+      [
+       -112.744941,
+       43.791133
+      ],
+      [
+       -112.74648,
+       43.7918
+      ],
+      [
+       -112.748024,
+       43.792461
+      ],
+      [
+       -112.749574,
+       43.793116
+      ],
+      [
+       -112.751129,
+       43.793764
+      ],
+      [
+       -112.752689,
+       43.794405
+      ],
+      [
+       -112.754254,
+       43.79504
+      ],
+      [
+       -112.755824,
+       43.795668
+      ],
+      [
+       -112.7574,
+       43.79629
+      ],
+      [
+       -112.75898,
+       43.796905
+      ],
+      [
+       -112.760565,
+       43.797514
+      ],
+      [
+       -112.762155,
+       43.798116
+      ],
+      [
+       -112.76375,
+       43.798711
+      ],
+      [
+       -112.76535,
+       43.7993
+      ],
+      [
+       -112.766954,
+       43.799882
+      ],
+      [
+       -112.768563,
+       43.800457
+      ],
+      [
+       -112.770177,
+       43.801026
+      ],
+      [
+       -112.771795,
+       43.801588
+      ],
+      [
+       -112.773418,
+       43.802143
+      ],
+      [
+       -112.775045,
+       43.802691
+      ],
+      [
+       -112.776676,
+       43.803232
+      ],
+      [
+       -112.778312,
+       43.803767
+      ],
+      [
+       -112.779952,
+       43.804295
+      ],
+      [
+       -112.781597,
+       43.804816
+      ],
+      [
+       -112.783245,
+       43.80533
+      ],
+      [
+       -112.784898,
+       43.805837
+      ],
+      [
+       -112.786554,
+       43.806337
+      ],
+      [
+       -112.788215,
+       43.806831
+      ],
+      [
+       -112.789879,
+       43.807317
+      ],
+      [
+       -112.791548,
+       43.807796
+      ],
+      [
+       -112.79322,
+       43.808269
+      ],
+      [
+       -112.794896,
+       43.808734
+      ],
+      [
+       -112.796576,
+       43.809193
+      ],
+      [
+       -112.798259,
+       43.809644
+      ],
+      [
+       -112.799946,
+       43.810089
+      ],
+      [
+       -112.801637,
+       43.810526
+      ],
+      [
+       -112.803331,
+       43.810957
+      ],
+      [
+       -112.805028,
+       43.81138
+      ],
+      [
+       -112.806729,
+       43.811796
+      ],
+      [
+       -112.808433,
+       43.812205
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "auto"
+   }
+  },
+  {
+   "id": "loc_r30",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_r30",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "RANGE 30 KM"
+      }
+     ]
+    },
+    "spec_name": "gate_r30",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.780668,
+       43.862398
+      ],
+      [
+       -112.7789,
+       43.861957
+      ],
+      [
+       -112.777135,
+       43.86151
+      ],
+      [
+       -112.775374,
+       43.861057
+      ],
+      [
+       -112.773615,
+       43.860598
+      ],
+      [
+       -112.77186,
+       43.860133
+      ],
+      [
+       -112.770108,
+       43.859662
+      ],
+      [
+       -112.768359,
+       43.859184
+      ],
+      [
+       -112.766613,
+       43.8587
+      ],
+      [
+       -112.764871,
+       43.858211
+      ],
+      [
+       -112.763132,
+       43.857715
+      ],
+      [
+       -112.761396,
+       43.857213
+      ],
+      [
+       -112.759664,
+       43.856705
+      ],
+      [
+       -112.757935,
+       43.856191
+      ],
+      [
+       -112.756209,
+       43.855671
+      ],
+      [
+       -112.754488,
+       43.855144
+      ],
+      [
+       -112.752769,
+       43.854612
+      ],
+      [
+       -112.751055,
+       43.854074
+      ],
+      [
+       -112.749344,
+       43.85353
+      ],
+      [
+       -112.747637,
+       43.852979
+      ],
+      [
+       -112.745933,
+       43.852423
+      ],
+      [
+       -112.744233,
+       43.851861
+      ],
+      [
+       -112.742537,
+       43.851293
+      ],
+      [
+       -112.740845,
+       43.850719
+      ],
+      [
+       -112.739157,
+       43.850139
+      ],
+      [
+       -112.737473,
+       43.849553
+      ],
+      [
+       -112.735793,
+       43.848961
+      ],
+      [
+       -112.734117,
+       43.848364
+      ],
+      [
+       -112.732445,
+       43.84776
+      ],
+      [
+       -112.730777,
+       43.847151
+      ],
+      [
+       -112.729113,
+       43.846536
+      ],
+      [
+       -112.727453,
+       43.845915
+      ],
+      [
+       -112.725797,
+       43.845288
+      ],
+      [
+       -112.724146,
+       43.844655
+      ],
+      [
+       -112.722499,
+       43.844017
+      ],
+      [
+       -112.720857,
+       43.843373
+      ],
+      [
+       -112.719218,
+       43.842723
+      ],
+      [
+       -112.717585,
+       43.842067
+      ],
+      [
+       -112.715955,
+       43.841406
+      ],
+      [
+       -112.71433,
+       43.840739
+      ],
+      [
+       -112.71271,
+       43.840066
+      ],
+      [
+       -112.711094,
+       43.839388
+      ],
+      [
+       -112.709483,
+       43.838704
+      ],
+      [
+       -112.707877,
+       43.838014
+      ],
+      [
+       -112.706275,
+       43.837319
+      ],
+      [
+       -112.704678,
+       43.836618
+      ],
+      [
+       -112.703085,
+       43.835912
+      ],
+      [
+       -112.701498,
+       43.8352
+      ],
+      [
+       -112.699915,
+       43.834482
+      ],
+      [
+       -112.698337,
+       43.833759
+      ],
+      [
+       -112.696764,
+       43.83303
+      ],
+      [
+       -112.695196,
+       43.832296
+      ],
+      [
+       -112.693633,
+       43.831556
+      ],
+      [
+       -112.692075,
+       43.830811
+      ],
+      [
+       -112.690522,
+       43.830061
+      ],
+      [
+       -112.688974,
+       43.829305
+      ],
+      [
+       -112.695987,
+       43.82187
+      ],
+      [
+       -112.697485,
+       43.822601
+      ],
+      [
+       -112.698988,
+       43.823328
+      ],
+      [
+       -112.700495,
+       43.824049
+      ],
+      [
+       -112.702008,
+       43.824764
+      ],
+      [
+       -112.703525,
+       43.825475
+      ],
+      [
+       -112.705047,
+       43.82618
+      ],
+      [
+       -112.706574,
+       43.826879
+      ],
+      [
+       -112.708106,
+       43.827574
+      ],
+      [
+       -112.709642,
+       43.828263
+      ],
+      [
+       -112.711183,
+       43.828946
+      ],
+      [
+       -112.712728,
+       43.829624
+      ],
+      [
+       -112.714278,
+       43.830297
+      ],
+      [
+       -112.715833,
+       43.830965
+      ],
+      [
+       -112.717392,
+       43.831626
+      ],
+      [
+       -112.718956,
+       43.832283
+      ],
+      [
+       -112.720524,
+       43.832934
+      ],
+      [
+       -112.722096,
+       43.833579
+      ],
+      [
+       -112.723673,
+       43.834219
+      ],
+      [
+       -112.725253,
+       43.834853
+      ],
+      [
+       -112.726839,
+       43.835482
+      ],
+      [
+       -112.728428,
+       43.836106
+      ],
+      [
+       -112.730022,
+       43.836723
+      ],
+      [
+       -112.73162,
+       43.837335
+      ],
+      [
+       -112.733222,
+       43.837942
+      ],
+      [
+       -112.734828,
+       43.838543
+      ],
+      [
+       -112.736438,
+       43.839138
+      ],
+      [
+       -112.738052,
+       43.839728
+      ],
+      [
+       -112.73967,
+       43.840312
+      ],
+      [
+       -112.741292,
+       43.84089
+      ],
+      [
+       -112.742917,
+       43.841462
+      ],
+      [
+       -112.744547,
+       43.842029
+      ],
+      [
+       -112.746181,
+       43.84259
+      ],
+      [
+       -112.747818,
+       43.843146
+      ],
+      [
+       -112.749459,
+       43.843696
+      ],
+      [
+       -112.751104,
+       43.84424
+      ],
+      [
+       -112.752752,
+       43.844778
+      ],
+      [
+       -112.754404,
+       43.84531
+      ],
+      [
+       -112.75606,
+       43.845837
+      ],
+      [
+       -112.757719,
+       43.846358
+      ],
+      [
+       -112.759381,
+       43.846872
+      ],
+      [
+       -112.761047,
+       43.847382
+      ],
+      [
+       -112.762717,
+       43.847885
+      ],
+      [
+       -112.76439,
+       43.848382
+      ],
+      [
+       -112.766066,
+       43.848874
+      ],
+      [
+       -112.767746,
+       43.84936
+      ],
+      [
+       -112.769428,
+       43.84984
+      ],
+      [
+       -112.771114,
+       43.850313
+      ],
+      [
+       -112.772804,
+       43.850781
+      ],
+      [
+       -112.774496,
+       43.851244
+      ],
+      [
+       -112.776191,
+       43.8517
+      ],
+      [
+       -112.77789,
+       43.85215
+      ],
+      [
+       -112.779591,
+       43.852594
+      ],
+      [
+       -112.781296,
+       43.853032
+      ],
+      [
+       -112.783004,
+       43.853465
+      ],
+      [
+       -112.784714,
+       43.853891
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "dwell",
+    "dwell_s": 15.0,
+    "max_s": 120.0,
+    "confirm": "auto"
+   }
+  },
+  {
+   "id": "loc_far",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "gate_far",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 0,
+       "amplitude": 0.9,
+       "message": "FAR END BOX"
+      }
+     ]
+    },
+    "spec_name": "gate_far",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   },
+   "location": {
+    "start": {
+     "polygon": [
+      [
+       -112.735195,
+       43.954694
+      ],
+      [
+       -112.733039,
+       43.954152
+      ],
+      [
+       -112.730886,
+       43.953604
+      ],
+      [
+       -112.728737,
+       43.953048
+      ],
+      [
+       -112.726592,
+       43.952486
+      ],
+      [
+       -112.72445,
+       43.951917
+      ],
+      [
+       -112.722311,
+       43.951342
+      ],
+      [
+       -112.720176,
+       43.950759
+      ],
+      [
+       -112.718044,
+       43.95017
+      ],
+      [
+       -112.715917,
+       43.949574
+      ],
+      [
+       -112.713792,
+       43.948972
+      ],
+      [
+       -112.711672,
+       43.948362
+      ],
+      [
+       -112.709555,
+       43.947746
+      ],
+      [
+       -112.707442,
+       43.947124
+      ],
+      [
+       -112.705333,
+       43.946494
+      ],
+      [
+       -112.703228,
+       43.945858
+      ],
+      [
+       -112.701127,
+       43.945215
+      ],
+      [
+       -112.69903,
+       43.944566
+      ],
+      [
+       -112.696936,
+       43.94391
+      ],
+      [
+       -112.694847,
+       43.943248
+      ],
+      [
+       -112.692762,
+       43.942579
+      ],
+      [
+       -112.690681,
+       43.941903
+      ],
+      [
+       -112.688604,
+       43.941221
+      ],
+      [
+       -112.686531,
+       43.940532
+      ],
+      [
+       -112.684463,
+       43.939836
+      ],
+      [
+       -112.682399,
+       43.939134
+      ],
+      [
+       -112.680339,
+       43.938426
+      ],
+      [
+       -112.678283,
+       43.937711
+      ],
+      [
+       -112.676232,
+       43.93699
+      ],
+      [
+       -112.674186,
+       43.936262
+      ],
+      [
+       -112.672143,
+       43.935527
+      ],
+      [
+       -112.670106,
+       43.934787
+      ],
+      [
+       -112.668073,
+       43.934039
+      ],
+      [
+       -112.666044,
+       43.933286
+      ],
+      [
+       -112.66402,
+       43.932526
+      ],
+      [
+       -112.662001,
+       43.931759
+      ],
+      [
+       -112.659987,
+       43.930986
+      ],
+      [
+       -112.657977,
+       43.930207
+      ],
+      [
+       -112.655972,
+       43.929422
+      ],
+      [
+       -112.653972,
+       43.92863
+      ],
+      [
+       -112.651977,
+       43.927832
+      ],
+      [
+       -112.649987,
+       43.927027
+      ],
+      [
+       -112.648001,
+       43.926216
+      ],
+      [
+       -112.646021,
+       43.925399
+      ],
+      [
+       -112.644045,
+       43.924576
+      ],
+      [
+       -112.642075,
+       43.923747
+      ],
+      [
+       -112.64011,
+       43.922911
+      ],
+      [
+       -112.63815,
+       43.922069
+      ],
+      [
+       -112.636195,
+       43.921221
+      ],
+      [
+       -112.634245,
+       43.920367
+      ],
+      [
+       -112.632301,
+       43.919506
+      ],
+      [
+       -112.630362,
+       43.91864
+      ],
+      [
+       -112.628428,
+       43.917767
+      ],
+      [
+       -112.6265,
+       43.916888
+      ],
+      [
+       -112.679288,
+       43.856996
+      ],
+      [
+       -112.680853,
+       43.857708
+      ],
+      [
+       -112.682421,
+       43.858416
+      ],
+      [
+       -112.683994,
+       43.859118
+      ],
+      [
+       -112.685571,
+       43.859816
+      ],
+      [
+       -112.687153,
+       43.860509
+      ],
+      [
+       -112.688738,
+       43.861196
+      ],
+      [
+       -112.690328,
+       43.861879
+      ],
+      [
+       -112.691922,
+       43.862557
+      ],
+      [
+       -112.69352,
+       43.863229
+      ],
+      [
+       -112.695123,
+       43.863897
+      ],
+      [
+       -112.696729,
+       43.864559
+      ],
+      [
+       -112.698339,
+       43.865217
+      ],
+      [
+       -112.699953,
+       43.865869
+      ],
+      [
+       -112.701572,
+       43.866516
+      ],
+      [
+       -112.703194,
+       43.867158
+      ],
+      [
+       -112.70482,
+       43.867795
+      ],
+      [
+       -112.70645,
+       43.868427
+      ],
+      [
+       -112.708084,
+       43.869053
+      ],
+      [
+       -112.709721,
+       43.869675
+      ],
+      [
+       -112.711363,
+       43.870291
+      ],
+      [
+       -112.713008,
+       43.870902
+      ],
+      [
+       -112.714657,
+       43.871508
+      ],
+      [
+       -112.716309,
+       43.872108
+      ],
+      [
+       -112.717965,
+       43.872704
+      ],
+      [
+       -112.719625,
+       43.873294
+      ],
+      [
+       -112.721289,
+       43.873879
+      ],
+      [
+       -112.722956,
+       43.874459
+      ],
+      [
+       -112.724626,
+       43.875033
+      ],
+      [
+       -112.7263,
+       43.875602
+      ],
+      [
+       -112.727978,
+       43.876166
+      ],
+      [
+       -112.729658,
+       43.876724
+      ],
+      [
+       -112.731343,
+       43.877278
+      ],
+      [
+       -112.73303,
+       43.877825
+      ],
+      [
+       -112.734721,
+       43.878368
+      ],
+      [
+       -112.736416,
+       43.878905
+      ],
+      [
+       -112.738113,
+       43.879437
+      ],
+      [
+       -112.739814,
+       43.879963
+      ],
+      [
+       -112.741518,
+       43.880484
+      ],
+      [
+       -112.743225,
+       43.881
+      ],
+      [
+       -112.744935,
+       43.88151
+      ],
+      [
+       -112.746649,
+       43.882015
+      ],
+      [
+       -112.748365,
+       43.882515
+      ],
+      [
+       -112.750085,
+       43.883009
+      ],
+      [
+       -112.751807,
+       43.883497
+      ],
+      [
+       -112.753532,
+       43.88398
+      ],
+      [
+       -112.755261,
+       43.884458
+      ],
+      [
+       -112.756992,
+       43.88493
+      ],
+      [
+       -112.758726,
+       43.885397
+      ],
+      [
+       -112.760463,
+       43.885858
+      ],
+      [
+       -112.762203,
+       43.886314
+      ],
+      [
+       -112.763946,
+       43.886764
+      ],
+      [
+       -112.765691,
+       43.887209
+      ],
+      [
+       -112.767439,
+       43.887648
+      ]
+     ]
+    }
+   },
+   "priority": 3,
+   "trigger": {
+    "mode": "while_inside",
+    "dwell_s": 20.0,
+    "max_s": 300.0,
+    "confirm": "auto"
+   }
+  }
+ ],
+ "map": {
+  "flight_path": [
+   [
+    -112.883333,
+    43.566667
+   ],
+   [
+    -112.7,
+    43.916667
+   ]
+  ],
+  "flight_path_source": "make_flight_plans.py --route",
+  "overlays": [
+   {
+    "id": "ov-flight-box",
+    "name": "Flight box",
+    "source": "make_flight_plans.py --flight-box",
+    "color": "#e65100",
+    "lines": [],
+    "polygons": [
+     {
+      "name": "Flight box",
+      "coords": [
+       [
+        -112.75,
+        43.916667
+       ],
+       [
+        -112.65,
+        43.916667
+       ],
+       [
+        -112.833333,
+        43.55
+       ],
+       [
+        -112.933333,
+        43.583333
+       ]
+      ]
+     }
+    ],
+    "points": []
+   },
+   {
+    "id": "ov-ground-site",
+    "name": "Ground radio site",
+    "source": "make_flight_plans.py --ground-site",
+    "color": "#1565c0",
+    "lines": [],
+    "polygons": [],
+    "points": [
+     {
+      "name": "Ground radio site",
+      "lat": 43.598621,
+      "lon": -112.905566
+     }
+    ]
+   }
+  ]
+ }
+}

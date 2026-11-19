@@ -1,0 +1,9 @@
+# DPMG radio service (Jetson / Linux containers): the GUI set plus the
+# POSIX-only pieces. posix_ipc is the shared-memory bus to the GPU channelizer;
+# it has no Windows build, and the GUI only ever imports it inside try/except.
+-r requirements-gui.txt
+posix_ipc
+# smbus2: the I2C ADS1115 on the G40 socket bus (T/R switch readback, HPA
+# temperature and current). Pure Python; an offline radio takes the wheel from
+# deploy/wheels/ (see deploy/g40/Dockerfile.frontend-overlay).
+smbus2

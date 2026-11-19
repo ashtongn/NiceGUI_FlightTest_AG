@@ -1,0 +1,460 @@
+# payload_profiles.yaml: RF chain of each payload build.  Master copy of every number used by:
+#   * payload_budget.py            (shared math)
+#   * the /payload GUI page        (live EIRP / warnings)
+#   * dpmg_service payload guard   (minimum safe RX attenuation before the HPA keys)
+#   * tools/gen_payload_workbook.py (writes docs/Payload_EIRP_Link_Budget.xlsx)
+# Edit here, then regenerate the workbook and copy the file to the radio (/app_svc)
+# and the GUI host; the guard reads it at service start and on frontend_reload.
+#
+# Builds: P1 (1208 HPA), P2 (1189) and P3 (1211), numbered as in the payload wiring
+# drawings (Payload wiring 1189 v2 02Nov26.pdf), except that P2 follows the build on
+# the bench as rewired 2026-11-03, not the drawing.  The 1208 and 1211 control
+# polarities are not on file (see frontend_setup.py presets).
+#
+# P2 as built 2026-11-03 has no directional coupler and no power meter:
+#   TX:  G40 TRx2B, 20 dB pad, HPA 1189, switch J2, switch J0, antenna
+#   RX:  antenna, switch J0, switch J1, RX attenuator, LNA, ZB3PD splitter, G40 TRx1A / TRx1B / TRx2A
+# The switch is mounted upside down, so the HPA is on the engraved J2 and the G40 runs
+# rf_frontend tr_switch tx_level: 0.  The attenuator directly after the switch is
+# rx_order: atten_first, so the setting protects the LNA as well and no G40 TX
+# attenuation floor is needed.  P2 reads the bench values of its G40 and HPA
+# (g40_tx_bench, hpa_1189_bench; leaves with measured: true), since the datasheet +5 dBm
+# G40 figure would put the HPA about 15 dB under its real level behind the pad.
+#
+# P2a keeps the 02Nov26 parts (PASR0200500600A switch, no pad, datasheet G40 and HPA)
+# with the attenuator before the LNA.
+# P2b is the bench setup of 2026-11-02: the ZB3PD on the TX side, three G40 TX ports
+# (TRx1A, TRx2A, TRx1B) combined into the HPA, one RX port (TRx2B) straight from the RX
+# attenuator, with the LNA before the attenuator.
+#
+# P1 (top drawing) has a ZGDC30-372HP+ coupler after the HPA feeding a PWR-8P-RC meter,
+# counted in its hpa_to_switch loss.  The chain for P1, P2b and P3 is:
+#   TX:  G40 TX then cable then [TX combiner] then [fixed pad] then HPA then cable then T/R switch then cable then antenna
+#   RX:  antenna then T/R switch then cable then LNA then cable then RX attenuator then cable then G40 RX
+# There the RX attenuator sits between the LNA and the G40, so it protects the G40 only.
+# In the TX state the LNA relies on the switch isolation, and where that is not enough
+# against the HPA at Psat (P2b) on the G40 TX attenuation as well: the payload guard
+# holds it at or above payload_budget.min_lna_safe_tx_atten.
+#
+# The g40_ports entry under a profile records which jacks are cabled and switch_ports
+# which switch port faces what; the diagram shows them, the math does not read them.
+# The coupler and power meter stay in the components section below: they are bench
+# characterization equipment (antenna removed, coupler plus power meter inline for a
+# per-frequency output-power reading, then taken back out for a loopback), listed under
+# bench_fixture and referenced by no payload profile.
+#
+# The earlier payload block diagram (cited below as the source of a couple of pad
+# values) still shows the coupler and the power meter in the payload.  This YAML
+# is the current chain.
+#
+# Leaf format:  {value: x, unit:, source:, note:, verify: bool}
+#               {points: [[freq_mhz, value], ...], unit:, source:, note:, verify: bool}
+# Tables are interpolated linearly in frequency and clamped at the ends.
+# verify: true = estimate, read off a datasheet curve, distributor-sourced, chip-level
+# rather than card-level, or not published.  measured: true = a bench reading rather than
+# a datasheet value (the workbook labels it MEASURED).  Nothing here is invented: a value
+# that was not found is null and the math refuses to use it.
+# Values come from the vendor datasheets (URL per value).  Losses are positive dB.
+schema_version: 1
+
+protection:
+  margin_db: {value: 10, unit: dB, source: "DPMG design choice", note: "G40 RX input kept this far below its max safe input in the TX state (covers RCDAT accuracy, switch isolation spread, antenna reflection, cable estimates)", verify: false}
+  min_rx_atten_db: null       # optional explicit floor (dB); null = computed value only
+
+workbook_defaults: {profile: P2, freq_mhz: 2200, tx_atten_db: 10, backoff_db: 3}
+
+# Radio that drives the HPA.  Every profile's g40_tx part is the default (the G40,
+# TX attenuation 0 to 41.75 dB).  Another radio swaps only that part: control
+# gain means output = the part's max_output_dbm - (gain_max - gain).  The /payload
+# page picks the entry from the selected radio (family epiq = g40, uhd + kind
+# b200 = b200).  The service-side guard always uses the profile's g40_tx part.
+radios:
+  g40: {tx: g40_tx, control: atten, min_db: 0, max_db: 41.75, step_db: 0.25, label: "G40 TX atten"}
+  b200: {tx: b200_tx, control: gain, min_db: 0, max_db: 89.75, step_db: 0.25, label: "B200 TX gain"}
+
+components:
+  g40_tx:
+    model: "Epiq Matchstiq G40 (Sidekiq NV100, ADRV9004) TX port"
+    datasheet: docs/datasheets/Epiq_Matchstiq_G20_G40.pdf
+    freq_range_mhz: {value: [30, 6000], unit: MHz, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", verify: false}
+    max_output_dbm: {value: 5, unit: dBm, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "'Typical Output Power +5 dBm' at 0 dB TX attenuation; single number, no frequency table published (ADRV9002 chip: 7.2-7.8 dBm full-scale CW). Measure per frequency on the bench.", verify: true}
+    tx_atten_max_db: {value: 41.75, unit: dB, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "0 to 41.75 dB in 0.25 dB steps = libsidekiq skiq_write_tx_attenuation 0..167 qdB (the NV100 sheet says 0-48 dB, inconsistent)", verify: false}
+  g40_tx_bench:
+    # The G40 on the Payload 2 bench.  Same port as g40_tx with the output measured.
+    model: "Epiq Matchstiq G40 TX port, bench unit, output measured 2026-11-02"
+    datasheet: docs/datasheets/Epiq_Matchstiq_G20_G40.pdf
+    freq_range_mhz: {value: [30, 6000], unit: MHz, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", verify: false}
+    max_output_dbm: {value: 20, unit: dBm, source: "bench measurement 2026-11-02 (HPA bench power sweep, profile P2b)", note: "Measured, not the datasheet +5 dBm: +13.4 to +14.3 dBm at the jack, 0 dB TX attenuation, 0.5 tone, plus 6 dB to full scale. Read through cables and a coupler on TRx1A, TRx1B and TRx2A at 915 and 2200 MHz; TRx2B itself not read. A direct reading at TRx2B would confirm it.", measured: true, verify: true}
+    tx_atten_max_db: {value: 41.75, unit: dB, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "0 to 41.75 dB in 0.25 dB steps = libsidekiq skiq_write_tx_attenuation 0..167 qdB", verify: false}
+  b200_tx:
+    # TX of an Ettus B200mini driving the HPA instead of the G40 (radios: b200
+    # below).  Only the output at full gain is on file; the rest of the chain is
+    # the same profile.
+    model: "Ettus USRP B200mini (AD9364) TX port"
+    freq_range_mhz: {value: [70, 6000], unit: MHz, source: "https://www.ettus.com/wp-content/uploads/2019/01/USRP_B200mini_Data_Sheet.pdf", verify: false}
+    max_output_dbm: {value: 10, unit: dBm, source: "https://www.ettus.com/wp-content/uploads/2019/01/USRP_B200mini_Data_Sheet.pdf", note: "datasheet 'Power Output >10 dBm' at maximum TX gain, single number, no frequency table; it falls off toward 6 GHz. Datasheet value, MEASURE per frequency on the bench.", verify: true}
+    tx_gain_max_db: {value: 89.75, unit: dB, source: "UHD get_tx_gain_range on the B200mini (0 to 89.75 dB, 0.25 dB steps; sdr_core UhdBackend.TX_GAIN_MAX_DB)", note: "output = max_output_dbm - (89.75 - gain)", verify: false}
+    bench_max_gain_db: {value: 45, unit: dB, source: "DPMG bench rule", note: "B200 TX gain 45 dB or less into the 20 dB pad on the bench loopback; shown as a warning in the planning view, not a hard stop", verify: false}
+  g40_rx:
+    model: "Epiq Matchstiq G40 (Sidekiq NV100) RX port"
+    datasheet: docs/datasheets/Epiq_Matchstiq_G20_G40.pdf
+    freq_range_mhz: {value: [30, 6000], unit: MHz, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", verify: false}
+    max_safe_input_dbm: {value: 20, unit: dBm, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "'Max RF Input Power Level (without damage) +20 dBm', card level, CW/peak not stated. ADI UG-1828 reportedly gives 18 dBm peak for the bare ADRV900x (unconfirmed); the 10 dB protection margin covers it.", verify: true}
+    max_operating_input_dbm: {value: -25, unit: dBm, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "RF full-scale input at MAX RX gain, TRx1x ports (TRx2x: -18 dBm); ~34 dB higher at minimum gain (derived). Used only as a 'strong signal' hint in the link budget.", verify: true}
+    noise_figure_db: {value: 5, unit: dB, source: "https://resources.epiqsolutions.com/hubfs/Matchstiq%20G20%20%26%20G40%20datasheet.pdf", note: "'Noise Figure (Typ.) <5 dB', single number at max gain, no frequency table", verify: true}
+  hpa_1189:
+    model: "Empower RF 1189 (500-2500 MHz, 100 W min / 125 W typ)"
+    datasheet: docs/datasheets/EmpowerRF_1189.pdf
+    freq_range_mhz: {value: [500, 2500], unit: MHz, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", verify: false}
+    gain_db: {points: [[500, 55.0], [600, 56.8], [700, 53.5], [1000, 56.8], [1250, 54.1], [1600, 57.3], [1800, 54.7], [2000, 54.2], [2200, 56.4], [2400, 56.2], [2500, 54.0]], unit: dB, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "small-signal gain read from datasheet Plot 1 (PIN -20 dBm), approx +/-0.3 dB; guaranteed only Gp >= 50 dB at P1dB", verify: true}
+    psat_dbm: {value: 51.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "Psat 125 W typ (100 W min = 50.0 dBm); typ used (worst case for protection)", verify: false}
+    p1db_dbm: {value: 47.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "50 W typ at 1 dB compression", verify: false}
+    max_input_dbm: {value: 10, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "input RF drive without damage", verify: false}
+    drive_for_psat_dbm: {value: 0, unit: dBm, note: "typ (max +3 dBm)", source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", verify: false}
+    off_gain_db: null   # feed-through with the HPA disabled: not published
+    control: "DB9 pin 5 Shutdown: TTL HIGH = DISABLED, internally pulled LOW -> amplifier ON when the pin floats. rf_frontend pa_enable.active_high: false. No fault output (analog current/temperature monitors only)."
+  hpa_1189_bench:
+    # The 1189 on the Payload 2 bench: small-signal gain and Psat measured, the rest
+    # from the datasheet (hpa_1189 keeps the datasheet gain table).
+    model: "Empower RF 1189 bench unit, gain and Psat measured 2026-11-02"
+    datasheet: docs/datasheets/EmpowerRF_1189.pdf
+    freq_range_mhz: {value: [500, 2500], unit: MHz, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", verify: false}
+    gain_db: {points: [[915, 58.9], [2200, 55.3]], unit: dB, source: "bench measurement 2026-11-02 (HPA bench power sweep, profile P2b)", note: "Measured small-signal gain at the two frequencies swept (with the HPA minus without it, cables cancel). Straight line between them and clamped outside, so the datasheet ripple of a few dB is not in it", measured: true, verify: true}
+    psat_dbm: {value: 51.6, unit: dBm, source: "bench measurement 2026-11-02 (HPA bench power sweep, profile P2b)", note: "Measured highest output (cable-corrected, about 1 dB uncertainty), above the 51.0 dBm datasheet typical, so it is the worst case for RX protection", measured: true, verify: true}
+    p1db_dbm: {value: 47.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "50 W typ at 1 dB compression", verify: false}
+    max_input_dbm: {value: 10, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", note: "input RF drive without damage", verify: false}
+    drive_for_psat_dbm: {value: 0, unit: dBm, note: "typ (max +3 dBm)", source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1189.pdf", verify: false}
+    off_gain_db: null   # feed-through with the HPA disabled: not published
+    control: "DB9 pin 5 Shutdown: TTL HIGH = DISABLED, internally pulled LOW -> amplifier ON when the pin floats. rf_frontend pa_enable.active_high: false. No fault output (analog current/temperature monitors only)."
+  hpa_1208:
+    model: "Empower RF 1208 (500-2700 MHz, 90 W min / 100 W typ)"
+    datasheet: docs/datasheets/EmpowerRF_1208.pdf
+    freq_range_mhz: {value: [500, 2700], unit: MHz, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", verify: false}
+    gain_db: {points: [[500, 61.4], [600, 58.6], [700, 59.9], [800, 60.6], [900, 60.7], [1000, 60.6], [1100, 58.7], [1200, 60.7], [1400, 59.9], [1600, 60.5], [1800, 59.9], [2000, 59.6], [2200, 61.5], [2300, 61.8], [2400, 60.1], [2600, 60.1], [2700, 59.5]], unit: dB, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", note: "small-signal gain read from datasheet Plot 1 (PIN -20 dBm), approx +/-0.3 dB; guaranteed Gp 50 min / 56 typ at P1dB", verify: true}
+    psat_dbm: {value: 50.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", note: "Psat 100 W typ (90 W min = 49.5 dBm)", verify: false}
+    p1db_dbm: {value: 47.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", note: "50 W typ at 1 dB compression", verify: false}
+    max_input_dbm: {value: 10, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", note: "input RF drive without damage", verify: false}
+    drive_for_psat_dbm: {value: -5, unit: dBm, note: "typ (max 0 dBm)", source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1208.pdf", verify: false}
+    off_gain_db: null   # feed-through with the HPA disabled: not published
+    control: "DB9 pin 5 Shutdown: TTL HIGH = DISABLED, internally pulled LOW -> ON when floating (same as 1189). No fault output."
+  hpa_1211:
+    model: "Empower RF 1211 (500-2500 MHz, 100 W min / 125 W typ, 48 V)"
+    datasheet: docs/datasheets/EmpowerRF_1211.pdf
+    freq_range_mhz: {value: [500, 2500], unit: MHz, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1211.pdf", verify: false}
+    gain_db: {value: 64, unit: dB, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1211.pdf", note: "small-signal gain typ (57 min) at the nominal setting of its 15 dB internal attenuator (0.5 dB steps); flatness +/-2 dB; no gain-vs-frequency data published", verify: true}
+    psat_dbm: {value: 51.0, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1211.pdf", note: "peak output 125 W typ (100 W min)", verify: false}
+    p1db_dbm: null    # not published -> Rapp smoothness falls back to s=2 (verify)
+    max_input_dbm: {value: 3, unit: dBm, source: "https://www.empowerrf.com/datasheet/Empower_RF_Amplifier_1211.pdf", note: "input RF drive without damage", verify: false}
+    drive_for_psat_dbm: null   # not published (estimate -7 to -14 dBm from gain) -> bench
+    off_gain_db: null   # feed-through with the HPA disabled: not published
+    control: "DB17W2 pin 6 PA Enable: LOW = DISABLED, internally pulled HIGH to 3.3 V -> ON when floating (OPPOSITE of 1189/1208; a BSS138 level shifter that pulls the 5 V side HIGH also leaves it ON). Pin 7 alarm HIGH = fault; pin 15 reset; RS-485."
+  coupler_zgdc30_372hp:
+    model: "Mini-Circuits ZGDC30-372HP+ 30 dB directional coupler (bench characterization only, not in the payload)"
+    datasheet: docs/datasheets/MiniCircuits_ZGDC30-372HP+.pdf
+    freq_range_mhz: {value: [380, 3700], unit: MHz, source: "https://www.minicircuits.com/pdfs/ZGDC30-372HP+.pdf", verify: false}
+    mainline_loss_db: {points: [[380, 0.03], [600, 0.04], [1500, 0.08], [2000, 0.1], [2500, 0.12], [2700, 0.13], [3000, 0.15], [3600, 0.17], [3700, 0.19]], unit: dB, source: "https://www.minicircuits.com/pdfs/ZGDC30-372HP+.pdf", note: "typical performance table IN-OUT (max 0.30 dB 600-2700 MHz)", verify: false}
+    coupling_db: {points: [[380, 33.4], [600, 31.1], [1500, 30.3], [2000, 30.5], [2500, 30.3], [2700, 30.6], [3000, 31.0], [3600, 31.3], [3700, 31.5]], unit: dB, source: "https://www.minicircuits.com/pdfs/ZGDC30-372HP+.pdf", note: "typical table IN-CPL (spec 30.0 +/- 0.7 dB 600-2700 MHz)", verify: false}
+    power_rating_dbm: {points: [[380, 53.98], [2700, 53.98], [2701, 51.76], [3700, 51.76]], unit: dBm, source: "https://www.minicircuits.com/pdfs/ZGDC30-372HP+.pdf", note: "250 W CW 380-2700 MHz, 150 W 2700-3700 MHz at 25 C with output load VSWR <= 2:1; derate to 100 W at 100 C", verify: false}
+  power_meter_pwr_8p_rc:
+    model: "Mini-Circuits PWR-8P-RC power sensor (bench characterization only, not in the payload)"
+    datasheet: docs/datasheets/MiniCircuits_PWR-8P-RC.pdf
+    freq_range_mhz: {value: [10, 8000], unit: MHz, source: "https://www.minicircuits.com/pdfs/PWR-8P-RC.pdf", verify: false}
+    max_input_dbm: {value: 23, unit: dBm, source: "https://www.minicircuits.com/pdfs/PWR-8P-RC.pdf", note: "maximum continuous safe operating input; absolute max (damage) +26 dBm CW; measurement range -60..+20 dBm", verify: false}
+    measure_max_dbm: {value: 20, unit: dBm, source: "https://www.minicircuits.com/pdfs/PWR-8P-RC.pdf", verify: false}
+  switch_pe71s2041:
+    model: "Pasternack PE71S2041 absorptive SPDT PIN-diode switch (not pSemi)"
+    datasheet: docs/datasheets/Pasternack_PE71S2041.pdf
+    freq_range_mhz: {value: [800, 2700], unit: MHz, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", verify: false}
+    insertion_loss_db: {points: [[900, 0.48], [1100, 0.55], [1300, 0.6], [1500, 0.63], [1700, 0.64], [1900, 0.78], [2100, 0.72], [2300, 0.76], [2500, 0.77], [2700, 0.88]], unit: dB, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", note: "typical curve, read approx +/-0.03 dB (spec 0.6 typ / 1.0 max 0.8-2 GHz, 0.8 / 1.2 max 2-2.7 GHz)", verify: true}
+    isolation_db: {points: [[800, 65], [2000, 65], [2001, 60], [2700, 60]], unit: dB, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", note: "guaranteed minimum (65 dB 0.8-2 GHz, 60 dB 2-2.7 GHz), used for RX protection; typical curve below is 62-90 dB", verify: false}
+    isolation_typ_db: {points: [[900, 85.0], [1100, 85.0], [1300, 83.0], [1500, 80.0], [1700, 88.0], [1900, 83.0], [2000, 90.0], [2100, 79.0], [2300, 72.0], [2500, 68.0], [2700, 62.0]], unit: dB, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", note: "typical curve read approx +/-2 dB (information only)", verify: true}
+    power_rating_dbm: {value: 50.0, unit: dBm, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", note: "100 W CW max input, below the 125 W typ Psat of the 1189 / 1211", verify: false}
+    hot_switch_rating_dbm: {value: 44.77, unit: dBm, source: "https://www.pasternack.com/images/ProductPDF/PE71S2041.pdf", note: "30 W CW max while switching, so always switch cold (HPA off first), as rf_frontend does", verify: false}
+    control: "TTL LOW = COM-J1, TTL HIGH = COM-J2 (datasheet drawing); which port is TX depends on the wiring -> rf_frontend tr_switch.tx_level. +15 V supply (drawing also shows a +5 V pin). Unpowered / floating state not documented."
+  antenna_omnilog_pro_nh:
+    model: "Aaronia OmniLOG PRO N-H (100 W, N connector, confirmed on the bench 2026-11-03)"
+    datasheet: docs/datasheets/Aaronia_OmniLOG_PRO_H.pdf
+    freq_range_mhz: {value: [700, 3000], unit: MHz, source: "https://www.meilhaus.de/cosmoshop/default/articleMedia/omnilog-pro/de/Datasheet_Aaronia_OmniLOG-PRO-H_en.pdf", note: "7030H variant; 7060H/70100H reach 6/10 GHz. Aaronia datasheet hosted by distributor Meilhaus", verify: true}
+    gain_dbi: {points: [[700, 1.3], [800, 2.7], [900, 3.2], [1000, 1.8], [1100, 1.2], [1200, 0.3], [1300, -0.5], [1400, -1.3], [1500, -1.1], [1600, -1.4], [1700, -2.0], [1800, -2.2], [1900, -1.6], [2000, -0.9], [2100, -0.7], [2200, -0.2], [2300, 0.0], [2400, 0.5], [2500, 1.4], [2600, 1.5], [2700, 1.6], [2800, 1.7], [2900, 0.5], [3000, -0.1]], unit: dBi, source: "https://www.meilhaus.de/cosmoshop/default/articleMedia/omnilog-pro/de/Datasheet_Aaronia_OmniLOG-PRO-H_en.pdf", note: "gain diagram (dashed N trace) read approx +/-0.5 dB; table says 5 dBi max but the curve peaks ~3.2 dBi below 3 GHz", verify: true}
+    max_input_dbm: {value: 50.0, unit: dBm, source: "https://www.meilhaus.de/cosmoshop/default/articleMedia/omnilog-pro/de/Datasheet_Aaronia_OmniLOG-PRO-H_en.pdf", note: "N-H series 100 W; the plain OmniLOG PRO N is rated 1 W and would be destroyed", verify: true}
+    vswr: {value: 2.5, unit: ":1", source: "https://www.meilhaus.de/cosmoshop/default/articleMedia/omnilog-pro/de/Datasheet_Aaronia_OmniLOG-PRO-H_en.pdf", note: "typ < 2.5:1 (mismatch loss up to ~0.9 dB, not included)", verify: false}
+  lna_zkl_33uln:
+    model: "Mini-Circuits ZKL-33ULN-S+ (5 V)"
+    datasheet: docs/datasheets/MiniCircuits_ZKL-33ULN-S+.pdf
+    freq_range_mhz: {value: [400, 3000], unit: MHz, source: "https://www.minicircuits.com/pdfs/ZKL-33ULN-S+.pdf", verify: false}
+    gain_db: {points: [[400, 47.38], [500, 44.35], [600, 41.65], [700, 39.26], [800, 37.13], [900, 35.24], [1000, 33.51], [1100, 31.94], [1200, 30.52], [1300, 29.21], [1400, 27.98], [1500, 26.81], [1600, 25.67], [1700, 24.56], [1800, 23.58], [1900, 22.78], [2000, 22.09], [2100, 21.32], [2200, 20.54], [2300, 19.79], [2400, 19.04], [2500, 18.31], [2600, 17.6], [2700, 16.9], [2800, 16.24], [2900, 15.62], [3000, 15.05]], unit: dB, source: "https://www.minicircuits.com/pages/s-params/ZKL-33ULN-S+_VIEW.pdf", note: "typical table (100 MHz subset); guaranteed 33-37 dB only at 900 MHz", verify: false}
+    nf_db: {points: [[400, 0.29], [500, 0.32], [600, 0.26], [700, 0.32], [800, 0.34], [900, 0.36], [1000, 0.31], [1100, 0.46], [1200, 0.43], [1300, 0.48], [1400, 0.48], [1500, 0.5], [1600, 0.52], [1700, 0.63], [1800, 0.61], [1900, 0.72], [2000, 0.68], [2100, 0.69], [2200, 0.7], [2300, 0.73], [2400, 0.8], [2500, 0.89], [2600, 1.03], [2700, 1.14], [2800, 1.25], [2900, 1.34], [3000, 1.44]], unit: dB, source: "https://www.minicircuits.com/pages/s-params/ZKL-33ULN-S+_VIEW.pdf", note: "typical table (100 MHz subset); max 0.70 dB at 900 MHz", verify: false}
+    p1db_out_dbm: {points: [[400, 18.45], [500, 18.56], [600, 18.65], [700, 18.42], [800, 18.42], [900, 18.3], [1000, 18.32], [1100, 17.89], [1200, 17.84], [1300, 18.1], [1400, 17.88], [1500, 17.93], [1600, 18.4], [1700, 17.64], [1800, 18.17], [1900, 17.91], [2000, 17.97], [2100, 18.18], [2200, 17.8], [2300, 17.6], [2400, 16.97], [2500, 16.23], [2600, 15.49], [2700, 14.72], [2800, 14.13], [2900, 13.6], [3000, 13.43]], unit: dBm, source: "https://www.minicircuits.com/pages/s-params/ZKL-33ULN-S+_VIEW.pdf", verify: false}
+    max_input_dbm: {points: [[400, -10], [1440, 0], [1500, 0], [3000, 10]], unit: dBm, source: "https://www.minicircuits.com/pdfs/ZKL-33ULN-S+.pdf", note: "input RF power (no damage): -10..0 dBm 400-1500 MHz, 0..+10 dBm 1500-3000 MHz; intermediate points from the curve (approx). Very low at UHF.", verify: true}
+  lna_zrl_3500:
+    model: "Mini-Circuits ZRL-3500+ (12 V)"
+    datasheet: docs/datasheets/MiniCircuits_ZRL-3500+.pdf
+    freq_range_mhz: {value: [700, 3500], unit: MHz, source: "https://www.minicircuits.com/pdfs/ZRL-3500+.pdf", verify: false}
+    gain_db: {points: [[700, 31.14], [800, 31.09], [900, 30.88], [1000, 30.44], [1100, 29.84], [1200, 29.18], [1300, 28.54], [1400, 27.87], [1500, 27.24], [1600, 26.79], [1700, 26.32], [1800, 25.84], [1900, 25.66], [2000, 25.27], [2100, 24.95], [2200, 24.5], [2300, 24.15], [2400, 23.58], [2500, 23.05], [2600, 22.53], [2700, 21.72], [2800, 21.17], [2900, 20.94], [3000, 20.79], [3100, 20.46], [3200, 20.1], [3300, 19.54], [3400, 18.83], [3500, 17.82]], unit: dB, source: "https://www.minicircuits.com/pages/s-params/ZRL-3500+_VIEW.pdf", note: "typical table; guaranteed min 21 / 18 / 12 dB in 700-1600 / 1600-2600 / 2600-3500 MHz", verify: false}
+    nf_db: {points: [[700, 2.63], [800, 2.21], [900, 1.97], [1000, 1.88], [1100, 1.83], [1200, 1.81], [1300, 1.86], [1400, 1.89], [1500, 1.91], [1600, 1.98], [1700, 2.0], [1800, 2.08], [1900, 2.1], [2000, 2.17], [2100, 2.15], [2200, 2.15], [2300, 2.21], [2400, 2.29], [2500, 2.4], [2600, 2.43], [2700, 2.64], [2800, 2.75], [2900, 2.84], [3000, 2.93], [3100, 3.04], [3200, 3.17], [3300, 3.32], [3400, 3.41], [3500, 3.43]], unit: dB, source: "https://www.minicircuits.com/pages/s-params/ZRL-3500+_VIEW.pdf", note: "typical table; max 3.5 / 3.2 / 4.2 dB per band", verify: false}
+    p1db_out_dbm: {value: 24, unit: dBm, source: "https://www.minicircuits.com/pdfs/ZRL-3500+.pdf", note: "typ (min 21)", verify: false}
+    max_input_dbm: {value: 10, unit: dBm, source: "https://www.minicircuits.com/pdfs/ZRL-3500+.pdf", note: "input RF power (no damage), no frequency dependence stated", verify: false}
+  splitter_zb3pd_63:
+    model: "Mini-Circuits ZB3PD-63-S+ 3-way 0 deg splitter/combiner; P2 uses it as a splitter (LNA output to three G40 RX ports), P2b as a combiner (three G40 TX ports into the HPA)"
+    datasheet: docs/datasheets/MiniCircuits_ZB3PD-63+.pdf
+    freq_range_mhz: {value: [150, 6000], unit: MHz, source: "https://www.minicircuits.com/pdfs/ZB3PD-63+.pdf", verify: false}
+    insertion_loss_db: {points: [[150, 5.77], [210, 5.50], [500, 4.90], [1000, 5.01], [1500, 5.08], [2000, 5.15], [2500, 5.26], [3000, 5.32], [3500, 5.41], [4000, 5.40], [4500, 5.48], [5000, 5.59], [5500, 5.76], [5800, 5.98], [6000, 5.81]], unit: dB, source: "https://www.minicircuits.com/pdfs/ZB3PD-63+.pdf", note: "total loss common port to one port, 4.77 dB split loss included; typical table, the lowest of the three ports per frequency (worst case for G40 RX protection); the other ports are up to 0.7 dB higher. Spec: 0.5 dB typ / 2.1 dB max above 4.8 dB, 600-5000 MHz", verify: false}
+    max_input_dbm: {value: 44.8, unit: dBm, source: "https://www.minicircuits.com/pdfs/ZB3PD-63+.pdf", note: "as a splitter 30 W 150-4000 MHz (20 W to 6 GHz), all outputs terminated in 50 ohm; as a combiner only 0.9 W. The LNA output limiter holds its input near +12 dBm", verify: false}
+    isolation_db: {value: 16, unit: dB, source: "https://www.minicircuits.com/pdfs/ZB3PD-63+.pdf", note: "port to port, 16 min / 20 typ 600-5000 MHz (information only)", verify: false}
+  switch_pasr0200500600a:
+    model: "dBWave PASR0200500600A reflective SP2T PIN switch, 0.01-6 GHz, TTL driver"
+    datasheet: docs/datasheets/dBWave_PASR0200500600A.pdf
+    freq_range_mhz: {value: [10, 6000], unit: MHz, source: "https://www.dbwave.com/pdf/switchers/PASR0200500600A.pdf", verify: false}
+    insertion_loss_db: {points: [[10, 1.1], [3000, 1.1], [3001, 1.3], [6000, 1.3]], unit: dB, source: "https://www.dbwave.com/pdf/switchers/PASR0200500600A.pdf", note: "typical 1.1 dB 0.01-3 GHz, 1.3 dB 3-6 GHz (max 1.3 / 1.5)", verify: false}
+    isolation_db: {points: [[10, 40], [3000, 40], [3001, 35], [6000, 35]], unit: dB, source: "https://www.dbwave.com/pdf/switchers/PASR0200500600A.pdf", note: "guaranteed minimum (40 dB 0.01-3 GHz, 35 dB 3-6 GHz), used for RX protection; typical 45 / 38 dB. Far below the 60-65 dB of the PE71S2041 it replaces", verify: false}
+    isolation_typ_db: {points: [[10, 45], [3000, 45], [3001, 38], [6000, 38]], unit: dB, source: "https://www.dbwave.com/pdf/switchers/PASR0200500600A.pdf", note: "typical (information only)", verify: false}
+    power_rating_dbm: {value: 47.0, unit: dBm, source: "https://www.dbwave.com/pdf/switchers/PASR0200500600A.pdf", note: "RF input 47 dBm CW (50 W) at 25 C, 50 dBm pulsed (10 % duty, 20 us). Below the 1189's 51 dBm typ Psat: the G40 TX attenuation must keep the HPA output at or under 47 dBm", verify: false}
+    hot_switch_rating_dbm: null   # cold switching only: the datasheet says RF must be blanked before any TTL change
+    control: "TTL 1 = J0-J1, TTL 0 = J0-J2; +5 V bias (+/-10 %); TTL 0-0.8 V / 2.8-5 V, never negative. Cold switching only. DC blocks required: no port may see DC or DC ground. Heat sink and air flow required. Which J port is TX depends on the wiring -> rf_frontend tr_switch.tx_level"
+  switch_pasr0200500600b:
+    # The switch fitted on the Payload 2 bench (a different part from the A above).
+    model: "dBWave PASR0200500600B reflective SP2T PIN switch, 0.5-6 GHz, TTL driver, heat sink included"
+    datasheet: docs/datasheets/PASR0200500600B.pdf
+    freq_range_mhz: {value: [500, 6000], unit: MHz, source: "docs/datasheets/PASR0200500600B.pdf", verify: false}
+    insertion_loss_db: {points: [[500, 1.0], [3000, 1.0], [3001, 1.3], [6000, 1.3]], unit: dB, source: "docs/datasheets/PASR0200500600B.pdf", note: "typical 1.0 dB 0.5-3 GHz, 1.3 dB 3-6 GHz (max 1.3 / 1.5)", verify: false}
+    isolation_db: {points: [[500, 40], [3000, 40], [3001, 35], [6000, 35]], unit: dB, source: "docs/datasheets/PASR0200500600B.pdf", note: "guaranteed minimum (40 dB 0.5-3 GHz, 35 dB 3-6 GHz), used for RX protection; typical 45 / 38 dB", verify: false}
+    isolation_typ_db: {points: [[500, 45], [3000, 45], [3001, 38], [6000, 38]], unit: dB, source: "docs/datasheets/PASR0200500600B.pdf", note: "typical (information only)", verify: false}
+    power_rating_dbm: null   # no CW rating on the datasheet: ask dBWave, do not assume the A's 47 dBm
+    pulsed_rating_dbm: {value: 50, unit: dBm, source: "docs/datasheets/PASR0200500600B.pdf", note: "RF input 50 dBm pulsed only (10 % duty, 20 us pulse); the datasheet has no CW row. Also lists 50 dBm 0.1 dB compression. Keep the case under 60 C at high power", verify: false}
+    hot_switch_rating_dbm: null   # cold switching only: the datasheet says RF must be blanked before any TTL change
+    control: "TTL 1 = J0-J1, TTL 0 = J0-J2; +5 V bias (+/-10 %); TTL 0-0.8 V / 2.8-5 V, never negative. Cold switching only. DC blocks required: no port may see DC or DC ground. Heat sink mandatory, air flow required. Which J port is TX depends on the wiring -> rf_frontend tr_switch.tx_level (Payload 2: HPA on J2, so tx_level 0)"
+  lna_palna200101000a:
+    model: "dBWave PALNA200101000A LNA with integrated output limiter, 0.1-10 GHz (+12 V)"
+    datasheet: docs/datasheets/dBWave_PALNA200101000A.pdf
+    freq_range_mhz: {value: [100, 10000], unit: MHz, source: "https://www.dbwave.com/pdf/lownoiseamplifier/PALNA200101000A.pdf", verify: false}
+    gain_db: {points: [[100, 33], [3000, 33], [3001, 31.5], [8000, 31.5], [8001, 29], [10000, 29]], unit: dB, source: "https://www.dbwave.com/pdf/lownoiseamplifier/PALNA200101000A.pdf", note: "typical per band (min 32 / 30 / 23 dB), flatness +/-1.0 to 1.5 dB", verify: false}
+    nf_db: {points: [[100, 1.5], [3000, 1.5], [3001, 1.8], [8000, 1.8], [8001, 2.5], [10000, 2.5]], unit: dB, source: "https://www.dbwave.com/pdf/lownoiseamplifier/PALNA200101000A.pdf", note: "typical per band (max 2.5 dB 3-8 GHz, 3.0 dB 8-10 GHz; none given 0.1-3 GHz)", verify: false}
+    p1db_out_dbm: {points: [[100, 8.5], [3000, 8.5], [3001, 9.0], [8000, 9.0], [8001, 8.5], [10000, 8.5]], unit: dBm, source: "https://www.dbwave.com/pdf/lownoiseamplifier/PALNA200101000A.pdf", note: "typical; Psat 12 / 12 / 11 dBm; integrated output limiter", verify: false}
+    max_input_dbm: {value: -5, unit: dBm, source: "https://www.dbwave.com/pdf/lownoiseamplifier/PALNA200101000A.pdf", note: "absolute maximum RF input -5 dBm. In the TX state the switch isolation protects it, plus the RX attenuator setting when that is in front of the LNA (rx_order: atten_first)", verify: false}
+  rcdat_6g_120h:
+    model: "Mini-Circuits RCDAT-6G-120H programmable attenuator"
+    datasheet: docs/datasheets/MiniCircuits_RCDAT-6G-120H.pdf
+    freq_range_mhz: {value: [200, 6000], unit: MHz, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", verify: false}
+    max_input_dbm: {value: 23, unit: dBm, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", note: "input operating power +23 dBm at any setting, 200-6000 MHz (total of RF In and RF Out); absolute maximum +26 dBm", verify: false}
+    max_db: {value: 120, unit: dB, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", note: "relative to the insertion loss", verify: false}
+    step_db: {value: 0.05, unit: dB, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", note: "0.05 dB to 105 dB, 0.10 dB from 105 to 120 dB", verify: false}
+    insertion_loss_db: {points: [[200, 4.18], [250, 4.22], [300, 4.28], [400, 4.42], [500, 4.59], [700, 4.92], [900, 5.2], [1000, 5.3], [1200, 5.45], [1400, 5.55], [1600, 5.69], [1800, 5.93], [2000, 6.21], [2200, 6.36], [2400, 6.45], [2600, 6.58], [2800, 6.74], [3000, 6.96], [3200, 7.22], [3400, 7.43], [3600, 7.62], [3800, 7.83], [4000, 7.99], [4200, 8.11], [4400, 8.26], [4600, 8.43], [4800, 8.64], [5000, 8.92], [5200, 9.18], [5400, 9.35], [5600, 9.56], [5800, 9.85], [5900, 10.02], [6000, 10.2]], unit: dB, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", note: "typical at the 0 dB setting, 25 C (max 7.0 / 9.0 / 11.3 dB per band)", verify: false}
+    max_input_dbm: {value: 23, unit: dBm, source: "https://www.minicircuits.com/pdfs/RCDAT-6G-120H.pdf", note: "operating, total into both ports; damage +26 dBm", verify: false}
+    accuracy: "typ +/-0.30 dB to 30 dB ... +/-2.10 dB at 120 dB; settings above ~100 dB read up to ~4 dB low"
+    startup: "powers up at max attenuation, then after ~0.5 s the user power-up state (max or a preset); holds the last value on a USB loss"
+
+bench_fixture:
+  # Characterization equipment used on the bench only: antenna removed, this
+  # coupler and power meter inline for a per-frequency output-power reading,
+  # then taken back out for a loopback.  No payload profile references these;
+  # the measurement panel uses them to work out the expected meter reading.
+  note: "Bench characterization fixture, removed before flight. Not part of any payload chain."
+  coupler: coupler_zgdc30_372hp
+  power_meter: power_meter_pwr_8p_rc
+
+profiles:
+  P1:
+    label: "Payload 1 (1208 HPA, ZGDC30-372HP+ coupler, ZKL-33ULN-S+ LNA)"
+    source: "Payload wiring 1189 v2 02Nov26.pdf, top drawing (Payload 1, 18Jun26)"
+    g40_tx: g40_tx
+    g40_rx: g40_rx
+    hpa: hpa_1208
+    switch: switch_pe71s2041
+    antenna: antenna_omnilog_pro_nh
+    lna: lna_zkl_33uln
+    rx_atten: rcdat_6g_120h
+    # band = overlap of the components' freq_range_mhz unless band_mhz is set here
+    cables_db:
+      g40_to_hpa: {value: 0.2, unit: dB, source: "estimate", note: "assumed one 12-in Mini-Circuits Hand-Flex .141 assembly (141-12SM+, 0.19 dB at 2 GHz typ); to be measured", verify: true}
+      hpa_to_switch: {value: 0.3, unit: dB, source: "estimate", note: "HPA output through the ZGDC30-372HP+ coupler mainline (0.08-0.12 dB typ 1.5-2.5 GHz, datasheet) to the T/R switch; assumed one 12-in Hand-Flex .141 assembly plus 0.1 dB for the coupler; to be measured. The coupled port feeds the PWR-8P-RC power meter in this build", verify: true}
+      switch_to_antenna: {value: 0.5, unit: dB, source: "estimate", note: "assumed a longer run to the antenna (~0.5 dB); to be measured", verify: true}
+      switch_to_lna: {value: 0.2, unit: dB, source: "estimate", note: "T/R switch RX port to the LNA; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      lna_to_atten: {value: 0.2, unit: dB, source: "estimate", note: "LNA to the RX attenuator; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      atten_to_g40: {value: 0.2, unit: dB, source: "estimate", note: "RX attenuator to the G40 RX port; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+    fixed_pad_db: {value: 0, unit: dB, source: "Payload wiring 1189 v2 02Nov26.pdf", note: "no pad between the G40 TX and the HPA input in the top drawing", verify: true}
+  P2:
+    label: "Payload 2 (1189 HPA, 20 dB TX pad, PASR0200500600B switch, RX attenuator before the LNA, ZB3PD RX splitter)"
+    source: "as built on the bench 2026-11-03: TX on TRx2B through a 20 dB pad, attenuator directly after the switch, three RX jacks off the ZB3PD"
+    g40_ports: {tx: [TRx2B], rx: [TRx1A, TRx1B, TRx2A]}
+    switch_ports: {antenna: J0, rx: J1, tx: J2}
+    g40_tx: g40_tx_bench
+    g40_rx: g40_rx
+    rx_splitter: splitter_zb3pd_63
+    hpa: hpa_1189_bench
+    switch: switch_pasr0200500600b
+    antenna: antenna_omnilog_pro_nh
+    lna: lna_palna200101000a
+    rx_atten: rcdat_6g_120h
+    # RX attenuator in front of the LNA, so its setting protects the LNA in TX.  The
+    # cables_db keys keep their names: switch_to_lna is the switch J1 to attenuator run,
+    # lna_to_atten the attenuator to LNA run, atten_to_g40 the LNA to G40 run.
+    rx_order: atten_first
+    # band = overlap of the components' freq_range_mhz unless band_mhz is set here
+    cables_db:
+      g40_to_hpa: {value: 0.2, unit: dB, source: "estimate", note: "G40 TRx2B to the pad and on to the HPA input; assumed one 12-in Mini-Circuits Hand-Flex .141 assembly (141-12SM+, 0.19 dB at 2 GHz typ); to be measured", verify: true}
+      hpa_to_switch: {value: 0.2, unit: dB, source: "estimate", note: "HPA output to the T/R switch J2; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      switch_to_antenna: {value: 0.5, unit: dB, source: "estimate", note: "switch J0 to the antenna; assumed a longer run (~0.5 dB); to be measured", verify: true}
+      switch_to_lna: {value: 0.2, unit: dB, source: "estimate", note: "T/R switch J1 to the RX attenuator; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      lna_to_atten: {value: 0.2, unit: dB, source: "estimate", note: "RX attenuator to the LNA; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      atten_to_g40: {value: 0.2, unit: dB, source: "estimate", note: "LNA to the RX splitter and on to one G40 RX jack; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+    fixed_pad_db: {value: 20, unit: dB, source: "as built on the bench 2026-11-03", note: "20 dB pad between G40 TRx2B and the HPA input; nominal value, loss not measured, power rating not on file (it sees the G40 output, about +20 dBm at most)", verify: true}
+  P2a:
+    label: "Payload 2a (02Nov26 parts: PASR0200500600A switch, no TX pad, RX attenuator before the LNA)"
+    source: "Payload wiring 1189 v2 02Nov26.pdf (the 02Nov26 drawing), with one G40 TX port and the ZB3PD on the RX side (2026-11-02)"
+    g40_tx: g40_tx
+    g40_rx: g40_rx
+    rx_splitter: splitter_zb3pd_63
+    hpa: hpa_1189
+    switch: switch_pasr0200500600a
+    antenna: antenna_omnilog_pro_nh
+    lna: lna_palna200101000a
+    rx_atten: rcdat_6g_120h
+    # RX attenuator in front of the LNA, so its setting protects the LNA in TX.  The
+    # cables_db keys keep their names: switch_to_lna is the switch to attenuator run,
+    # lna_to_atten the attenuator to LNA run, atten_to_g40 the LNA to G40 run.
+    rx_order: atten_first
+    # band = overlap of the components' freq_range_mhz unless band_mhz is set here
+    cables_db:
+      g40_to_hpa: {value: 0.2, unit: dB, source: "estimate", note: "one G40 TX port straight to the HPA input; assumed one 12-in Mini-Circuits Hand-Flex .141 assembly (141-12SM+, 0.19 dB at 2 GHz typ); to be measured", verify: true}
+      hpa_to_switch: {value: 0.2, unit: dB, source: "estimate", note: "HPA output to the T/R switch; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      switch_to_antenna: {value: 0.5, unit: dB, source: "estimate", note: "assumed a longer run to the antenna (~0.5 dB); to be measured", verify: true}
+      switch_to_lna: {value: 0.2, unit: dB, source: "estimate", note: "T/R switch RX port to the RX attenuator; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      lna_to_atten: {value: 0.2, unit: dB, source: "estimate", note: "RX attenuator to the LNA; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      atten_to_g40: {value: 0.2, unit: dB, source: "estimate", note: "LNA (and the RX splitter) to the G40 RX port; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+    fixed_pad_db: {value: 0, unit: dB, source: "Payload wiring 1189 v2 02Nov26.pdf", note: "no pad between the G40 TX and the HPA input", verify: true}
+  P2b:
+    label: "Payload 2b (1189 HPA, ZB3PD TX combiner on three G40 TX ports, one RX port TRx2B)"
+    source: "bench setup 2026-11-02: 02Nov26 parts with the ZB3PD on the TX side; TRx1A, TRx2A, TRx1B transmit, TRx2B receives"
+    g40_ports: {tx: [TRx1A, TRx2A, TRx1B], rx: [TRx2B]}
+    g40_tx: g40_tx
+    g40_rx: g40_rx
+    tx_combiner: splitter_zb3pd_63
+    hpa: hpa_1189
+    switch: switch_pasr0200500600a
+    antenna: antenna_omnilog_pro_nh
+    lna: lna_palna200101000a
+    rx_atten: rcdat_6g_120h
+    # band = overlap of the components' freq_range_mhz unless band_mhz is set here
+    cables_db:
+      g40_to_hpa: {value: 0.4, unit: dB, source: "estimate", note: "one G40 TX port to the combiner input plus the combiner output to the HPA input; assumed two 12-in Mini-Circuits Hand-Flex .141 assemblies (141-12SM+, 0.19 dB at 2 GHz typ each); the combiner loss itself is tx_combiner; to be measured", verify: true}
+      hpa_to_switch: {value: 0.2, unit: dB, source: "estimate", note: "HPA output to the T/R switch; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      switch_to_antenna: {value: 0.5, unit: dB, source: "estimate", note: "assumed a longer run to the antenna (~0.5 dB); to be measured", verify: true}
+      switch_to_lna: {value: 0.2, unit: dB, source: "estimate", note: "T/R switch RX port to the LNA; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      lna_to_atten: {value: 0.2, unit: dB, source: "estimate", note: "LNA to the RX attenuator; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      atten_to_g40: {value: 0.2, unit: dB, source: "estimate", note: "RX attenuator straight to the G40 TRx2B RX port; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+    fixed_pad_db: {value: 0, unit: dB, source: "bench setup 2026-11-02", note: "no pad between the combiner and the HPA input", verify: true}
+  P3:
+    label: "Payload 3 (1211 HPA, ZRL-3500+ LNA)"
+    g40_tx: g40_tx
+    g40_rx: g40_rx
+    hpa: hpa_1211
+    switch: switch_pe71s2041
+    antenna: antenna_omnilog_pro_nh
+    lna: lna_zrl_3500
+    rx_atten: rcdat_6g_120h
+    # band = overlap of the components' freq_range_mhz unless band_mhz is set here
+    cables_db:
+      g40_to_hpa: {value: 0.2, unit: dB, source: "estimate", note: "assumed one 12-in Mini-Circuits Hand-Flex .141 assembly (141-12SM+, 0.19 dB at 2 GHz typ); to be measured", verify: true}
+      hpa_to_switch: {value: 0.2, unit: dB, source: "estimate", note: "HPA output to the T/R switch; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      switch_to_antenna: {value: 0.5, unit: dB, source: "estimate", note: "assumed a longer run to the antenna (~0.5 dB); to be measured", verify: true}
+      switch_to_lna: {value: 0.2, unit: dB, source: "estimate", note: "T/R switch RX port to the LNA; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      lna_to_atten: {value: 0.2, unit: dB, source: "estimate", note: "LNA to the RX attenuator; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+      atten_to_g40: {value: 0.2, unit: dB, source: "estimate", note: "RX attenuator to the G40 RX port; assumed one 12-in Hand-Flex .141 assembly; to be measured", verify: true}
+    fixed_pad_db: {value: 0, unit: dB, source: "earlier payload block diagram", note: "no pad between the G40 TX and the HPA input in the drawing", verify: true}
+
+required_esn0:
+  note: "Es = energy per channel symbol. Coherent rows: AWGN Monte-Carlo with DPMG's own constellations (dpmg.modulation.higher_order) and soft Viterbi (dpmg.fec.conv), ideal receiver, BER 1e-5 (simulated 2026-10-18); add implementation loss. FSK rows: DPMG decode edge measured offline 2026-10-18 (frame decodes in >= 4/8 windows, noncoherent soft FSK, fec-decode-edge-study): a decode-success edge, not BER 1e-5; on hardware the coded rates decoded 2-4+ dB deeper than uncoded with the 1 dB decode gate (FEC-03)."
+  rows:
+    - {mod: "BPSK", fec: "none", bits_per_symbol: 1, code_rate: 1.0, esn0_db: 9.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "BPSK", fec: "1/2", bits_per_symbol: 1, code_rate: 0.5, esn0_db: 1.08, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "BPSK", fec: "2/3", bits_per_symbol: 1, code_rate: 0.6667, esn0_db: 2.8, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "BPSK", fec: "3/4", bits_per_symbol: 1, code_rate: 0.75, esn0_db: 3.94, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "BPSK", fec: "5/6", bits_per_symbol: 1, code_rate: 0.8333, esn0_db: 4.98, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "BPSK", fec: "7/8", bits_per_symbol: 1, code_rate: 0.875, esn0_db: 6.08, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "QPSK", fec: "none", bits_per_symbol: 2, code_rate: 1.0, esn0_db: 12.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "QPSK", fec: "1/2", bits_per_symbol: 2, code_rate: 0.5, esn0_db: 4.16, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "QPSK", fec: "2/3", bits_per_symbol: 2, code_rate: 0.6667, esn0_db: 5.9, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "QPSK", fec: "3/4", bits_per_symbol: 2, code_rate: 0.75, esn0_db: 6.95, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "QPSK", fec: "5/6", bits_per_symbol: 2, code_rate: 0.8333, esn0_db: 8.06, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "QPSK", fec: "7/8", bits_per_symbol: 2, code_rate: 0.875, esn0_db: 8.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8PSK", fec: "none", bits_per_symbol: 3, code_rate: 1.0, esn0_db: 17.69, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "8PSK", fec: "1/2", bits_per_symbol: 3, code_rate: 0.5, esn0_db: 7.48, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8PSK", fec: "2/3", bits_per_symbol: 3, code_rate: 0.6667, esn0_db: 9.39, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8PSK", fec: "3/4", bits_per_symbol: 3, code_rate: 0.75, esn0_db: 11.22, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8PSK", fec: "5/6", bits_per_symbol: 3, code_rate: 0.8333, esn0_db: 12.73, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8PSK", fec: "7/8", bits_per_symbol: 3, code_rate: 0.875, esn0_db: 13.04, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "8QAM", fec: "none", bits_per_symbol: 3, code_rate: 1.0, esn0_db: 16.46, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "8QAM", fec: "1/2", bits_per_symbol: 3, code_rate: 0.5, esn0_db: 9.0, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "8QAM", fec: "2/3", bits_per_symbol: 3, code_rate: 0.6667, esn0_db: 10.61, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "8QAM", fec: "3/4", bits_per_symbol: 3, code_rate: 0.75, esn0_db: 11.79, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "8QAM", fec: "5/6", bits_per_symbol: 3, code_rate: 0.8333, esn0_db: 12.9, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "8QAM", fec: "7/8", bits_per_symbol: 3, code_rate: 0.875, esn0_db: 13.55, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "16QAM", fec: "none", bits_per_symbol: 4, code_rate: 1.0, esn0_db: 19.41, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "16QAM", fec: "1/2", bits_per_symbol: 4, code_rate: 0.5, esn0_db: 9.47, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "16QAM", fec: "2/3", bits_per_symbol: 4, code_rate: 0.6667, esn0_db: 11.74, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "16QAM", fec: "3/4", bits_per_symbol: 4, code_rate: 0.75, esn0_db: 12.88, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "16QAM", fec: "5/6", bits_per_symbol: 4, code_rate: 0.8333, esn0_db: 14.41, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "16QAM", fec: "7/8", bits_per_symbol: 4, code_rate: 0.875, esn0_db: 15.29, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB)", verify: false}
+    - {mod: "16APSK", fec: "none", bits_per_symbol: 4, code_rate: 1.0, esn0_db: 20.06, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "16APSK", fec: "1/2", bits_per_symbol: 4, code_rate: 0.5, esn0_db: 12.82, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "16APSK", fec: "2/3", bits_per_symbol: 4, code_rate: 0.6667, esn0_db: 14.42, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "16APSK", fec: "3/4", bits_per_symbol: 4, code_rate: 0.75, esn0_db: 15.5, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "16APSK", fec: "5/6", bits_per_symbol: 4, code_rate: 0.8333, esn0_db: 15.93, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "16APSK", fec: "7/8", bits_per_symbol: 4, code_rate: 0.875, esn0_db: 16.85, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "32APSK", fec: "none", bits_per_symbol: 5, code_rate: 1.0, esn0_db: 23.93, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", verify: false}
+    - {mod: "32APSK", fec: "1/2", bits_per_symbol: 5, code_rate: 0.5, esn0_db: 15.83, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "32APSK", fec: "2/3", bits_per_symbol: 5, code_rate: 0.6667, esn0_db: 17.19, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "32APSK", fec: "3/4", bits_per_symbol: 5, code_rate: 0.75, esn0_db: 18.31, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "32APSK", fec: "5/6", bits_per_symbol: 5, code_rate: 0.8333, esn0_db: 19.51, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "32APSK", fec: "7/8", bits_per_symbol: 5, code_rate: 0.875, esn0_db: 19.66, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coded: +/-0.5 dB Monte-Carlo spread (bursty Viterbi errors; BPSK vs QPSK, which must match, differ by up to 0.5 dB); DPMG's bit labels are not Gray across ring neighbours, so coded (bit-interleaved) performance is worse than the uncoded ranking suggests", verify: false}
+    - {mod: "2FSK (noncoherent theory)", fec: "none", bits_per_symbol: 1, code_rate: 1.0, esn0_db: 13.35, basis: "theory BER 1e-5, noncoherent orthogonal", source: "noncoherent orthogonal FSK closed-form BER", verify: false}
+    - {mod: "4FSK (noncoherent theory)", fec: "none", bits_per_symbol: 2, code_rate: 1.0, esn0_db: 13.62, basis: "theory BER 1e-5, noncoherent orthogonal", source: "noncoherent orthogonal FSK closed-form BER", verify: false}
+    - {mod: "FSK (DPMG measured edge)", fec: "none", bits_per_symbol: 1, code_rate: 1, esn0_db: 8.5, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "FSK (DPMG measured edge)", fec: "1/2", bits_per_symbol: 1, code_rate: 0.5, esn0_db: 4.0, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "FSK (DPMG measured edge)", fec: "2/3", bits_per_symbol: 1, code_rate: 0.6667, esn0_db: 5.5, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "FSK (DPMG measured edge)", fec: "3/4", bits_per_symbol: 1, code_rate: 0.75, esn0_db: 5.0, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "FSK (DPMG measured edge)", fec: "5/6", bits_per_symbol: 1, code_rate: 0.8333, esn0_db: 6.5, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "FSK (DPMG measured edge)", fec: "7/8", bits_per_symbol: 1, code_rate: 0.875, esn0_db: 6.5, basis: "DPMG decode edge, offline replay", source: "tests/test_fsk_fec_snr_replay.py (FSK 4800, 5 kHz)", note: "decode success in >= 4/8 windows, not BER 1e-5", verify: true}
+    - {mod: "DSSS-BPSK", fec: "none", bits_per_symbol: 1, code_rate: 1.0, esn0_db: 9.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-BPSK", fec: "1/2", bits_per_symbol: 1, code_rate: 0.5, esn0_db: 1.08, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-BPSK", fec: "2/3", bits_per_symbol: 1, code_rate: 0.6667, esn0_db: 2.8, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-BPSK", fec: "3/4", bits_per_symbol: 1, code_rate: 0.75, esn0_db: 3.94, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-BPSK", fec: "5/6", bits_per_symbol: 1, code_rate: 0.8333, esn0_db: 4.98, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-BPSK", fec: "7/8", bits_per_symbol: 1, code_rate: 0.875, esn0_db: 6.08, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "same Es/N0 per data symbol as BPSK; spreading gain shows as wider bandwidth, not lower Es/N0", verify: true}
+    - {mod: "DSSS-QPSK", fec: "none", bits_per_symbol: 2, code_rate: 1.0, esn0_db: 12.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "DSSS-QPSK", fec: "1/2", bits_per_symbol: 2, code_rate: 0.5, esn0_db: 4.16, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "DSSS-QPSK", fec: "2/3", bits_per_symbol: 2, code_rate: 0.6667, esn0_db: 5.9, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "DSSS-QPSK", fec: "3/4", bits_per_symbol: 2, code_rate: 0.75, esn0_db: 6.95, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "DSSS-QPSK", fec: "5/6", bits_per_symbol: 2, code_rate: 0.8333, esn0_db: 8.06, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "DSSS-QPSK", fec: "7/8", bits_per_symbol: 2, code_rate: 0.875, esn0_db: 8.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "as BPSK", verify: true}
+    - {mod: "pi/4-QPSK", fec: "none", bits_per_symbol: 2, code_rate: 1.0, esn0_db: 12.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "pi/4-QPSK", fec: "1/2", bits_per_symbol: 2, code_rate: 0.5, esn0_db: 4.16, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "pi/4-QPSK", fec: "2/3", bits_per_symbol: 2, code_rate: 0.6667, esn0_db: 5.9, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "pi/4-QPSK", fec: "3/4", bits_per_symbol: 2, code_rate: 0.75, esn0_db: 6.95, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "pi/4-QPSK", fec: "5/6", bits_per_symbol: 2, code_rate: 0.8333, esn0_db: 8.06, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "pi/4-QPSK", fec: "7/8", bits_per_symbol: 2, code_rate: 0.875, esn0_db: 8.56, basis: "sim BER 1e-5 (ideal coherent)", source: "DPMG AWGN Monte-Carlo simulation, 2026-10-18", note: "coherent detection assumed (= QPSK); differential detection costs ~2-3 dB more", verify: true}
+    - {mod: "CSS/LoRa", fec: "none", bits_per_symbol: 1, code_rate: 1.0, esn0_db: null, basis: "not characterised", source: "", note: "spreading-factor dependent; no DPMG measurement yet", verify: true}
+
+link_budget:
+  note: "notional far-end transmitters for planning only (not real systems). Edit freely; the workbook columns follow this list."
+  notional_systems:
+    - {name: "Handheld radio, 5 W, whip", freq_mhz: 1350, eirp_dbw: 5.0, range_km: 150, pol_loss_db: 3, pointing_loss_db: 2, other_loss_db: 3, t_ant_k: 290, rx_atten_db: 0, symbol_rate_hz: 50000, noise_bw_hz: 67500, mod: "QPSK", fec: "1/2", impl_loss_db: 2}
+    - {name: "Vehicle terminal, 20 W, 3 dBi", freq_mhz: 2200, eirp_dbw: 16.0, range_km: 250, pol_loss_db: 1, pointing_loss_db: 1, other_loss_db: 3, t_ant_k: 290, rx_atten_db: 0, symbol_rate_hz: 500000, noise_bw_hz: 675000, mod: "8PSK", fec: "2/3", impl_loss_db: 2}
+    - {name: "Ground station, 50 W, 15 dBi dish", freq_mhz: 2250, eirp_dbw: 32.0, range_km: 600, pol_loss_db: 0.5, pointing_loss_db: 1, other_loss_db: 2, t_ant_k: 290, rx_atten_db: 0, symbol_rate_hz: 1000000, noise_bw_hz: 1350000, mod: "QPSK", fec: "3/4", impl_loss_db: 2}
+    - {name: "Low-rate sensor, 1 W, FSK 4800", freq_mhz: 915, eirp_dbw: 0.0, range_km: 300, pol_loss_db: 3, pointing_loss_db: 2, other_loss_db: 3, t_ant_k: 290, rx_atten_db: 0, symbol_rate_hz: 4800, noise_bw_hz: 15000, mod: "FSK (DPMG measured edge)", fec: "1/2", impl_loss_db: 1}
+    - {name: "16QAM data link, 10 W, 6 dBi", freq_mhz: 1800, eirp_dbw: 16.0, range_km: 150, pol_loss_db: 1, pointing_loss_db: 1, other_loss_db: 3, t_ant_k: 290, rx_atten_db: 0, symbol_rate_hz: 1000000, noise_bw_hz: 1350000, mod: "16QAM", fec: "3/4", impl_loss_db: 2.5}
+
+risks:
+  - "PASR0200500600B (P2 switch) has no CW rating on its datasheet, only 50 dBm pulsed (20 us, 10 % duty), and the 1189 reaches about 51.6 dBm. Get a CW rating from dBWave before CW keying at high power. Heat sink and air flow are mandatory."
+  - "P2 EIRP uses the G40 output measured on the bench (about +20 dBm full scale) because the datasheet +5 dBm reads about 15 dB low; behind the 20 dB pad the HPA still saturates near 0 dB TX attenuation."
+  - "HPA PSAT typ 125 W (1189, 1211) exceeds the PE71S2041 switch CW rating 100 W. 1208 typ 100 W is at the limit. Back off drive or cap output at <=100 W."
+  - "Switch hot-switching limit is 30 W CW: disable the HPA (1189/1208 pin 5 HIGH; 1211 pin 6 LOW) before changing T/R; HPA disable time is 1-5 us, switch time 6-10 us."
+  - "HPA defaults are ENABLED when control pins float (1189/1208 pull-low on an active-high shutdown; 1211 pull-high on an active-low enable). Opposite polarities between models."
+  - "Switch spec starts at 800 MHz and N-H antenna at 700 MHz; HPAs start at 500 MHz."
+  - "Antenna: plain OmniLOG PRO N is rated 1 W; only the N-H (H series) is rated 100 W."
+  - "Bench only: the power sensor on the coupler coupled port sees ~+20.7 dBm at 125 W (limit +23 dBm safe, +26 dBm damage): add a pad. The coupler and meter are characterization equipment, removed before flight."
+  - "Bench only: the coupler input rating is 250 W CW (600-2700 MHz) at 25 C with an output load VSWR <= 2.0:1. During characterization a load mismatch above 2:1 is outside that rating; reflected power goes back into the HPA (load-VSWR tolerance 3:1 continuous)."
+  - "ZKL-33ULN-S+ (P1 LNA) survives only -10 dBm at 400 MHz rising to 0 dBm at ~1.5 GHz and +10 dBm at 3 GHz; very low at UHF. In P1 the RX attenuator sits after the LNA, so in TX the LNA is protected only by the switch isolation (no limiter). The minimum safe RX attenuation protects the G40, not the LNA."
+  - "1211 max input is +3 dBm: the G40 at 0 dB TX attenuation (+5 dBm typ) with a full-scale CW waveform overdrives it; keep >= 2-3 dB TX attenuation or add a pad."
+  - "G40 TX output vs frequency and RX noise figure vs frequency are not published (single typical numbers used, VERIFY); measure both on the bench."
+  - "Cable losses are estimates (one 12-in .141 assembly per segment); measure the harness."

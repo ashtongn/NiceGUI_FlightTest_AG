@@ -1,0 +1,5 @@
+# Full set (what the Docker images install). Split so a Windows ground station
+# can `pip install -r requirements-gui.txt` without the POSIX-only packages:
+#   requirements-gui.txt    GUI deps (nicegui, numpy, scipy, pyyaml)
+#   requirements-radio.txt  GUI set + posix_ipc (radio service / GPU bus)
+-r requirements-radio.txt

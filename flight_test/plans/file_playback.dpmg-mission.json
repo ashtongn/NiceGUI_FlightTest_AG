@@ -1,0 +1,204 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: example files through the planner build",
+ "notes": "The example files from files/ copied to the radio as data/waveforms/flight/. The radio starts at 7.68 MS/s for B, C, E, F and A; B, C and E (2.4 and 5 MS/s) are not G40 rates, so Choose IQ file resamples them to 7.68 MS/s. F has no rate marker and plays at the radio's rate unless it gets a .rate sidecar. A is a spec the radio builds at its own rate. Then a Set sample rate step takes the radio to 1.92 MS/s (about 50 s) for D, which plays at its own rate.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 7680000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "file_b",
+   "radio": "G40-AX3G",
+   "technique": "iq_playback",
+   "radiates": true,
+   "params": {
+    "source": "file",
+    "path": "data/waveforms/flight/fsk_pair_2m4.cdif",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 20.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "file_c",
+   "radio": "G40-AX3G",
+   "technique": "iq_playback",
+   "radiates": true,
+   "params": {
+    "source": "file",
+    "path": "data/waveforms/flight/qpsk_msg_5m.c64",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 30.0,
+    "stop_s": 45.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "file_e",
+   "radio": "G40-AX3G",
+   "technique": "iq_playback",
+   "radiates": true,
+   "params": {
+    "source": "file",
+    "path": "data/waveforms/flight/fsk_pair_2400k.iq.bin",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 55.0,
+    "stop_s": 70.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "file_f",
+   "radio": "G40-AX3G",
+   "technique": "iq_playback",
+   "radiates": true,
+   "params": {
+    "source": "file",
+    "path": "data/waveforms/flight/fsk_pair_nomark.iq.bin",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 80.0,
+    "stop_s": 95.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "file_a",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "fsk_pair_2m4",
+     "description": "Two FSK signals with messages, authored at 2.4 MS/s, a rate the G40 does not run",
+     "sample_rate_hz": 2400000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.25,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "name": "FSK low",
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "tone_spacing_hz": 5000,
+       "offset_hz": -300000,
+       "amplitude": 0.8,
+       "message": "FILE A LOW"
+      },
+      {
+       "name": "FSK high",
+       "modulation": "FSK",
+       "symbol_rate": 9600,
+       "tone_spacing_hz": 10000,
+       "offset_hz": 400000,
+       "amplitude": 0.8,
+       "message": "FILE A HIGH"
+      }
+     ]
+    },
+    "spec_name": "fsk_pair_2m4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 105.0,
+    "stop_s": 120.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "file_rate_d",
+   "radio": "G40-AX3G",
+   "technique": "set_rate",
+   "radiates": false,
+   "params": {
+    "sample_rate": 1920000
+   },
+   "schedule": {
+    "start_s": 130.0,
+    "stop_s": 132.0
+   }
+  },
+  {
+   "id": "file_d",
+   "radio": "G40-AX3G",
+   "technique": "iq_playback",
+   "radiates": true,
+   "params": {
+    "source": "file",
+    "path": "data/waveforms/flight/bpsk_msg_1m92.iq.bin",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 190.0,
+    "stop_s": 205.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

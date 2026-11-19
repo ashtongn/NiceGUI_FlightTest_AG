@@ -1,0 +1,1080 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Pair G40, payload transmits: G40-AX3G keys, G40-AX35 decodes",
+ "notes": "G40-AX3G keys 12 comm waveforms in turn on TRx2B through the HPA at TX attenuation 30 dB, 13 s each, and G40-AX35 decodes each on TRx1A. The payload does not receive in this plan. Starts on Run mission: the first minute sets each radio to its jack, the first waveform keys at 01:08, the last ends at 05:23.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-18"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "G40-AX35",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.22:47810"
+  }
+ ],
+ "steps": [
+  {
+   "id": "dl_rx01",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "COMM FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 82.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "COMM FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "dl1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 68.0,
+    "stop_s": 81.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx02",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "COMM 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 87.0,
+    "stop_s": 104.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "COMM 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "dl2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 90.0,
+    "stop_s": 103.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx03",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "COMM BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 109.0,
+    "stop_s": 126.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "COMM BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 112.0,
+    "stop_s": 125.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx04",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 131.0,
+    "stop_s": 148.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 134.0,
+    "stop_s": 147.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx05",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "COMM OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 153.0,
+    "stop_s": 170.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "COMM OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 156.0,
+    "stop_s": 169.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx06",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "COMM 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 175.0,
+    "stop_s": 192.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "COMM 8PSK"
+      }
+     ]
+    },
+    "spec_name": "dl6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 178.0,
+    "stop_s": 191.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx07",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "COMM 16QAM"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 197.0,
+    "stop_s": 214.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "COMM 16QAM"
+      }
+     ]
+    },
+    "spec_name": "dl7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 200.0,
+    "stop_s": 213.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx08",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 219.0,
+    "stop_s": 236.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx08",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "COMM QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 222.0,
+    "stop_s": 235.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx09",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "COMM FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 241.0,
+    "stop_s": 258.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx09",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "COMM FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "dl9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 244.0,
+    "stop_s": 257.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx10",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl10",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl10",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 263.0,
+    "stop_s": 280.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx10",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl10",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "DSSS",
+       "carrier": "bpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 1,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS BPSK"
+      }
+     ]
+    },
+    "spec_name": "dl10",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 266.0,
+    "stop_s": 279.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx11",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl11",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl11",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 285.0,
+    "stop_s": 302.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx11",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl11",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK-DSSS",
+       "carrier": "qpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 2,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": 450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS QPSK"
+      }
+     ]
+    },
+    "spec_name": "dl11",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 288.0,
+    "stop_s": 301.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "dl_rx12",
+   "radio": "G40-AX35",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "dl12",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl12",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 307.0,
+    "stop_s": 324.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "dl_tx12",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "dl12",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK-DSSS",
+       "carrier": "oqpsk",
+       "chip_rate_hz": 300000.0,
+       "code_spec": {
+        "family": "lfsr",
+        "poly": [
+         4,
+         1
+        ],
+        "state": 4,
+        "form": "fibonacci",
+        "length": 15
+       },
+       "samples_per_chip": 2,
+       "offset_hz": -450000.0,
+       "amplitude": 0.9,
+       "message": "DSSS OQPSK"
+      }
+     ]
+    },
+    "spec_name": "dl12",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 310.0,
+    "stop_s": 323.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

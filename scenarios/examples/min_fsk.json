@@ -1,0 +1,9 @@
+{
+  "name": "min_fsk",
+  "sample_rate_hz": 1920000,
+  "center_freq_hz": 915000000,
+  "signals": [
+    {"modulation": "FSK", "symbol_rate": 4800, "tone_spacing_hz": 5000,
+     "offset_hz": 100000, "message": "HELLO"}
+  ]
+}

@@ -1,0 +1,11 @@
+{"type": "FeatureCollection", "features": [
+ {"type": "Feature", "properties": {"name": "Route 1"}, "geometry": {"type": "LineString", "coordinates": [[-111.0, 32.0], [-110.9, 32.1], [-110.8, 32.2]]}},
+ {"type": "Feature", "properties": {"Name": "Short"}, "geometry": {"type": "MultiLineString", "coordinates": [[[-110.0, 33.0], [-109.99, 33.01]]]}},
+ {"type": "Feature", "properties": {"title": "Area A"}, "geometry": {"type": "Polygon", "coordinates": [[[-110.95, 32.30], [-110.90, 32.30], [-110.90, 32.34], [-110.95, 32.30]], [[-110.93, 32.31], [-110.92, 32.31], [-110.92, 32.32], [-110.93, 32.31]]]}},
+ {"type": "Feature", "properties": {"name": "Two boxes"}, "geometry": {"type": "MultiPolygon", "coordinates": [[[[-112.0, 33.0], [-111.9, 33.0], [-111.9, 33.1], [-112.0, 33.0]]], [[[-112.5, 33.5], [-112.4, 33.5], [-112.4, 33.6], [-112.5, 33.5]]]]}},
+ {"type": "Feature", "properties": {"name": "Site 1", "radius_m": 800}, "geometry": {"type": "Point", "coordinates": [-110.97, 32.22]}},
+ {"type": "Feature", "properties": {"label": "Site 2", "radius_km": 1.5}, "geometry": {"type": "Point", "coordinates": [-110.87, 32.12, 500]}},
+ {"type": "Feature", "properties": {}, "geometry": {"type": "MultiPoint", "coordinates": [[-110.5, 32.5], [-110.4, 32.4]]}},
+ {"type": "Feature", "properties": {"name": "bad"}, "geometry": {"type": "Point", "coordinates": [999, 0]}},
+ {"type": "Feature", "properties": {}, "geometry": {"type": "GeometryCollection", "geometries": [{"type": "LineString", "coordinates": [[-113.0, 34.0], [-113.1, 34.1]]}]}}
+]}

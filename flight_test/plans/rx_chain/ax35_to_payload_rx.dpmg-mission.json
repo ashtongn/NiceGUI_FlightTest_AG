@@ -1,0 +1,771 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Ground to payload RX chain: G40-AX35 keys, G40-AX3G decodes",
+ "notes": "Cable G40-AX35 TRx1B to the payload antenna port (T/R switch J0). G40-AX35 keys 9 comm waveforms in turn at TX attenuation 30 dB, 13 s each. G40-AX3G decodes each on TRx1A through the payload RX chain: switch, RX attenuator at 60 dB, LNA, splitter. Times count from Run mission; the first waveform starts at 00:01:05. The last one ends at 00:04:18. Estimated level: -20 dBm at J0, -87 dBm at the LNA, -64 dBm at G40-AX3G. Nothing keys on the payload in this plan. The payload must not key while G40-AX35 is on the antenna port: the HPA output would go into G40-AX35. Keep G40-AX35 at 10 dB TX attenuation or more on this cable.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "cabled: ground G40 TX jack to the payload antenna port, no antenna, the payload does not key"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-18"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "G40-AX35",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.22:47810"
+  }
+ ],
+ "steps": [
+  {
+   "id": "rxc_rx01",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "rxc1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 65.0,
+    "stop_s": 82.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx01",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc1",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -400000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "rxc1",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 68.0,
+    "stop_s": 81.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx02",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "rxc2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 87.0,
+    "stop_s": 104.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx02",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc2",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "4FSK",
+       "symbol_rate": 4800,
+       "offset_hz": -300000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 4FSK",
+       "tone_spacing_hz": 5000
+      }
+     ]
+    },
+    "spec_name": "rxc2",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 90.0,
+    "stop_s": 103.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx03",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN BPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 109.0,
+    "stop_s": 126.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx03",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc3",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "BPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -200000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN BPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc3",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 112.0,
+    "stop_s": 125.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx04",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN QPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 131.0,
+    "stop_s": 148.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx04",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc4",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN QPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc4",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 134.0,
+    "stop_s": 147.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx05",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN OQPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 153.0,
+    "stop_s": 170.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx05",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc5",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "OQPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 500000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN OQPSK"
+      }
+     ]
+    },
+    "spec_name": "rxc5",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 156.0,
+    "stop_s": 169.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx06",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 8PSK"
+      }
+     ]
+    },
+    "spec_name": "rxc6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 175.0,
+    "stop_s": 192.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx06",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc6",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "8PSK",
+       "symbol_rate": 9600,
+       "offset_hz": 100000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 8PSK"
+      }
+     ]
+    },
+    "spec_name": "rxc6",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 178.0,
+    "stop_s": 191.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx07",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 16QAM"
+      }
+     ]
+    },
+    "spec_name": "rxc7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 197.0,
+    "stop_s": 214.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx07",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc7",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "16QAM",
+       "symbol_rate": 9600,
+       "offset_hz": 200000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN 16QAM"
+      }
+     ]
+    },
+    "spec_name": "rxc7",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 200.0,
+    "stop_s": 213.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx08",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "rxc8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 219.0,
+    "stop_s": 236.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx08",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc8",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": 300000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN QPSK CONV 1/2",
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "rxc8",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 222.0,
+    "stop_s": 235.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  },
+  {
+   "id": "rxc_rx09",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "rxc9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "rxc9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 60.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 241.0,
+    "stop_s": 258.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "rxc_tx09",
+   "radio": "G40-AX35",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "rxc9",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "FSK",
+       "symbol_rate": 4800,
+       "offset_hz": 400000,
+       "amplitude": 0.9,
+       "message": "RX CHAIN FSK CONV 1/2",
+       "tone_spacing_hz": 5000,
+       "fec": {
+        "type": "conv",
+        "rate": "1/2"
+       }
+      }
+     ]
+    },
+    "spec_name": "rxc9",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 244.0,
+    "stop_s": 257.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx1B"
+   }
+  }
+ ]
+}

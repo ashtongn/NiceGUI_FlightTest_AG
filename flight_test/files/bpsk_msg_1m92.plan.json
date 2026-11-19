@@ -1,0 +1,35 @@
+{
+ "schema_version": 1,
+ "description": "bpsk_msg_1m92",
+ "compose": {
+  "tx_radio": "g40",
+  "sample_rate_hz": 1920000.0,
+  "center_freq_hz": 1325000000.0,
+  "rf_bandwidth_hz": 1536000.0,
+  "peak_fs": 0.45
+ },
+ "entries": [
+  {
+   "name": "BPSK",
+   "modulation": "BPSK",
+   "params": {
+    "symbol_rate": 9600.0,
+    "tone_spacing_hz": 1000.0
+   },
+   "offset_hz": 250000.0,
+   "power_db": 0.0,
+   "role": "known",
+   "decode": true,
+   "frame": {
+    "sync_bits": "1011001000111011",
+    "max_sync_errors": 2,
+    "has_length": true,
+    "crc": "CRC-16-CCITT"
+   },
+   "meta": {
+    "samples_per_bit": 8,
+    "tone_center_hz": 0.0
+   }
+  }
+ ]
+}

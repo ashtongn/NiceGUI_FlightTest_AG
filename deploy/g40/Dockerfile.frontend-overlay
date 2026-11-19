@@ -1,0 +1,11 @@
+# RF front-end overlay for an offline radio: add the gpiod, hidapi and smbus2 wheels to the
+# already-built dpmg:latest image without re-running apt/pip (which need internet).
+# The main Dockerfile does the same when the image is built from scratch online.
+#
+#   mkdir -p /tmp/feov && cp deploy/wheels/*.whl /tmp/feov/ \
+#     && cp deploy/g40/Dockerfile.frontend-overlay /tmp/feov/Dockerfile \
+#     && docker build -t dpmg:latest /tmp/feov
+#   docker run --rm dpmg:latest python -c "import gpiod, hid, smbus2; print(gpiod.__version__, smbus2.__version__)"
+FROM dpmg:latest
+COPY *.whl /tmp/wheels/
+RUN pip install --no-cache-dir --no-deps /tmp/wheels/*.whl && rm -rf /tmp/wheels

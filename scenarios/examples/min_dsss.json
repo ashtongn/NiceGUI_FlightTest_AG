@@ -1,0 +1,11 @@
+{
+  "name": "min_dsss",
+  "sample_rate_hz": 1920000,
+  "loop_s": 0.25,
+  "code_set": {"kind": "gold", "n": 5, "count": 2},
+  "dsss": {"symbol_rate": 2400, "samples_per_chip": 2, "offset_hz": 300000},
+  "users": [
+    {"id": "U01", "code": 0, "message": "U01 PING"},
+    {"id": "U02", "code": 1, "message": "U02 PING"}
+  ]
+}

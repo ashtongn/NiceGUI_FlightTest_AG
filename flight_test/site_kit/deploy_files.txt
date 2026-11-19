@@ -1,0 +1,24 @@
+# Radio files pushed to the payload G40 at the site (named files, push_update.sh).
+# One path per line, relative to the repo root. A line starting with "-" is a file whose code
+# differs from the payload's 5 November code but is left out on purpose; make_site_bundle.sh
+# flags any other code difference so a new one is seen before the flight.
+#
+# The set is what the bench G40 got on 8 November for the clock work (the service, the clock
+# module, the backend, the bridge, the container script), plus port_map.py, which the service
+# at 19872bf imports new functions from (unknown_jack, jacks_of, kind_text), and the native
+# receive drain library, pushed so its hash is known after the deploy even though the
+# payload should already have the same build. From 8beb544 also gps_antenna.py and
+# demod_helper.py (the two merges of 9 November).
+dpmg/radio/dpmg_service.py      # clock choices, clock meter, log time columns, port_jacks in caps
+dpmg/radio/g40_clock.py         # HMC7044 input, PCC.00, clock verdicts
+dpmg/radio/sdr_core.py          # G40 clock sequence in EpiqBackend
+dpmg/radio/skiq_bridge.py       # 1 PPS source write, last 1 PPS timestamp read
+dpmg/radio/port_map.py          # needed by dpmg_service.py at 19872bf and later
+dpmg/radio/gps_antenna.py       # simulator only (bias_on, no_fix); dpmg_service.py at 516282f passes bias_on
+dpmg/dsp/demod_helper.py        # uplink carrier acquisition at 9600 Bd, 2aec9d2; runs in the service's decode pool
+deploy/radio/g40_up_r36.sh      # the container recreate with the /epiq and hmc_from_file mounts
+native/lib/librxdrain.so        # native receive drain, not in git; the bundle adds it (same build as 5 November)
+#
+# Left out:
+-dpmg/scenario/gen_scenario_json.py   # peak limit 1.0 (freeze item 4); never run on a radio; the bench G40 still has the 0.95 limit
+-dpmg/paths.py                        # match_folder_owner for the GUI's output files; nothing on the radio calls it

@@ -1,0 +1,7 @@
+# Developer / test-host extras. Not installed into the radio or GUI images:
+# the offline test loop runs on the x86 dev box.
+#   pip install -r requirements-dev.txt
+# About 30 test files use pytest; tests/run_all.sh runs those under pytest and the
+# rest as plain `python3 tests/<file>.py`.
+-r requirements.txt
+pytest>=8

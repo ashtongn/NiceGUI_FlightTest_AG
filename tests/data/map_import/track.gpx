@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="fixture" xmlns="http://www.topografix.com/GPX/1/1">
+  <wpt lat="32.22" lon="-110.97"><name>WP1</name></wpt>
+  <wpt lat="32.25" lon="-110.95"><name>WP2</name></wpt>
+  <rte><name>Route</name>
+    <rtept lat="32.0" lon="-111.0"/><rtept lat="32.1" lon="-110.9"/>
+  </rte>
+  <trk><name>Sortie 3</name>
+    <trkseg><trkpt lat="32.5" lon="-111.5"/><trkpt lat="32.6" lon="-111.4"/></trkseg>
+    <trkseg><trkpt lat="32.7" lon="-111.3"/><trkpt lat="32.8" lon="-111.2"/></trkseg>
+  </trk>
+</gpx>

@@ -1,0 +1,283 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: power ladder through the 1189",
+ "notes": "Barrage then spot tone at each TX attenuation of the ladder, 20 s each with 15 s clear for the FieldFox reading and the HPA case temperature. Radio at 30.72 MS/s. The service floor is 13 dB and the payload guard holds the RX attenuator at 120 dB.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 30720000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  }
+ ],
+ "steps": [
+  {
+   "id": "lad_40_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 40.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 25.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_40_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 40.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 40.0,
+    "stop_s": 60.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_30_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 75.0,
+    "stop_s": 95.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_30_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 110.0,
+    "stop_s": 130.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_25_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 25.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 145.0,
+    "stop_s": 165.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_25_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 25.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 180.0,
+    "stop_s": 200.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_20_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 20.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 215.0,
+    "stop_s": 235.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_20_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 20.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 250.0,
+    "stop_s": 270.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_15_barrage",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 15.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 285.0,
+    "stop_s": 305.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "lad_15_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 15.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 3840000.0
+   },
+   "schedule": {
+    "start_s": 320.0,
+    "stop_s": 340.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  }
+ ]
+}

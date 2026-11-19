@@ -1,0 +1,23 @@
+{
+  "format": "dpmg-mission/1",
+  "name": "Minimal location plan",
+  "authorization": {"reference": "TEST-001"},
+  "anchor": {"mode": "on_tx"},
+  "radios": [
+    {"id": "G40-SIM", "type": "g40", "techniques": ["tx", "rx"],
+     "sample_rate": 30720000}
+  ],
+  "steps": [
+    {"id": "box_noise", "radio": "G40-SIM", "technique": "jammer.noise",
+     "radiates": true,
+     "params": {"center_hz": 915000000.0, "tx_atten_db": 40, "ampl": 0.5,
+                "seconds": 0.5, "prf": 0.0, "duty": 0.5,
+                "bw": 1000000.0, "center": 0.0},
+     "location": {"start": {"polygon": [[-112.02, 33.43], [-111.98, 33.43],
+                                        [-111.98, 33.47], [-112.02, 33.47]]}},
+     "trigger": {"mode": "while_inside", "max_s": 120, "confirm": "once"},
+     "priority": 3,
+     "ports": {"rx": "none", "tx": "TRx2B"}}
+  ],
+  "map": {"flight_path": [[-112.0, 33.40], [-112.0, 33.50]]}
+}

@@ -1,0 +1,19 @@
+{
+  "format": "dpmg-mission/1",
+  "name": "Minimal tone plan",
+  "authorization": {"reference": "TEST-001", "note": "bench, into the load"},
+  "anchor": {"mode": "on_tx"},
+  "radios": [
+    {"id": "G40-SIM", "type": "g40", "techniques": ["tx", "rx"],
+     "sample_rate": 30720000, "clock_source": "internal"}
+  ],
+  "steps": [
+    {"id": "tone1", "radio": "G40-SIM", "technique": "tools.tone",
+     "radiates": true,
+     "params": {"center_hz": 915000000.0, "tx_atten_db": 40, "ampl": 0.5,
+                "seconds": 0.1, "freq": 100000.0},
+     "schedule": {"start_s": 5, "stop_s": 25},
+     "ports": {"rx": "none", "tx": "TRx2B"}}
+  ],
+  "map": {}
+}

@@ -1,0 +1,5 @@
+# Mini-Circuits programmable attenuators (RCDAT/RUDAT, USB HID, VID 20ce PID 0023):
+# let the `periph` group (the sidekiq user is a member) talk to /dev/hidrawN.
+# Install on the G40 host:  sudo cp 60-minicircuits.rules /etc/udev/rules.d/ &&
+#                           sudo udevadm control --reload && sudo udevadm trigger
+SUBSYSTEM=="hidraw", ATTRS{idVendor}=="20ce", ATTRS{idProduct}=="0023", MODE="0660", GROUP="periph"

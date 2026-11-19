@@ -1,0 +1,1 @@
+options dmadriver DMADescriptorsPerEngine=65536 RingBufferPacketCount=16384

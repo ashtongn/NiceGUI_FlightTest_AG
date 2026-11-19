@@ -1,0 +1,6 @@
+# DPMG ground-station GUI (x86 / Windows laptop). Pure-Python + wheels only:
+# installs on Linux, macOS and Windows. The radio side adds requirements-radio.txt.
+nicegui==3.13.0
+numpy==2.3.5
+scipy
+pyyaml

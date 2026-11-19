@@ -1,0 +1,26 @@
+# Dockerfile.gpu.r36: GPU channelizer container for Jetson JetPack 6 / L4T R36
+# (Orin Nano Super). JetPack-6 twin of Dockerfile.gpu (which targets the G40's
+# JetPack 5 / r35.4.1). l4t-jetpack bundles the CUDA 12.6 libraries CuPy needs.
+#
+# Build (on the Jetson, context = repo):
+#   docker build -f deploy/docker/Dockerfile.gpu.r36 -t dpmg-gpu:r36 .
+# Run:
+#   docker run -d --name dpmg-gpu --runtime nvidia --ipc=host --restart=always dpmg-gpu:r36
+FROM nvcr.io/nvidia/l4t-jetpack:r36.4.0
+
+ENV DEBIAN_FRONTEND=noninteractive
+RUN apt-get update && apt-get install -y --no-install-recommends \
+        python3-pip \
+    && rm -rf /var/lib/apt/lists/*
+
+# CuPy for CUDA 12.x. 12.3.0 keeps numpy on the 1.x line, matching the radio
+# container and the DPMG shared-memory dtypes (complex64/float32). fastrlock is
+# CuPy's runtime lock dep; posix_ipc is the channelizer shm/semaphore transport.
+RUN pip3 install --no-cache-dir --ignore-installed \
+        "numpy>=1.21,<2" "cupy-cuda12x==12.3.0" fastrlock posix_ipc
+
+WORKDIR /app
+COPY dpmg/gpu/gpu_channelizer2.py /app/gpu_channelizer2.py
+COPY dpmg/gpu/gpu_service.py /app/gpu_service.py
+
+CMD ["python3", "-u", "/app/gpu_service.py"]

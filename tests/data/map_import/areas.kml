@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2" xmlns:gx="http://www.google.com/kml/ext/2.2">
+<Document><name>fixture</name>
+<Placemark><name>Range A</name><Polygon><outerBoundaryIs><LinearRing><coordinates>
+-110.95,32.30,0 -110.90,32.30,0 -110.90,32.34,0 -110.95,32.34,0 -110.95,32.30,0
+</coordinates></LinearRing></outerBoundaryIs>
+<innerBoundaryIs><LinearRing><coordinates>-110.93,32.31,0 -110.92,32.31,0 -110.92,32.32,0 -110.93,32.31,0</coordinates></LinearRing></innerBoundaryIs>
+</Polygon></Placemark>
+<Placemark><name>Ingress</name><LineString><coordinates>-111.0,32.0,100 -110.9,32.1,100 -110.8,32.2,100</coordinates></LineString></Placemark>
+<Placemark><name>Site 1</name><Point><coordinates>-110.97,32.22,0</coordinates></Point></Placemark>
+<Placemark><name>Flight</name><gx:Track><when>2026-01-01T00:00:00Z</when><gx:coord>-111.1 32.5 300</gx:coord><gx:coord>-111.0 32.6 300</gx:coord></gx:Track></Placemark>
+<Placemark><name>Both</name><MultiGeometry><Point><coordinates>-110.5,32.5,0</coordinates></Point><Point><coordinates>999,32.5,0</coordinates></Point></MultiGeometry></Placemark>
+</Document></kml>

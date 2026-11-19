@@ -1,0 +1,272 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Flight: open air go or no-go with the X40 ground radio",
+ "notes": "Antenna on J0, X40-B00S (x40) on its own antenna and receiving on RXB1. G40-AX3G keys a tone 10 s at 40 dB, then 10 s at the flight drive (30 dB); then one comm message that X40-B00S decodes; then one barrage 10 s at the flight drive; then X40-B00S keys one comm message on TXA1 at 30 dB that G40-AX3G decodes on TRx1A (the air radio re-inits to that port first, about 50 s). Stop at the first thing that reads wrong.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "X40-B00S",
+   "type": "x40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 50000000
+  }
+ ],
+ "steps": [
+  {
+   "id": "air_01_tone_40",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 40.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 300000.0
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 15.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "air_02_tone_flight",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 300000.0
+   },
+   "schedule": {
+    "start_s": 45.0,
+    "stop_s": 55.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "air_03_rx_down",
+   "radio": "X40-B00S",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "air_down",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 450000,
+       "amplitude": 0.9,
+       "message": "AIR WIDE QPSK"
+      }
+     ]
+    },
+    "spec_name": "air_down",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": null,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 80.0,
+    "stop_s": 97.0
+   },
+   "ports": {
+    "rx": "RXB1"
+   }
+  },
+  {
+   "id": "air_03_tx_down",
+   "radio": "G40-AX3G",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "air_down",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 100000,
+       "offset_hz": 450000,
+       "amplitude": 0.9,
+       "message": "AIR WIDE QPSK"
+      }
+     ]
+    },
+    "spec_name": "air_down",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 83.0,
+    "stop_s": 96.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "air_04_barrage_flight",
+   "radio": "G40-AX3G",
+   "technique": "jammer.barrage",
+   "radiates": true,
+   "params": {
+    "kind": "barrage",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5
+   },
+   "schedule": {
+    "start_s": 125.0,
+    "stop_s": 135.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "air_05_rx_up",
+   "radio": "G40-AX3G",
+   "technique": "scenario_decode",
+   "radiates": false,
+   "params": {
+    "spec": {
+     "name": "air_up",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "AIR UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "air_up",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "rx_atten_db": 40.0,
+    "center_hz": 1325000000.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 190.0,
+    "stop_s": 207.0
+   },
+   "ports": {
+    "rx": "TRx1A"
+   }
+  },
+  {
+   "id": "air_05_tx_up",
+   "radio": "X40-B00S",
+   "technique": "scenario_json",
+   "radiates": true,
+   "params": {
+    "spec": {
+     "name": "air_up",
+     "sample_rate_hz": 1920000,
+     "center_freq_hz": 1325000000.0,
+     "loop_s": 0.2,
+     "peak_fs": 0.45,
+     "signals": [
+      {
+       "modulation": "QPSK",
+       "symbol_rate": 9600,
+       "offset_hz": -100000,
+       "amplitude": 0.9,
+       "message": "AIR UPLINK QPSK"
+      }
+     ]
+    },
+    "spec_name": "air_up",
+    "source": "console",
+    "spec_path": "",
+    "match_radio_rate": true,
+    "peak_fs": 0.45,
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null
+   },
+   "schedule": {
+    "start_s": 193.0,
+    "stop_s": 206.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  }
+ ]
+}

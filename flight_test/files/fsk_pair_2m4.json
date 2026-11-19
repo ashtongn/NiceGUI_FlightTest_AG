@@ -1,0 +1,28 @@
+{
+ "name": "fsk_pair_2m4",
+ "description": "Two FSK signals with messages, authored at 2.4 MS/s, a rate the G40 does not run",
+ "sample_rate_hz": 2400000,
+ "center_freq_hz": 1325000000.0,
+ "loop_s": 0.25,
+ "peak_fs": 0.45,
+ "signals": [
+  {
+   "name": "FSK low",
+   "modulation": "FSK",
+   "symbol_rate": 4800,
+   "tone_spacing_hz": 5000,
+   "offset_hz": -300000,
+   "amplitude": 0.8,
+   "message": "FILE A LOW"
+  },
+  {
+   "name": "FSK high",
+   "modulation": "FSK",
+   "symbol_rate": 9600,
+   "tone_spacing_hz": 10000,
+   "offset_hz": 400000,
+   "amplitude": 0.8,
+   "message": "FILE A HIGH"
+  }
+ ]
+}

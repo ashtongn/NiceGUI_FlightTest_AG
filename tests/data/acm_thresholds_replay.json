@@ -1,0 +1,2940 @@
+{
+ "test": "acm_threshold_sweep",
+ "mode": "replay",
+ "date": "2026-10-19T03:05:34",
+ "target_fer": 0.01,
+ "margin_db": 1.0,
+ "windows": 100,
+ "coarse_windows": 6,
+ "rate_hz": 1920000.0,
+ "seed": 2755,
+ "elapsed_s": 1544.3,
+ "esn0_definition": "Es/N0 per on-air channel symbol (QPSK-family plan symbol_rate is the bit rate, /2), AWGN at 1.92 MSps (replay_chain.awgn)",
+ "results": [
+  {
+   "modcod": "BPSK-conv12",
+   "modulation": "BPSK",
+   "rate": "1/2",
+   "nominal_db": 1.0,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": null,
+     "raw_bits": 0,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": null,
+     "raw_bits": 0,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.08666666666666667,
+     "raw_bits": 300,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": null,
+     "raw_bits": 0,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.06,
+     "raw_bits": 300,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": null,
+     "raw_bits": 0,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.10333333333333333,
+     "raw_bits": 300,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.07916666666666666,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.06666666666666667,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.051666666666666666,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.05,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.05722222222222222,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.04133333333333333,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.05,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.05,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.030555555555555555,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.04933333333333333,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": null,
+   "proposed_db": null,
+   "seconds": 111.3
+  },
+  {
+   "modcod": "QPSK-conv12",
+   "modulation": "QPSK",
+   "rate": "1/2",
+   "nominal_db": 3.0,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 2400.0,
+   "points": [
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.5055555555555555,
+     "raw_bits": 900,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.44266666666666665,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.29777777777777775,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.29888888888888887,
+     "raw_bits": 900,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.24055555555555555,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.2788888888888889,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.21222222222222223,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.304,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.175,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.13583333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.011111111111111112,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.044,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.012,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.12222222222222222,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.002,
+     "raw_bits": 1500,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.04,
+     "raw_bits": 1800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 100,
+     "decoded": 85,
+     "fer": 0.15000000000000002,
+     "raw_ber": 0.03527210884353742,
+     "raw_bits": 29400,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 100,
+     "decoded": 86,
+     "fer": 0.14,
+     "raw_ber": 0.021134751773049645,
+     "raw_bits": 28200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 100,
+     "decoded": 90,
+     "fer": 0.09999999999999998,
+     "raw_ber": 0.01697594501718213,
+     "raw_bits": 29100,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 100,
+     "decoded": 96,
+     "fer": 0.040000000000000036,
+     "raw_ber": 0.007380952380952381,
+     "raw_bits": 29400,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 100,
+     "decoded": 94,
+     "fer": 0.06000000000000005,
+     "raw_ber": 0.0053608247422680414,
+     "raw_bits": 29100,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.0057666666666666665,
+     "raw_bits": 30000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.0025252525252525255,
+     "raw_bits": 29700,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 100,
+     "decoded": 97,
+     "fer": 0.030000000000000027,
+     "raw_ber": 0.006233333333333333,
+     "raw_bits": 30000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.001750841750841751,
+     "raw_bits": 29700,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 100,
+     "decoded": 96,
+     "fer": 0.040000000000000036,
+     "raw_ber": 0.0065993265993266,
+     "raw_bits": 29700,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.0021212121212121214,
+     "raw_bits": 29700,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0012,
+     "raw_bits": 30000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.0021,
+     "raw_bits": 30000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.0015333333333333334,
+     "raw_bits": 30000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0009666666666666667,
+     "raw_bits": 30000,
+     "pass": "fine"
+    }
+   ],
+   "threshold_db": 32.0,
+   "proposed_db": 33.0,
+   "seconds": 386.7
+  },
+  {
+   "modcod": "QPSK-conv34",
+   "modulation": "QPSK",
+   "rate": "3/4",
+   "nominal_db": 5.0,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 2400.0,
+   "points": [
+    {
+     "esn0_db": 15.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.4241666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.4533333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3225,
+     "raw_bits": 800,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.32666666666666666,
+     "raw_bits": 600,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.278,
+     "raw_bits": 1000,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.319,
+     "raw_bits": 1000,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.30416666666666664,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.15666666666666668,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.1475,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.11833333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.12666666666666668,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.07666666666666666,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.07166666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.07333333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 100,
+     "decoded": 88,
+     "fer": 0.12,
+     "raw_ber": 0.026683673469387756,
+     "raw_bits": 19600,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 100,
+     "decoded": 97,
+     "fer": 0.030000000000000027,
+     "raw_ber": 0.00815,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.0046,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.00585,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00225,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0029,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.00355,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.002,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00135,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00185,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.004166666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0008333333333333334,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0016666666666666668,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0008333333333333334,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 26.0,
+   "proposed_db": 27.0,
+   "seconds": 218.5
+  },
+  {
+   "modcod": "8PSK-conv23",
+   "modulation": "8PSK",
+   "rate": "2/3",
+   "nominal_db": 7.0,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 10.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.43407407407407406,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 11.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.44666666666666666,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 11.5,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.31037037037037035,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 12.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.35555555555555557,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 12.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.16592592592592592,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 13.0,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.30962962962962964,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 13.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.22740740740740742,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 14.0,
+     "windows": 100,
+     "decoded": 91,
+     "fer": 0.08999999999999997,
+     "raw_ber": 0.04986666666666666,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 14.5,
+     "windows": 100,
+     "decoded": 93,
+     "fer": 0.06999999999999995,
+     "raw_ber": 0.03782222222222222,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 15.0,
+     "windows": 100,
+     "decoded": 97,
+     "fer": 0.030000000000000027,
+     "raw_ber": 0.01711111111111111,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 15.5,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.011422222222222222,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0008,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0005777777777777778,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 8.888888888888889e-05,
+     "raw_bits": 22500,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1350,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 16.0,
+   "proposed_db": 17.0,
+   "seconds": 107.7
+  },
+  {
+   "modcod": "8PSK-conv34",
+   "modulation": "8PSK",
+   "rate": "3/4",
+   "nominal_db": 8.5,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 10.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.44333333333333336,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 10.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.425,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 11.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3641666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 11.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3625,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 12.0,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.2941666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 12.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.1575,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 13.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.09333333333333334,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 13.5,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.08333333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 14.0,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.21083333333333334,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 14.5,
+     "windows": 100,
+     "decoded": 96,
+     "fer": 0.040000000000000036,
+     "raw_ber": 0.022,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 15.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.0088,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 15.5,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.00465,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0009,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00045,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 16.0,
+   "proposed_db": 17.0,
+   "seconds": 111.5
+  },
+  {
+   "modcod": "16APSK-conv34",
+   "modulation": "16APSK",
+   "rate": "3/4",
+   "nominal_db": 10.5,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 14.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.43318318318318316,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 14.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.3611111111111111,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 15.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3551051051051051,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 15.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.28903903903903905,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 6,
+     "decoded": 2,
+     "fer": 0.6666666666666667,
+     "raw_ber": 0.29204204204204204,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.1704204204204204,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.25975975975975973,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.22297297297297297,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.14864864864864866,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0037537537537537537,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 100,
+     "decoded": 97,
+     "fer": 0.030000000000000027,
+     "raw_ber": 0.01481981981981982,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.008558558558558558,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.00472972972972973,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.001036036036036036,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 21.0,
+   "proposed_db": 22.0,
+   "seconds": 156.2
+  },
+  {
+   "modcod": "16APSK-conv56",
+   "modulation": "16APSK",
+   "rate": "5/6",
+   "nominal_db": 11.5,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 14.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.3775,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 14.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.41583333333333333,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 15.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.355,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 15.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.36666666666666664,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.33916666666666667,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.14,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.1375,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.13416666666666666,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0008333333333333334,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.16916666666666666,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 100,
+     "decoded": 94,
+     "fer": 0.06000000000000005,
+     "raw_ber": 0.0229,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 100,
+     "decoded": 97,
+     "fer": 0.030000000000000027,
+     "raw_ber": 0.0132,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0003,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00015,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0001,
+     "raw_bits": 20000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1200,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 20.0,
+   "proposed_db": 21.0,
+   "seconds": 142.9
+  },
+  {
+   "modcod": "32APSK-conv34",
+   "modulation": "32APSK",
+   "rate": "3/4",
+   "nominal_db": 12.5,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 15.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.41066066066066065,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.41516516516516516,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.34459459459459457,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.4166666666666667,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.22597597597597596,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3303303303303303,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.07357357357357357,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.06231231231231231,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.13663663663663664,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.06681681681681682,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0022522522522522522,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.010045045045045045,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 100,
+     "decoded": 98,
+     "fer": 0.020000000000000018,
+     "raw_ber": 0.009864864864864865,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0007657657657657658,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.00018018018018018018,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 4.5045045045045046e-05,
+     "raw_bits": 22200,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1332,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 22.0,
+   "proposed_db": 23.0,
+   "seconds": 165.3
+  },
+  {
+   "modcod": "32APSK-conv78",
+   "modulation": "32APSK",
+   "rate": "7/8",
+   "nominal_db": 14.0,
+   "plan_symbol_rate": 4800.0,
+   "symbol_rate": 4800.0,
+   "points": [
+    {
+     "esn0_db": 16.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.3456140350877193,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 16.5,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.393859649122807,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.0,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.32894736842105265,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 17.5,
+     "windows": 6,
+     "decoded": 1,
+     "fer": 0.8333333333333334,
+     "raw_ber": 0.3473684210526316,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.0,
+     "windows": 6,
+     "decoded": 0,
+     "fer": 1.0,
+     "raw_ber": 0.4114035087719298,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 18.5,
+     "windows": 6,
+     "decoded": 4,
+     "fer": 0.33333333333333337,
+     "raw_ber": 0.14385964912280702,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.0,
+     "windows": 6,
+     "decoded": 5,
+     "fer": 0.16666666666666663,
+     "raw_ber": 0.07719298245614035,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 19.5,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.1956140350877193,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.0,
+     "windows": 6,
+     "decoded": 3,
+     "fer": 0.5,
+     "raw_ber": 0.2149122807017544,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 20.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 21.0,
+     "windows": 100,
+     "decoded": 99,
+     "fer": 0.010000000000000009,
+     "raw_ber": 0.00468421052631579,
+     "raw_bits": 19000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 21.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0005789473684210527,
+     "raw_bits": 19000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.0,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0002631578947368421,
+     "raw_bits": 19000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 22.5,
+     "windows": 100,
+     "decoded": 100,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 19000,
+     "pass": "fine"
+    },
+    {
+     "esn0_db": 23.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 23.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0008771929824561404,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 24.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 25.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 26.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 27.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 28.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 29.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 30.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 31.5,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    },
+    {
+     "esn0_db": 32.0,
+     "windows": 6,
+     "decoded": 6,
+     "fer": 0.0,
+     "raw_ber": 0.0,
+     "raw_bits": 1140,
+     "pass": "coarse"
+    }
+   ],
+   "threshold_db": 21.5,
+   "proposed_db": 22.5,
+   "seconds": 144.1
+  }
+ ]
+}

@@ -1,0 +1,9 @@
+# DPMG console on a Windows x86 laptop, native Python (no Docker): the GUI
+# (run_gui_link.py), with the operator, engineering and mission views in one
+# process. Wheels only, so plain pip installs it.
+# start_console.bat installs this file into .venv.
+#
+# The radio side (posix_ipc, libsidekiq, UHD) stays on the Linux hosts and is
+# never installed here. websocket-client is only for the Linux click-test
+# harness and is not needed on the console.
+-r requirements-gui.txt

@@ -1,0 +1,90 @@
+{
+ "format": "dpmg-mission/1",
+ "name": "Bench X40 and G40: tone each way, no HPA",
+ "notes": "Two tones each way through the pads: G40-AX3G keys a tone on TRx2B for 10 s and X40-B00S shows it, then X40-B00S keys a tone on TXA1 and G40-AX3G shows it. Both radios on the GPSDO. Levels recorded, not graded.",
+ "authorization": {
+  "reference": "FLIGHT-2026-11",
+  "note": "bench: HPA output on the coupler and load, no antenna, unless the card says otherwise"
+ },
+ "anchor": {
+  "mode": "on_tx",
+  "date": "2026-11-17"
+ },
+ "radios": [
+  {
+   "id": "G40-AX3G",
+   "type": "g40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 1920000,
+   "address": "192.168.0.23:47810",
+   "clock_source": "external"
+  },
+  {
+   "id": "X40-B00S",
+   "type": "x40",
+   "techniques": [
+    "tx",
+    "rx"
+   ],
+   "sample_rate": 50000000,
+   "address": "192.168.0.26:47810"
+  }
+ ],
+ "steps": [
+  {
+   "id": "b_air_tone",
+   "radio": "G40-AX3G",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 1000000.0
+   },
+   "schedule": {
+    "start_s": 5.0,
+    "stop_s": 15.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TRx2B"
+   }
+  },
+  {
+   "id": "b_ground_tone",
+   "radio": "X40-B00S",
+   "technique": "jammer.tone",
+   "radiates": true,
+   "params": {
+    "kind": "tone",
+    "center_hz": 1325000000.0,
+    "tx_center_hz": null,
+    "tx_atten_db": 30.0,
+    "rx_gain_index": null,
+    "ampl": 0.5,
+    "seconds": 0.05,
+    "prf": 0.0,
+    "duty": 0.5,
+    "freq": 1000000.0
+   },
+   "schedule": {
+    "start_s": 30.0,
+    "stop_s": 40.0
+   },
+   "ports": {
+    "rx": "none",
+    "tx": "TXA1"
+   }
+  }
+ ]
+}
