@@ -777,7 +777,7 @@ def _build_psd_chart():
             # wider left gutter so the floating y-zoom buttons, the axis name
             # and the tick labels each sit in their own lane and stop covering
             # each other.
-            "grid": {"left": 100, "right": 20, "top": 34, "bottom": 60},
+            "grid": {"left": 100, "right": 20, "top": 34, "bottom": 74},
             # LineX brush selects a frequency span; brushEnd: the
             # carve panel reads the selected [f_lo, f_hi] and offers to save it.
             "toolbox": {"right": 10, "top": 0,
@@ -788,12 +788,20 @@ def _build_psd_chart():
                       "throttleType": "debounce", "throttleDelay": 200,
                       "brushStyle": {"color": "rgba(70,130,255,0.18)"}},
             "xAxis": {"type": "value", "name": "Frequency (Hz)",
-                      "scale": True, "nameLocation": "middle", "nameGap": 32},
+                      "scale": True, "nameLocation": "middle", "nameGap": 30},
             "yAxis": {"type": "value", "name": "PSD (dB/Hz)",
                       "scale": True, "nameLocation": "middle", "nameGap": 56},
             "dataZoom": [
                 {"type": "inside", "xAxisIndex": 0, "filterMode": "none"},
-                {"type": "slider", "xAxisIndex": 0, "height": 16, "bottom": 6},
+                {"type": "slider", "xAxisIndex": 0, "height": 10, "bottom": 4,
+                 "showDetail": False, "borderColor": "#2c322c",
+                 "backgroundColor": "#141714", "fillerColor": "rgba(208,166,68,0.18)",
+                 "handleSize": "140%", "moveHandleSize": 4,
+                 "handleStyle": {"color": "#8a8f7a", "borderColor": "#8a8f7a"},
+                 "dataBackground": {"lineStyle": {"opacity": 0},
+                                    "areaStyle": {"opacity": 0}},
+                 "selectedDataBackground": {"lineStyle": {"opacity": 0},
+                                            "areaStyle": {"opacity": 0}}},
             ],
             "series": [
                 {"type": "line", "showSymbol": False, "lineStyle": {"width": 1},
@@ -2097,7 +2105,7 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
         with ui.row().classes("items-center gap-2"):
             jbuild = ui.button("Build + load").props("color=primary")
             jtx = ui.button("TRANSMIT").props("color=negative")
-            jstop = ui.button("STOP").props("color=grey")
+            jstop = ui.button("STOP").props("color=grey-8 outline")
 
         _pmap = {"barrage": [], "noise": [p_bw, p_freq], "tone": [p_freq],
                  "comb": [p_spacing, p_ntones, p_freq],
@@ -2222,7 +2230,25 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
         # have seen TX active so a slow first heartbeat does not clear it early.
         _seen_tx = {"on": False}
 
+        _btn_on = {"v": None}
+
+        def _paint_btns():
+            host = get_host()
+            st = getattr(host, "status", None) if host is not None else None
+            on = bool(st is not None and st.flags & proto.Status.FLAG_TX_ACTIVE)
+            if on == _btn_on["v"]:
+                return
+            _btn_on["v"] = on
+            if on:        # transmitting: TRANSMIT muted + disabled, STOP is the action
+                jtx.props("color=grey-8 outline disable")
+                jstop.props(remove="outline disable").props("color=negative")
+            else:         # idle: TRANSMIT is the action, STOP is muted
+                jtx.props(remove="outline disable").props("color=negative")
+                jstop.props("color=grey-8 outline")
+            jtx.update(); jstop.update()
+
         def _watch_tx():
+            _paint_btns()
             if not jstat.text.startswith("JAMMING:"):
                 _seen_tx["on"] = False
                 return
@@ -2235,7 +2261,7 @@ def build_jammer_panel(get_host, title="Jammer: resiliency test signals",
             elif _seen_tx["on"]:
                 jstat.set_text("jam stopped (TX off)")
                 _seen_tx["on"] = False
-        ui.timer(1.0, _watch_tx)
+        ui.timer(0.5, _watch_tx)
 
 
 def _fmt_bytes(b):
