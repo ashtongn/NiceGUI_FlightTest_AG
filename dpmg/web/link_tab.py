@@ -3811,7 +3811,6 @@ def build_operator_sdr():
             sensor_lbl = ui.label("").classes("font-mono text-xs text-gray-600")
             sensor_lbl.set_visibility(False)
 
-        ctl_card.move(left_col)
 
         # Widgets that follow the radio (keys = view_sync.op_fields)
         vguard = _vs.EditGuard()
@@ -4417,6 +4416,7 @@ def build_operator_sdr():
             # with empty areas: reset the readout so it doesn't linger
             psd_chart.on("chart:brush", _on_sel)
         spec_card.move(left_col)
+        ctl_card.move(left_col)
 
         # frozen header row for the scrollable tables (inline + "view all")
         ui.add_css("""
