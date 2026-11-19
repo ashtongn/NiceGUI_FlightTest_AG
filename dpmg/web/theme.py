@@ -6,13 +6,13 @@ apply_theme() first in every @ui.page builder.
 """
 from nicegui import ui
 
-BG = "#0e1013"        # page
-SURFACE = "#15181d"   # cards / panels
-RAISED = "#1b1f26"    # headers, inputs, table heads
-BORDER = "#2a2f38"
+BG = "#0d0f0d"        # page
+SURFACE = "#141714"   # cards / panels
+RAISED = "#1a1e1a"    # headers, inputs, table heads
+BORDER = "#2c322c"
 TEXT = "#d7dbe2"
-MUTED = "#8b93a1"
-ACCENT = "#5b9bd5"
+MUTED = "#8d968b"
+ACCENT = "#d0a644"
 
 THEME_CSS = f"""
 :root {{ --bg:{BG}; --surface:{SURFACE}; --raised:{RAISED}; --border:{BORDER};
@@ -33,7 +33,7 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .q-tab-panels, .q-tab-panel {{ background:var(--surface) !important; color:var(--text) !important; }}
 .q-card {{ border:1px solid var(--border); box-shadow:none !important; }}
 .q-tab-panel {{ padding:12px; }}
-.q-header {{ background:var(--raised) !important; border-bottom:1px solid var(--border);
+.q-header {{ background:var(--raised) !important; border-bottom:1px solid var(--border); border-top:2px solid #6b7a3a; font-family:'JetBrains Mono','SF Mono',Menlo,monospace;
   box-shadow:none !important; text-transform:uppercase; letter-spacing:.08em; }}
 .q-header .text-lg {{ font-size:13px; font-weight:600; }}
 .q-header a {{ color:var(--muted) !important; text-decoration:none; font-size:11px; }}
@@ -48,7 +48,7 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 
 /* buttons & fields */
 .q-btn {{ text-transform:uppercase; letter-spacing:.06em; font-size:11px; font-weight:600; box-shadow:none !important; }}
-.q-btn.bg-primary, .q-btn--standard.bg-primary {{ background:var(--accent) !important; color:#0b0d10 !important; }}
+.q-btn.bg-primary, .q-btn--standard.bg-primary {{ background:var(--accent) !important; color:#0b0d0b !important; }}
 .q-btn--flat, .q-btn--outline {{ color:var(--accent); }}
 .q-field--outlined .q-field__control:before {{ border-color:var(--border); }}
 .q-field--outlined .q-field__control {{ background:var(--raised); }}
@@ -60,8 +60,8 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .q-table thead tr th, .sticky-head thead tr th {{ background:var(--raised) !important; color:var(--muted);
   text-transform:uppercase; letter-spacing:.06em; font-size:10.5px; border-color:var(--border) !important; }}
 .q-table td {{ border-color:var(--border) !important; }}
-.q-table tbody tr:hover td {{ background:#1f242c; }}
-.q-table tbody tr.selected td {{ background:#1d3350 !important; }}
+.q-table tbody tr:hover td {{ background:#1f241f; }}
+.q-table tbody tr.selected td {{ background:#33300f !important; }}
 
 /* remap light tailwind utilities used in the app onto the dark palette */
 .bg-white, .bg-gray-50, .bg-gray-100, .bg-slate-50, .bg-slate-100, .bg-grey-1, .bg-grey-2 {{ background:var(--surface) !important; }}
@@ -70,7 +70,7 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .bg-amber-100, .bg-yellow-100, .bg-orange-100 {{ background:#3a2f12 !important; }}
 .bg-red-100, .bg-red-50 {{ background:#3a1719 !important; }}
 .bg-green-100, .bg-green-50, .bg-emerald-100 {{ background:#12301e !important; }}
-.bg-blue-100, .bg-blue-50, .bg-sky-100 {{ background:#14263b !important; }}
+.bg-blue-100, .bg-blue-50, .bg-sky-100 {{ background:#262a14 !important; }}
 .text-black, .text-gray-900, .text-gray-800, .text-gray-700, .text-slate-800, .text-slate-700,
 .text-grey-9, .text-grey-8 {{ color:var(--text) !important; }}
 .text-gray-600, .text-gray-500, .text-gray-400, .text-slate-600, .text-slate-500, .text-grey-7, .text-grey-6 {{ color:var(--muted) !important; }}
@@ -80,19 +80,40 @@ body, .q-field, .q-btn, .q-tab {{ font-family:'Inter','SF Pro Text','Helvetica N
 .text-blue-900, .text-blue-800, .text-blue-700, .text-blue-600 {{ color:var(--accent) !important; }}
 .border-gray-200, .border-gray-300, .border-slate-200, .border-slate-300 {{ border-color:var(--border) !important; }}
 
-.q-chip.bg-grey-3, .q-chip.bg-green-1, .q-chip.bg-grey-2, .q-chip.bg-grey-4 {{ background:var(--raised) !important; color:var(--text) !important; border:1px solid var(--border); }}
+.q-chip.bg-grey-3, .q-chip[class*=bg-], .q-chip.bg-green-1, .q-chip.bg-grey-2, .q-chip.bg-grey-4 {{ background:var(--raised) !important; color:var(--text) !important; border:1px solid var(--border); }}
 .q-chip.bg-green-1 {{ color:#6fd08c !important; }}
+
+/* tactical touches: corner-tick frames on cards, status footer */
+.q-card {{ position:relative; }}
+.q-card::after {{ content:''; position:absolute; inset:-1px; pointer-events:none; z-index:1; background-image:
+  linear-gradient(var(--accent),var(--accent)), linear-gradient(var(--accent),var(--accent)),
+  linear-gradient(var(--accent),var(--accent)), linear-gradient(var(--accent),var(--accent)),
+  linear-gradient(var(--accent),var(--accent)), linear-gradient(var(--accent),var(--accent)),
+  linear-gradient(var(--accent),var(--accent)), linear-gradient(var(--accent),var(--accent));
+  background-repeat:no-repeat;
+  background-size:8px 1px,1px 8px,8px 1px,1px 8px,8px 1px,1px 8px,8px 1px,1px 8px;
+  background-position:left top,left top,right top,right top,left bottom,left bottom,right bottom,right bottom; }}
+.q-card .q-card::after {{ display:none; }}
+.q-card .text-lg, .q-card .text-base, .q-card .text-h6, .q-card .text-h5 {{ text-transform:uppercase; letter-spacing:.08em;
+  font-size:12px !important; font-weight:600; }}
+.tac-strip {{ position:fixed; left:0; right:0; bottom:0; height:20px; z-index:3000; display:flex; align-items:center;
+  justify-content:space-between; padding:0 12px; background:#0a0c0a; border-top:1px solid var(--border);
+  font:10px 'JetBrains Mono','SF Mono',Menlo,monospace; letter-spacing:.14em; color:var(--muted); }}
+.tac-strip b {{ color:#7fa650; font-weight:600; }}
+body {{ padding-bottom:20px; }}
 
 /* scrollbars */
 ::-webkit-scrollbar {{ width:10px; height:10px; }}
 ::-webkit-scrollbar-track {{ background:var(--bg); }}
-::-webkit-scrollbar-thumb {{ background:#2f3540; border:2px solid var(--bg); }}
+::-webkit-scrollbar-thumb {{ background:#303730; border:2px solid var(--bg); }}
 """
 
 
 def apply_theme() -> None:
     ui.dark_mode(True)
-    ui.colors(primary=ACCENT, secondary="#6b7686", accent=ACCENT,
-              positive="#3fb868", negative="#e5484d", warning="#e0a030",
+    ui.colors(primary=ACCENT, secondary="#6f786b", accent=ACCENT,
+              positive="#7fa650", negative="#e5484d", warning="#e0a030",
               info=ACCENT, dark=RAISED)
     ui.add_head_html(f"<style>{THEME_CSS}</style>")
+    ui.add_body_html('<div class="tac-strip"><span>DPMG // GROUND STATION</span>'
+                     '<span><b>&#9679;</b> SYSTEM NOMINAL</span><span>UNCLASSIFIED</span></div>')
