@@ -97,7 +97,7 @@ def new_mission(name="untitled mission") -> dict:
     return {"format": FORMAT, "name": name, "notes": "",
             "authorization": {"reference": "", "note": ""},
             "anchor": {"mode": "on_tx", "date": "", "tz": "UTC"},
-            "radios": [], "steps": [], "map": {}}
+            "radios": [], "steps": [], "staged": [], "map": {}}
 
 
 # anchor and clock-time helpers
@@ -375,6 +375,7 @@ def loads(data) -> dict:
     data.setdefault("anchor", {"mode": "on_tx", "date": "", "tz": "UTC"})
     data.setdefault("radios", [])
     data.setdefault("steps", [])
+    data.setdefault("staged", [])
     data.setdefault("map", {})
     if not isinstance(data["map"], dict):
         raise MissionError("map must be an object")
@@ -382,6 +383,8 @@ def loads(data) -> dict:
         raise MissionError("radios must be a list")
     if not isinstance(data["steps"], list):
         raise MissionError("steps must be a list")
+    if not isinstance(data["staged"], list):
+        raise MissionError("staged must be a list")
     for st in data["steps"]:
         if isinstance(st, dict):
             migrate_step(st)
